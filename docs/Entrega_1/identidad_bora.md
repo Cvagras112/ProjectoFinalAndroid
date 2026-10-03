@@ -1,6 +1,6 @@
 # BORA
 
-## 1. Identidad
+## Identidad de BORA
 
 ### Nombre comercial
 
@@ -22,28 +22,55 @@ El nombre refleja la idea de crear una red donde distintos emprendimientos pueda
 
 ### Estilo visual
 
-La identidad visual de BORA tendrá un estilo **minimalista, moderno y elegante**. Se utilizarán formas simples, espacios limpios y colores pastel para transmitir cercanía, confianza y facilidad de uso.
+La identidad visual de BORA fue diseñada con un enfoque moderno, minimalista y cercano. Se busca que la marca sea fácil de reconocer y que pueda utilizarse de forma consistente tanto en la aplicación móvil como en la plataforma web.
 
-La identidad deberá adaptarse tanto a la aplicación móvil como a la plataforma web.
+Se utilizan formas simples, bordes redondeados y una combinación de colores suaves con elementos de mayor contraste para mantener una apariencia limpia y amigable.
 
 ### Paleta de colores
 
-- **Verde salvia pastel (#A8BFA3):** color principal de la marca.
-- **Beige crema (#F5F0E8):** fondos y superficies.
-- **Terracota pastel (#D9A38F):** detalles y elementos destacados.
-- **Gris oscuro suave (#3F4541):** textos y elementos de contraste.
+La identidad de BORA utiliza principalmente los siguientes colores:
+
+- **Verde:** color principal de la marca. Representa crecimiento, cercanía y desarrollo de los emprendimientos.
+- **Naranjo / terracota:** utilizado como color de acento para transmitir energía, dinamismo y destacar elementos importantes.
+- **Crema:** utilizado principalmente como fondo para mantener una apariencia cálida, limpia y minimalista.
+- **Gris oscuro:** utilizado en textos y elementos que requieren mayor contraste.
+
+La combinación busca entregar una identidad moderna y cercana, evitando una utilización excesiva de colores.
 
 ### Tipografía
 
-Se propone utilizar la tipografía **Poppins**, debido a su apariencia moderna, limpia y fácil de leer.
+Se propone utilizar una tipografía sans serif moderna y de formas redondeadas, como **Poppins**, debido a su buena legibilidad tanto en dispositivos móviles como en páginas web.
 
 - **Poppins SemiBold:** títulos y elementos destacados.
 - **Poppins Regular:** textos, descripciones y contenido general.
 
-### Propuesta de logotipo
+### Logotipo
 
-El logotipo tendrá como elemento principal la palabra **BORA**, utilizando un diseño sencillo y reconocible.
+El logotipo de BORA combina diferentes elementos relacionados con el propósito de la plataforma.
 
-Se buscará incorporar un símbolo minimalista relacionado con los emprendimientos, el comercio y la conexión entre personas, evitando elementos excesivos para mantener una imagen elegante y fácil de identificar.
+La letra **B** funciona como elemento principal de la identidad y permite relacionar directamente el símbolo con el nombre BORA.
 
-El diseño deberá permitir su utilización como logotipo de la plataforma y como ícono de la aplicación móvil.
+Sobre ella se incorpora una **bolsa de compra**, que representa los productos, las ventas y el espacio digital donde los emprendimientos podrán exhibir lo que ofrecen.
+
+La **etiqueta** representa la identificación y comercialización de los productos disponibles dentro de la plataforma.
+
+El elemento curvo de color naranjo que rodea el símbolo representa la **conexión y circulación** entre emprendimientos, productos y compradores.
+
+Los pequeños elementos naranjos ubicados en la parte superior representan la **visibilidad y el descubrimiento**, uno de los objetivos de BORA al permitir que nuevos compradores conozcan diferentes emprendimientos.
+
+El conjunto forma un símbolo sencillo y reconocible que puede utilizarse junto al nombre BORA o de manera independiente.
+
+### Ícono de la aplicación
+
+BORA también cuenta con una versión simplificada de su identidad destinada al ícono de la aplicación móvil.
+
+Esta versión utiliza solamente el símbolo principal, eliminando el texto BORA para permitir una correcta visualización en espacios pequeños.
+
+El ícono mantiene los elementos principales de la identidad: la letra B, la bolsa, la etiqueta y el elemento de conexión.
+
+De esta manera, BORA mantiene una identidad visual consistente entre la aplicación móvil, la plataforma web y la documentación del proyecto.
+
+### Recursos gráficos
+
+- Logo oficial de BORA: `imagenes/Logo BORA.png`
+- Ícono de la aplicación: `imagenes/Icono BORA.png`
