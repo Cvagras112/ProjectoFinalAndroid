@@ -1,0 +1,132 @@
+
+/* BORA - Estilos exclusivos del administrador */
+
+.bora-admin {
+  min-height: 100vh;
+  display: flex;
+  background: #f4f6fb;
+  color: #172033;
+  font-family: Arial, sans-serif;
+}
+
+.bora-admin * {
+  box-sizing: border-box;
+}
+
+/* Menú lateral */
+.bora-sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #172033;
+  color: white;
+  padding: 28px 20px;
+}
+
+.bora-logo {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.bora-subtitle {
+  font-size: 13px;
+  color: #b8c2d8;
+  margin-bottom: 35px;
+}
+
+.bora-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bora-menu button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #e5e9f2;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.bora-menu button:hover,
+.bora-menu button.active {
+  background: #6554d9;
+  color: white;
+}
+
+/* Contenido principal */
+.bora-content {
+  flex: 1;
+  min-width: 0;
+  padding: 35px;
+}
+
+.bora-header {
+  margin-bottom: 30px;
+}
+
+.bora-header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.bora-header p {
+  color: #667085;
+}
+
+/* Tarjetas */
+.bora-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.bora-card {
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid #e7eaf0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.bora-card h3 {
+  font-size: 15px;
+  color: #667085;
+  margin-bottom: 15px;
+}
+
+.bora-card .value {
+  font-size: 30px;
+  font-weight: bold;
+  color: #172033;
+}
+
+/* Adaptación a pantallas pequeñas */
+@media (max-width: 1000px) {
+  .bora-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .bora-admin {
+    flex-direction: column;
+  }
+
+  .bora-sidebar {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .bora-content {
+    padding: 20px;
+  }
+
+  .bora-cards {
+    grid-template-columns: 1fr;
+  }
+}
