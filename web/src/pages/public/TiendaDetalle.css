@@ -1,0 +1,569 @@
+
+/* ==========================================
+   BORA - PERFIL INDIVIDUAL DE TIENDA
+========================================== */
+
+.bora-tienda-detalle {
+  min-height: 100vh;
+  padding-bottom: 90px;
+  background: #fbf9f4;
+  color: #293a30;
+}
+
+.bora-tienda-detalle * {
+  box-sizing: border-box;
+}
+
+/* PORTADA */
+
+.bora-tienda-portada {
+  position: relative;
+  max-width: 1350px;
+  height: 270px;
+  margin: 24px auto 0;
+  overflow: hidden;
+  border-radius: 22px 22px 0 0;
+  background: #dce9de;
+}
+
+.bora-tienda-portada img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+.bora-tienda-portada-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(21, 77, 48, 0.36),
+    rgba(21, 77, 48, 0.03)
+  );
+}
+
+/* PERFIL */
+
+.bora-tienda-perfil {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 30px 38px;
+  background: #ffffff;
+  border: 1px solid #e8eee7;
+  border-top: none;
+  box-shadow: 0 10px 30px rgba(30, 70, 45, 0.05);
+}
+
+.bora-tienda-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border: 5px solid #ffffff;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #236b4b, #52a477);
+  color: white;
+  font-size: 45px;
+  font-weight: 800;
+  box-shadow: 0 6px 22px rgba(35, 107, 75, 0.18);
+}
+
+.bora-tienda-identidad {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.bora-tienda-distintivo {
+  display: inline-block;
+  margin-bottom: 9px;
+  color: #d48b2c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.bora-tienda-identidad h1 {
+  margin: 0 0 8px;
+  color: #195b3b;
+  font-size: clamp(26px, 3vw, 35px);
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.bora-tienda-categoria {
+  margin: 0 0 10px;
+  color: #38845a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bora-tienda-descripcion {
+  max-width: 570px;
+  margin: 0;
+  color: #748276;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* BOTONES DE SEGUIR Y COMPARTIR */
+
+.bora-tienda-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex: 0 1 290px;
+}
+
+.bora-tienda-acciones button {
+  min-height: 44px;
+  padding: 11px 17px;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
+}
+
+.bora-tienda-acciones button:hover {
+  transform: translateY(-2px);
+}
+
+.bora-tienda-acciones button:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+.bora-tienda-seguir {
+  border: 1px solid #236b4b;
+  background: #236b4b;
+  color: white;
+}
+
+.bora-tienda-seguir:hover {
+  background: #185438;
+}
+
+.bora-tienda-seguir.activo {
+  border-color: #c5e3cd;
+  background: #e8f4eb;
+  color: #236b4b;
+}
+
+.bora-tienda-compartir {
+  border: 1px solid #d6e5da;
+  background: #ffffff;
+  color: #236b4b;
+}
+
+.bora-tienda-compartir:hover {
+  background: #edf6ee;
+}
+
+.bora-tienda-mensaje-compartir {
+  width: 100%;
+  color: #28744e;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* CONTADOR DE PRODUCTOS */
+
+.bora-tienda-resumen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 145px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: #f0f7ef;
+  text-align: center;
+}
+
+.bora-tienda-resumen strong {
+  color: #236b4b;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.bora-tienda-resumen span {
+  color: #718376;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* NAVEGACIÓN */
+
+.bora-tienda-navegacion {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 0 38px;
+  background: #ffffff;
+  border: 1px solid #e8eee7;
+  border-top: none;
+  border-radius: 0 0 18px 18px;
+}
+
+.bora-tienda-navegacion a {
+  display: inline-block;
+  padding: 18px 0;
+  border-bottom: 3px solid transparent;
+  color: #718376;
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.bora-tienda-navegacion a:first-child {
+  border-bottom-color: #236b4b;
+  color: #236b4b;
+}
+
+.bora-tienda-navegacion a:hover {
+  color: #236b4b;
+}
+
+/* CATÁLOGO DE LA TIENDA */
+
+.bora-tienda-productos {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 58px 24px 0;
+  scroll-margin-top: 30px;
+}
+
+.bora-tienda-productos-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 20px;
+}
+
+.bora-tienda-seccion-etiqueta {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #df912e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.bora-tienda-productos-encabezado h2 {
+  margin: 0 0 10px;
+  color: #244631;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+}
+
+.bora-tienda-productos-encabezado p {
+  margin: 0;
+  color: #778579;
+  font-size: 14px;
+}
+
+.bora-tienda-productos-encabezado input {
+  width: 100%;
+  max-width: 320px;
+  height: 49px;
+  padding: 0 17px;
+  border: 1px solid #dce8dd;
+  border-radius: 12px;
+  outline: none;
+  background: white;
+  color: #293a30;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bora-tienda-productos-encabezado input:focus {
+  border-color: #236b4b;
+  box-shadow: 0 0 0 3px rgba(35, 107, 75, 0.1);
+}
+
+.bora-tienda-resultados {
+  margin: 0 0 22px;
+  color: #859187;
+  font-size: 13px;
+}
+
+/* TARJETAS DE PRODUCTOS */
+
+.bora-tienda-productos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.bora-tienda-producto-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e7ece6;
+  border-radius: 17px;
+  background: #ffffff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(35, 75, 48, 0.04);
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s,
+    border-color 0.25s;
+}
+
+.bora-tienda-producto-card:hover {
+  transform: translateY(-5px);
+  border-color: #b7d7bf;
+  box-shadow: 0 14px 30px rgba(35, 75, 48, 0.12);
+}
+
+.bora-tienda-producto-card:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+.bora-tienda-producto-imagen {
+  height: 230px;
+  overflow: hidden;
+  background: #f0f3ed;
+}
+
+.bora-tienda-producto-imagen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s;
+}
+
+.bora-tienda-producto-card:hover img {
+  transform: scale(1.06);
+}
+
+.bora-tienda-producto-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.bora-tienda-producto-info > span:first-child {
+  color: #4c8b62;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bora-tienda-producto-info h3 {
+  flex: 1;
+  margin: 10px 0 15px;
+  color: #334238;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.bora-tienda-producto-info strong {
+  color: #1c5c3c;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.bora-tienda-ver-producto {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #edf1ec;
+  color: #236b4b;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+/* SIN RESULTADOS */
+
+.bora-tienda-vacio,
+.bora-tienda-no-encontrada {
+  padding: 70px 24px;
+  text-align: center;
+}
+
+.bora-tienda-vacio h3,
+.bora-tienda-no-encontrada h1 {
+  color: #236b4b;
+}
+
+.bora-tienda-vacio p,
+.bora-tienda-no-encontrada p {
+  color: #718376;
+}
+
+.bora-tienda-vacio button,
+.bora-tienda-no-encontrada a {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #236b4b;
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* TABLETS */
+
+@media (max-width: 1050px) {
+  .bora-tienda-portada {
+    margin: 18px 18px 0;
+  }
+
+  .bora-tienda-perfil,
+  .bora-tienda-navegacion {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .bora-tienda-productos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bora-tienda-resumen {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 800px) {
+  .bora-tienda-perfil {
+    padding: 26px;
+  }
+
+  .bora-tienda-acciones {
+    flex: 1 1 100%;
+  }
+
+  .bora-tienda-productos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bora-tienda-productos-encabezado {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bora-tienda-productos-encabezado input {
+    max-width: 100%;
+  }
+}
+
+/* CELULARES */
+
+@media (max-width: 550px) {
+  .bora-tienda-portada {
+    height: 175px;
+    margin: 10px 10px 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .bora-tienda-perfil {
+    gap: 14px;
+    margin: 0 10px;
+    padding: 22px 18px;
+  }
+
+  .bora-tienda-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 19px;
+    font-size: 32px;
+  }
+
+  .bora-tienda-identidad {
+    flex-basis: calc(100% - 90px);
+  }
+
+  .bora-tienda-identidad h1 {
+    font-size: 24px;
+  }
+
+  .bora-tienda-acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bora-tienda-acciones button {
+    width: 100%;
+  }
+
+  .bora-tienda-resumen {
+    width: 100%;
+    margin: 0;
+  }
+
+  .bora-tienda-navegacion {
+    gap: 22px;
+    margin: 0 10px;
+    padding: 0 18px;
+  }
+
+  .bora-tienda-navegacion a {
+    font-size: 12px;
+  }
+
+  .bora-tienda-productos {
+    padding: 38px 15px 0;
+  }
+
+  .bora-tienda-productos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .bora-tienda-producto-imagen {
+    height: 165px;
+  }
+
+  .bora-tienda-producto-info {
+    padding: 12px;
+  }
+
+  .bora-tienda-producto-info h3 {
+    font-size: 13px;
+  }
+
+  .bora-tienda-producto-info strong {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 360px) {
+  .bora-tienda-productos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bora-tienda-producto-card,
+  .bora-tienda-producto-imagen img,
+  .bora-tienda-acciones button {
+    transition: none;
+  }
+}

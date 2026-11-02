@@ -11,6 +11,8 @@ import Ayuda from './pages/public/Ayuda'
 import Login from './pages/auth/Login'
 import Registro from './pages/auth/Registro'
 import RecuperarContrasena from './pages/auth/RecuperarContrasena'
+import Emprendimientos from './pages/public/Emprendimientos'
+import TiendaDetalle from './pages/public/TiendaDetalle'
 
 import './App.css'
 
@@ -42,10 +44,8 @@ function App() {
         />
 
         {/* EMPRENDIMIENTOS */}
-        <Route
-          path="/tiendas"
-          element={<PaginaPendiente titulo="Emprendimientos" />}
-        />
+        <Route path="/tiendas" element={<Emprendimientos />} />
+        <Route path="/tiendas/:slug" element={<TiendaDetalle />} />
 
         {/* AYUDA */}
         <Route path="/ayuda" element={<Ayuda />} />

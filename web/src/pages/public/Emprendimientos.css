@@ -1,0 +1,420 @@
+
+/* ==========================================
+   BORA - EMPRENDIMIENTOS
+   Diseño renovado
+========================================== */
+
+.bora-emprendimientos {
+  min-height: 100vh;
+  padding-bottom: 90px;
+  background: #fbf9f4;
+  color: #293a30;
+}
+
+.bora-emprendimientos * {
+  box-sizing: border-box;
+}
+
+/* HERO */
+
+.bora-emprendimientos-hero {
+  position: relative;
+  max-width: 1320px;
+  margin: 28px auto 0;
+  padding: 68px 28px 76px;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(255, 181, 91, .23), transparent 30%),
+    radial-gradient(circle at 88% 80%, rgba(77, 157, 108, .20), transparent 30%),
+    linear-gradient(120deg, #e9f4e8, #fff5e5);
+  text-align: center;
+}
+
+.bora-emprendimientos-hero::before,
+.bora-emprendimientos-hero::after {
+  content: "";
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border: 1px solid rgba(35, 107, 75, .14);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bora-emprendimientos-hero::before {
+  top: -125px;
+  left: -65px;
+}
+
+.bora-emprendimientos-hero::after {
+  bottom: -150px;
+  right: -40px;
+  width: 270px;
+  height: 270px;
+}
+
+.bora-emprendimientos-hero > span {
+  display: inline-block;
+  padding: 9px 17px;
+  margin-bottom: 19px;
+  border: 1px solid rgba(35, 107, 75, .13);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, .65);
+  color: #236b4b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.bora-emprendimientos-hero h1 {
+  max-width: 800px;
+  margin: 0 auto 18px;
+  color: #195b3b;
+  font-size: clamp(34px, 4.5vw, 57px);
+  font-weight: 800;
+  letter-spacing: -1.8px;
+  line-height: 1.15;
+}
+
+.bora-emprendimientos-hero p {
+  max-width: 590px;
+  margin: 0 auto;
+  color: #60766a;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* CONTENEDOR */
+
+.bora-emprendimientos-contenido {
+  max-width: 1270px;
+  margin: 0 auto;
+  padding: 58px 24px 0;
+}
+
+/* CABECERA DE RESULTADOS */
+
+.bora-emprendimientos-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 22px;
+}
+
+.bora-emprendimientos-subtitulo {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #e3942e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.bora-emprendimientos-superior h2 {
+  margin: 0 0 9px;
+  color: #244631;
+  font-size: clamp(23px, 2.5vw, 31px);
+  font-weight: 800;
+  letter-spacing: -.7px;
+}
+
+.bora-emprendimientos-superior p {
+  margin: 0;
+  color: #7a887d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* BUSCADOR */
+
+.bora-emprendimientos-buscador {
+  width: 100%;
+  max-width: 350px;
+  flex-shrink: 0;
+}
+
+.bora-emprendimientos-buscador input {
+  width: 100%;
+  height: 54px;
+  padding: 0 19px;
+  border: 1px solid #dce8dd;
+  border-radius: 15px;
+  outline: none;
+  background: #ffffff;
+  color: #293a30;
+  font: inherit;
+  font-size: 14px;
+  box-shadow: 0 5px 18px rgba(35, 107, 75, .04);
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.bora-emprendimientos-buscador input:focus {
+  border-color: #236b4b;
+  box-shadow: 0 0 0 4px rgba(35, 107, 75, .09);
+}
+
+.bora-emprendimientos-contador {
+  margin: 0 0 23px;
+  color: #758678;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* GRID */
+
+.bora-emprendimientos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 27px;
+}
+
+/* TARJETAS */
+
+.bora-emprendimiento-tarjeta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e6ece5;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 5px 22px rgba(26, 67, 44, .045);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.bora-emprendimiento-tarjeta:hover {
+  transform: translateY(-7px);
+  border-color: #b9d7c1;
+  box-shadow: 0 18px 38px rgba(26, 67, 44, .12);
+}
+
+/* IMAGEN */
+
+.bora-emprendimiento-imagen {
+  position: relative;
+  height: 235px;
+  overflow: hidden;
+  background: #eaf0e8;
+}
+
+.bora-emprendimiento-imagen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .5s ease;
+}
+
+.bora-emprendimiento-tarjeta:hover .bora-emprendimiento-imagen img {
+  transform: scale(1.07);
+}
+
+.bora-emprendimiento-etiqueta {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 9px 14px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, .95);
+  color: #236b4b;
+  font-size: 11px;
+  font-weight: 750;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+}
+
+/* INFORMACIÓN */
+
+.bora-emprendimiento-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 25px;
+}
+
+.bora-emprendimiento-categoria {
+  color: #db912f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+
+.bora-emprendimiento-info h3 {
+  margin: 11px 0;
+  color: #1d5738;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
+
+.bora-emprendimiento-descripcion {
+  flex: 1;
+  margin: 0 0 24px;
+  color: #738176;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* PIE */
+
+.bora-emprendimiento-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid #edf0eb;
+}
+
+.bora-emprendimiento-pie > span {
+  color: #8a958b;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.bora-emprendimiento-enlace {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 39px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: #eaf4ec;
+  color: #236b4b;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .2s, color .2s;
+}
+
+.bora-emprendimiento-enlace:hover {
+  background: #236b4b;
+  color: #ffffff;
+}
+
+.bora-emprendimiento-enlace:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+/* SIN RESULTADOS */
+
+.bora-emprendimientos-vacio {
+  padding: 65px 20px;
+  border: 1px solid #e6ece5;
+  border-radius: 20px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.bora-emprendimientos-vacio h3 {
+  color: #236b4b;
+}
+
+.bora-emprendimientos-vacio p {
+  color: #738176;
+}
+
+.bora-emprendimientos-vacio button {
+  margin-top: 15px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #236b4b;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .bora-emprendimientos-hero {
+    margin: 20px 20px 0;
+  }
+
+  .bora-emprendimientos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bora-emprendimientos-superior {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bora-emprendimientos-buscador {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .bora-emprendimientos-hero {
+    margin: 12px 12px 0;
+    padding: 48px 20px 54px;
+    border-radius: 20px;
+  }
+
+  .bora-emprendimientos-hero h1 {
+    font-size: 34px;
+    letter-spacing: -1px;
+  }
+
+  .bora-emprendimientos-hero p {
+    font-size: 14px;
+  }
+
+  .bora-emprendimientos-contenido {
+    padding: 38px 16px 0;
+  }
+
+  .bora-emprendimientos-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .bora-emprendimiento-imagen {
+    height: 235px;
+  }
+
+  .bora-emprendimiento-info {
+    padding: 22px;
+  }
+
+  .bora-emprendimiento-pie {
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bora-emprendimiento-tarjeta,
+  .bora-emprendimiento-imagen img {
+    transition: none;
+  }
+}
+.bora-emprendimiento-tarjeta {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bora-emprendimiento-tarjeta:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 4px;
+}
+
+.bora-emprendimiento-visitar {
+  color: #236b4b;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.bora-emprendimiento-tarjeta:hover
+.bora-emprendimiento-visitar {
+  color: #df912e;
+}
