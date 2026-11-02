@@ -3,7 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/public/Home'
 import Ayuda from './pages/public/Ayuda'
+import Login from './pages/auth/Login'
+import Registro from './pages/auth/Registro'
+import RecuperarContrasena from './pages/auth/RecuperarContrasena'
 import './App.css'
+
 
 function PaginaPendiente({ titulo }) {
   return (
@@ -34,10 +38,11 @@ function App() {
 
         <Route path="/ayuda" element={<Ayuda />} />
 
-        <Route
-          path="/login"
-          element={<PaginaPendiente titulo="Iniciar sesión" />}
-        />
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/registro" element={<Registro />} />
+
+        <Route path="/recuperar" element={<RecuperarContrasena />} />
 
         <Route
           path="*"
