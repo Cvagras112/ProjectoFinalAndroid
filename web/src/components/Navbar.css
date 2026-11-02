@@ -1,111 +1,289 @@
 
+/* =========================================
+   BORA - NAVEGACIÓN VERDE CON ICONO NARANJA
+   ========================================= */
+
 .navbar {
-  width: 100%;
-  background: #ffffff;
-  border-bottom: 1px solid #e6ece7;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
+  width: 100%;
+  background: linear-gradient(
+    110deg,
+    #08683d 0%,
+    #005333 55%,
+    #003f2b 100%
+  );
+  border-bottom: 1px solid #ffffff25;
+  box-shadow: 0 4px 18px #002d2020;
 }
 
 .navbar-container {
-  max-width: 1280px;
-  min-height: 76px;
-  margin: 0 auto;
-  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 22px;
+  max-width: 1600px;
+  min-height: 86px;
+  margin: 0 auto;
+  padding: 10px 34px;
 }
+
+/* LOGOTIPO */
 
 .navbar-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 27px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  color: #175c40;
+  gap: 11px;
+  flex-shrink: 0;
+  color: white;
+  text-decoration: none;
+}
+
+.navbar-logo:hover {
+  color: white;
 }
 
 .navbar-logo-icon {
-  width: 38px;
-  height: 38px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
-  background: #e3f2e8;
-  color: #238153;
-  font-size: 25px;
+  width: 62px;
+  height: 62px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 16px;
+
+  /* Recuadro naranja detrás del icono */
+  background: linear-gradient(
+    145deg,
+    #ffa72c,
+    #f47b00
+  );
+
+  border: 1px solid #ffb74e;
+  box-shadow: 0 4px 12px #002c1c30;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
+.navbar-logo:hover .navbar-logo-icon {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 16px #002c1c40;
+}
+
+.navbar-icon-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.navbar-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-brand-text strong {
+  color: white;
+  font-size: 29px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.navbar-brand-text small {
+  max-width: 220px;
+  color: #e4f0e6;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+/* ENLACES DEL MENÚ */
 
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .navbar-links a {
-  color: #53635a;
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  color: #f1f8f2;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 13px;
   font-weight: 600;
-  transition: color 0.2s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
 }
 
 .navbar-links a:hover {
-  color: #167348;
+  background: #ffffff20;
+  color: white;
+  transform: translateY(-2px);
 }
+
+/* ENLACE ACTIVO */
+
+.navbar-links a.navbar-link-active {
+  background: white;
+  color: #06482d;
+  box-shadow: 0 4px 12px #002b1c26;
+}
+
+.navbar-link-icon {
+  display: inline-grid;
+  place-items: center;
+  min-width: 17px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* BOTÓN INICIAR SESIÓN */
 
 .navbar-actions {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .navbar-login {
-  background: #176b49;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
   padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background 0.2s ease;
+  border-radius: 13px;
+
+  background: linear-gradient(
+    120deg,
+    #ff981a,
+    #f47b00
+  );
+
+  color: white;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 5px 14px #001e1520;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.navbar-login span {
+  font-size: 22px;
+  line-height: 1;
 }
 
 .navbar-login:hover {
-  background: #105237;
+  transform: translateY(-2px);
+  background: linear-gradient(
+    120deg,
+    #ffac36,
+    #ff8700
+  );
+  color: white;
+  box-shadow: 0 8px 18px #001e1530;
 }
 
-@media (max-width: 900px) {
+/* RESPONSIVE - TABLETS */
+
+@media (max-width: 1200px) {
+  .navbar-container {
+    padding: 12px 22px;
+    gap: 12px;
+  }
+
+  .navbar-brand-text small {
+    display: none;
+  }
+
+  .navbar-links a {
+    padding: 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 950px) {
   .navbar-container {
     flex-wrap: wrap;
-    padding: 16px 20px;
+    justify-content: space-between;
   }
 
   .navbar-links {
     order: 3;
+    justify-content: flex-start;
     width: 100%;
     overflow-x: auto;
-    gap: 20px;
-    padding-bottom: 5px;
+    padding: 4px 0 8px;
+    scrollbar-width: thin;
   }
 
-  .navbar-links a {
-    white-space: nowrap;
+  .navbar-brand-text small {
+    display: block;
   }
 }
 
+/* RESPONSIVE - CELULARES */
+
 @media (max-width: 480px) {
   .navbar-container {
-    gap: 14px;
+    min-height: 70px;
+    padding: 10px 14px;
   }
 
-  .navbar-logo {
-    font-size: 23px;
+  .navbar-logo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+  }
+
+  .navbar-brand-text strong {
+    font-size: 24px;
+  }
+
+  .navbar-brand-text small {
+    max-width: 145px;
+    font-size: 7px;
   }
 
   .navbar-login {
+    min-height: 40px;
     padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .navbar-login span {
+    display: none;
+  }
+
+  .navbar-links a {
     font-size: 12px;
+  }
+}
+
+/* ACCESIBILIDAD */
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar a,
+  .navbar-logo-icon {
+    transition: none;
   }
 }
