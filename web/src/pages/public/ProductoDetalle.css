@@ -1,0 +1,444 @@
+
+/* ========================================
+   BORA - PÁGINA INDIVIDUAL DE PRODUCTO
+======================================== */
+
+.bora-producto-pagina {
+  min-height: 100vh;
+  background: #fbf9f4;
+  color: #303b34;
+  padding: 30px 24px 80px;
+}
+
+.bora-producto-pagina * {
+  box-sizing: border-box;
+}
+
+/* RUTA DE NAVEGACIÓN */
+
+.bora-producto-ruta {
+  max-width: 1250px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+  color: #778078;
+}
+
+.bora-producto-ruta a {
+  color: #236b4b;
+  text-decoration: none;
+}
+
+.bora-producto-ruta a:hover {
+  text-decoration: underline;
+}
+
+.bora-producto-ruta strong {
+  font-weight: 500;
+  color: #303b34;
+}
+
+/* CONTENEDOR PRINCIPAL */
+
+.bora-producto-contenedor {
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 35px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 45px;
+  background: #ffffff;
+  border: 1px solid #e9e9e4;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(30, 65, 45, 0.05);
+}
+
+/* FOTOGRAFÍA */
+
+.bora-producto-galeria {
+  min-width: 0;
+}
+
+.bora-producto-foto {
+  width: 100%;
+  min-height: 450px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f8f5;
+  border: 1px solid #eeeeea;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.bora-producto-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bora-producto-foto-nota {
+  margin: 12px 0 0;
+  color: #8a918c;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* INFORMACIÓN */
+
+.bora-producto-informacion {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bora-producto-categoria {
+  display: inline-block;
+  color: #236b4b;
+  background: #eaf5ed;
+  padding: 7px 13px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 17px;
+}
+
+.bora-producto-titulo-fila {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.bora-producto-titulo-fila h1 {
+  margin: 0;
+  font-size: clamp(25px, 3vw, 35px);
+  line-height: 1.2;
+  font-weight: 700;
+  color: #27382e;
+}
+
+/* CORAZÓN DE FAVORITOS */
+
+.bora-producto-titulo-fila .bora-boton-favorito {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #e4e8e4;
+  border-radius: 50%;
+  color: #6b746e;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bora-producto-titulo-fila .bora-boton-favorito:hover {
+  transform: scale(1.08);
+  color: #e54865;
+  border-color: #e54865;
+}
+
+.bora-producto-titulo-fila .bora-boton-favorito.activo {
+  color: #e54865;
+}
+
+.bora-producto-titulo-fila .bora-boton-favorito:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+/* ETIQUETA Y PRECIO */
+
+.bora-producto-etiqueta {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  background: #fff1dc;
+  color: #b36a13;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bora-producto-precio {
+  margin: 23px 0 27px;
+  color: #1d583b;
+  font-size: clamp(32px, 4vw, 43px);
+  font-weight: 750;
+  letter-spacing: -1px;
+}
+
+/* EMPRENDIMIENTO */
+
+.bora-producto-vendedor {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 19px;
+  border: 1px solid #e5eee7;
+  border-radius: 14px;
+  background: #f7fbf7;
+}
+
+.bora-producto-vendedor-icono {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: #e5f1e8;
+  font-size: 23px;
+}
+
+.bora-producto-vendedor small {
+  color: #7a867d;
+  font-size: 12px;
+}
+
+.bora-producto-vendedor h2 {
+  margin: 3px 0;
+  font-size: 17px;
+  color: #236b4b;
+}
+
+.bora-producto-vendedor p {
+  margin: 0;
+  color: #78837a;
+  font-size: 12px;
+}
+
+/* DESCRIPCIÓN */
+
+.bora-producto-descripcion {
+  width: 100%;
+  margin-top: 27px;
+  padding-top: 23px;
+  border-top: 1px solid #e9ece8;
+}
+
+.bora-producto-descripcion h2 {
+  margin: 0 0 12px;
+  font-size: 19px;
+  color: #29392e;
+}
+
+.bora-producto-descripcion p {
+  margin: 0;
+  color: #68736b;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* CONTACTO */
+
+.bora-producto-acciones {
+  width: 100%;
+  margin-top: 30px;
+}
+
+.bora-producto-contactar {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 18px;
+  background: #236b4b;
+  color: #ffffff;
+  border: none;
+  border-radius: 11px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.bora-producto-contactar:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.bora-producto-acciones p {
+  margin: 12px 0 0;
+  color: #89928a;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* PRODUCTOS RELACIONADOS */
+
+.bora-producto-relacionados {
+  max-width: 1250px;
+  margin: 55px auto 0;
+}
+
+.bora-producto-relacionados-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 23px;
+}
+
+.bora-producto-relacionados-titulo h2 {
+  margin: 0;
+  font-size: 25px;
+  color: #29392e;
+}
+
+.bora-producto-relacionados-titulo a {
+  color: #236b4b;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.bora-producto-relacionados-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.bora-producto-relacionado {
+  display: block;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e8ebe7;
+  border-radius: 14px;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bora-producto-relacionado:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 9px 25px rgba(30, 65, 45, 0.1);
+}
+
+.bora-producto-relacionado img {
+  width: 100%;
+  height: 185px;
+  object-fit: cover;
+}
+
+.bora-producto-relacionado > div {
+  padding: 17px;
+}
+
+.bora-producto-relacionado span {
+  color: #28744e;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bora-producto-relacionado h3 {
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.bora-producto-relacionado p {
+  margin: 0 0 12px;
+  color: #859086;
+  font-size: 12px;
+}
+
+.bora-producto-relacionado strong {
+  color: #236b4b;
+  font-size: 19px;
+}
+
+/* PRODUCTO NO ENCONTRADO */
+
+.bora-producto-no-encontrado {
+  min-height: 65vh;
+  padding: 100px 20px;
+  text-align: center;
+  background: #fbf9f4;
+}
+
+.bora-producto-no-encontrado h1 {
+  color: #236b4b;
+}
+
+.bora-producto-no-encontrado a {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 12px 22px;
+  border-radius: 9px;
+  background: #236b4b;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 950px) {
+  .bora-producto-contenedor {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .bora-producto-foto {
+    min-height: 350px;
+  }
+
+  .bora-producto-relacionados-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .bora-producto-pagina {
+    padding: 20px 12px 50px;
+  }
+
+  .bora-producto-contenedor {
+    padding: 17px;
+    gap: 23px;
+    border-radius: 13px;
+  }
+
+  .bora-producto-foto {
+    min-height: 250px;
+  }
+
+  .bora-producto-titulo-fila h1 {
+    font-size: 25px;
+  }
+
+  .bora-producto-relacionados {
+    margin-top: 38px;
+  }
+
+  .bora-producto-relacionados-titulo h2 {
+    font-size: 21px;
+  }
+
+  .bora-producto-relacionados-grid {
+    gap: 12px;
+  }
+
+  .bora-producto-relacionado img {
+    height: 130px;
+  }
+
+  .bora-producto-relacionado > div {
+    padding: 12px;
+  }
+
+  .bora-producto-relacionado strong {
+    font-size: 16px;
+  }
+}
