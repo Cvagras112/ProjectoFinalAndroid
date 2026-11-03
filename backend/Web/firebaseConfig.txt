@@ -1,0 +1,23 @@
+// Importa las funciones que necesites de los SDKs que requieras
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+// TODO: Añade los SDKs para productos Firebase que quieras usar
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// La configuracion de tu App Web en Firebase 
+// Para Firebase JS SDK v7.20.0 y futuros, measurementId es opcional
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA-fvcUZIt1eH77AhNrgPoTEMZ-rVhH_c0",
+  authDomain: "bora-database.firebaseapp.com",
+  projectId: "bora-database",
+  storageBucket: "bora-database.firebasestorage.app",
+  messagingSenderId: "17026152565",
+  appId: "1:17026152565:web:abfcd68ff2fa112662603c",
+  measurementId: "G-783V1SEY0C"
+};
+
+// Inicializa Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
