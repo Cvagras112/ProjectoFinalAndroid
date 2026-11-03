@@ -7,20 +7,26 @@ import Home from './pages/public/Home'
 import Productos from './pages/public/Productos'
 import ProductoDetalle from './pages/public/ProductoDetalle'
 import Ayuda from './pages/public/Ayuda'
+import Emprendimientos from './pages/public/Emprendimientos'
+import TiendaDetalle from './pages/public/TiendaDetalle'
 
 import Login from './pages/auth/Login'
 import Registro from './pages/auth/Registro'
 import RecuperarContrasena from './pages/auth/RecuperarContrasena'
-import Emprendimientos from './pages/public/Emprendimientos'
-import TiendaDetalle from './pages/public/TiendaDetalle'
+
+import MiPerfil from './pages/perfil/MiPerfil'
 
 import './App.css'
 
-function PaginaPendiente({ titulo }) {
+function PaginaPendiente({ titulo, descripcion }) {
   return (
-    <main>
+    <main style={{
+      maxWidth: '1100px',
+      margin: '70px auto',
+      padding: '0 24px'
+    }}>
       <h1>{titulo}</h1>
-      <p>Estamos preparando esta sección de BORA.</p>
+      <p>{descripcion || 'Estamos preparando esta sección de BORA.'}</p>
     </main>
   )
 }
@@ -34,14 +40,9 @@ function App() {
         {/* PÁGINA PRINCIPAL */}
         <Route path="/" element={<Home />} />
 
-        {/* CATÁLOGO DE PRODUCTOS */}
+        {/* PRODUCTOS */}
         <Route path="/productos" element={<Productos />} />
-
-        {/* DETALLE INDIVIDUAL DE CADA PRODUCTO */}
-        <Route
-          path="/productos/:id"
-          element={<ProductoDetalle />}
-        />
+        <Route path="/productos/:id" element={<ProductoDetalle />} />
 
         {/* EMPRENDIMIENTOS */}
         <Route path="/tiendas" element={<Emprendimientos />} />
@@ -52,12 +53,35 @@ function App() {
 
         {/* AUTENTICACIÓN */}
         <Route path="/login" element={<Login />} />
-
         <Route path="/registro" element={<Registro />} />
-
         <Route
           path="/recuperar"
           element={<RecuperarContrasena />}
+        />
+
+        {/* PERFIL DEL USUARIO */}
+        <Route path="/perfil" element={<MiPerfil />} />
+
+        {/* PANEL ADMINISTRATIVO - DAVID */}
+        <Route
+          path="/admin"
+          element={
+            <PaginaPendiente
+              titulo="Panel de administración"
+              descripcion="El panel administrativo de BORA se encuentra en desarrollo."
+            />
+          }
+        />
+
+        {/* PANEL DE EMPRENDEDORAS */}
+        <Route
+          path="/panel-emprendedora"
+          element={
+            <PaginaPendiente
+              titulo="Panel de emprendedora"
+              descripcion="Aquí podrás administrar tu tienda y tus productos."
+            />
+          }
         />
 
         {/* PÁGINA NO ENCONTRADA */}

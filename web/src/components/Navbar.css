@@ -287,3 +287,224 @@
     transition: none;
   }
 }
+
+/* =========================================
+   BORA - MENÚ DE USUARIO AUTENTICADO
+   ========================================= */
+
+.navbar-user {
+  position: relative;
+}
+
+.navbar-user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 13px 7px 7px;
+  min-height: 52px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease;
+}
+
+.navbar-user-trigger:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.navbar-user-trigger:focus-visible,
+.navbar-user-option:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+.navbar-user-avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffbd61, #f47b00);
+  color: #06482d;
+  font-size: 18px;
+  font-weight: 800;
+  overflow: hidden;
+}
+
+.navbar-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.navbar-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  max-width: 145px;
+  min-width: 0;
+}
+
+.navbar-user-info strong {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: white;
+}
+
+.navbar-user-info small {
+  font-size: 11px;
+  color: #d3f1df;
+}
+
+.navbar-user-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 1100;
+  width: 280px;
+  max-width: calc(100vw - 24px);
+  padding: 9px;
+  background: white;
+  border: 1px solid #e4ebe4;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0, 40, 25, 0.2);
+  animation: boraMenuEntrada 0.18s ease-out;
+}
+
+.navbar-user-header {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 15px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: #f5faf5;
+}
+
+.navbar-user-header strong {
+  color: #075638;
+  font-size: 15px;
+}
+
+.navbar-user-header small {
+  color: #66796c;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.navbar-user-header > span {
+  align-self: flex-start;
+  margin-top: 5px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #e1f2e7;
+  color: #087343;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.navbar-user-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #244433;
+  text-decoration: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.navbar-user-option:hover {
+  background: #f0f7f1;
+  color: #00683d;
+}
+
+.navbar-user-option > span {
+  width: 22px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.navbar-user-logout {
+  margin-top: 7px;
+  border-top: 1px solid #e8eee8;
+  border-radius: 0 0 11px 11px;
+  color: #bd3b2e;
+}
+
+.navbar-user-logout:hover {
+  background: #fff0ed;
+  color: #a32d22;
+}
+
+.navbar-auth-loading {
+  color: #e4f0e6;
+  font-size: 12px;
+}
+
+@keyframes boraMenuEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Adaptación para celulares */
+
+@media (max-width: 480px) {
+  .navbar-user-trigger {
+    gap: 7px;
+    padding: 5px 9px 5px 5px;
+    min-height: 44px;
+  }
+
+  .navbar-user-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .navbar-user-info {
+    max-width: 85px;
+  }
+
+  .navbar-user-info strong {
+    font-size: 11px;
+  }
+
+  .navbar-user-info small {
+    font-size: 10px;
+  }
+
+  .navbar-user-dropdown {
+    width: 260px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-user-dropdown {
+    animation: none;
+  }
+}
