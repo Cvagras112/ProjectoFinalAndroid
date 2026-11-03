@@ -2,94 +2,249 @@
 import { useState } from 'react'
 import './AdminDashboard.css'
 
+import EmprendedorasAdmin from './EmprendedorasAdmin'
+import AsociacionesAdmin from './AsociacionesAdmin'
+import AsignacionesAdmin from './AsignacionesAdmin'
+import CategoriasAdmin from './CategoriasAdmin'
+import TiposProductosAdmin from './TiposProductosAdmin'
+
 function AdminDashboard() {
-  const [seccion, setSeccion] = useState('dashboard')
 
-  const opciones = [
-    { id: 'dashboard', nombre: 'Panel principal' },
-    { id: 'emprendedoras', nombre: 'Emprendedoras' },
-    { id: 'asociaciones', nombre: 'Asociaciones' },
-    { id: 'asignaciones', nombre: 'Asignaciones' },
-    { id: 'categorias', nombre: 'Categorías' },
-    { id: 'tipos', nombre: 'Tipos de productos' }
-  ]
+    // SECCIÓN ACTUAL
+    const [seccion, setSeccion] = useState('dashboard')
 
-  return (
-    <div className="bora-admin">
+    // ESTADOS COMPARTIDOS
+    const [emprendedoras, setEmprendedoras] = useState([])
+    const [asociaciones, setAsociaciones] = useState([])
+    const [asignaciones, setAsignaciones] = useState([])
+    const [categorias, setCategorias] = useState([])
+    const [tiposProductos, setTiposProductos] = useState([])
 
-      <aside className="bora-sidebar">
-        <div className="bora-logo">BORA</div>
-        <p className="bora-subtitle">
-          Panel de administración
-        </p>
+    // ESTADÍSTICAS DEL DASHBOARD
+    const totalEmprendedoras = emprendedoras.length
+    const totalAsociaciones = asociaciones.length
+    const totalCategorias = categorias.length
+    const totalTiposProductos = tiposProductos.length
 
-        <nav className="bora-menu">
-          {opciones.map((opcion) => (
-            <button
-              key={opcion.id}
-              type="button"
-              className={
-                seccion === opcion.id ? 'active' : ''
-              }
-              onClick={() => setSeccion(opcion.id)}
-            >
-              {opcion.nombre}
-            </button>
-          ))}
-        </nav>
-      </aside>
+    // OPCIONES DEL MENÚ
+    const opciones = [
+        { id: 'dashboard', nombre: 'Panel principal' },
+        { id: 'emprendedoras', nombre: 'Emprendedoras' },
+        { id: 'asociaciones', nombre: 'Asociaciones' },
+        { id: 'asignaciones', nombre: 'Asignaciones' },
+        { id: 'categorias', nombre: 'Categorías' },
+        { id: 'tipos', nombre: 'Tipos de productos' }
+    ]
 
-      <main className="bora-content">
-        <header className="bora-header">
-          <h1>
-            {opciones.find(
-              (opcion) => opcion.id === seccion
-            )?.nombre}
-          </h1>
-          <p>
-            Administración de la plataforma BORA
-          </p>
-        </header>
+    const obtenerNombreSeccion = () => {
+        return opciones.find(
+            (opcion) => opcion.id === seccion
+        )?.nombre
+    }
 
-        {seccion === 'dashboard' ? (
-          <section className="bora-cards">
-            <article className="bora-card">
-              <h3>Emprendedoras</h3>
-              <div className="value">—</div>
-            </article>
+    return (
+        <div className="bora-admin">
 
-            <article className="bora-card">
-              <h3>Asociaciones</h3>
-              <div className="value">—</div>
-            </article>
+            {/* MENÚ LATERAL */}
+            <aside className="bora-sidebar">
 
-            <article className="bora-card">
-              <h3>Categorías</h3>
-              <div className="value">—</div>
-            </article>
+                <div className="bora-logo">
+                    BORA
+                </div>
 
-            <article className="bora-card">
-              <h3>Tipos de productos</h3>
-              <div className="value">—</div>
-            </article>
-          </section>
-        ) : (
-          <section className="bora-card">
-            <h3>
-              Gestión de {
-                opciones.find(
-                  (opcion) => opcion.id === seccion
-                )?.nombre
-              }
-            </h3>
-            <p>
-              Módulo pendiente de implementación.
-            </p>
-          </section>
-        )}
-      </main>
-    </div>
-  )
+                <p className="bora-subtitle">
+                    Panel de administración
+                </p>
+
+                <nav className="bora-menu">
+                    {opciones.map((opcion) => (
+                        <button
+                            key={opcion.id}
+                            type="button"
+                            className={
+                                seccion === opcion.id ? 'active' : ''
+                            }
+                            onClick={() => setSeccion(opcion.id)}
+                        >
+                            {opcion.nombre}
+                        </button>
+                    ))}
+                </nav>
+
+            </aside>
+
+            {/* CONTENIDO PRINCIPAL */}
+            <main className="bora-content">
+
+                {/* ENCABEZADO */}
+                <header className="bora-header">
+
+                    {seccion === 'dashboard' ? (
+                        <>
+                            <h1>
+                                ¡Bienvenido al panel BORA!
+                            </h1>
+
+                            <p>
+                                Gestiona las emprendedoras, asociaciones
+                                y categorías de la plataforma desde
+                                un solo lugar.
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <h1>
+                                {obtenerNombreSeccion()}
+                            </h1>
+
+                            <p>
+                                Administración de la plataforma BORA
+                            </p>
+                        </>
+                    )}
+
+                </header>
+
+                {/* CONTENIDO SEGÚN LA SECCIÓN */}
+                {seccion === 'dashboard' ? (
+
+                    <>
+                        {/* ACCESOS RÁPIDOS */}
+                        <section className="bora-acciones">
+
+                            <h2>
+                                Accesos rápidos
+                            </h2>
+
+                            <div className="bora-acciones-botones">
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setSeccion('emprendedoras')
+                                    }
+                                >
+                                    Gestionar emprendedoras
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setSeccion('asociaciones')
+                                    }
+                                >
+                                    Gestionar asociaciones
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setSeccion('categorias')
+                                    }
+                                >
+                                    Gestionar categorías
+                                </button>
+
+                            </div>
+
+                        </section>
+
+                        {/* TARJETAS DE ESTADÍSTICAS */}
+                        <section className="bora-cards">
+
+                            <article className="bora-card">
+                                <h3>Emprendedoras</h3>
+                                <div className="value">
+                                    {totalEmprendedoras}
+                                </div>
+                            </article>
+
+                            <article className="bora-card">
+                                <h3>Asociaciones</h3>
+                                <div className="value">
+                                    {totalAsociaciones}
+                                </div>
+                            </article>
+
+                            <article className="bora-card">
+                                <h3>Categorías</h3>
+                                <div className="value">
+                                    {totalCategorias}
+                                </div>
+                            </article>
+
+                            <article className="bora-card">
+                                <h3>Tipos de productos</h3>
+                                <div className="value">
+                                    {totalTiposProductos}
+                                </div>
+                            </article>
+
+                        </section>
+                    </>
+
+                ) : seccion === 'emprendedoras' ? (
+
+                    /* MÓDULO EMPRENDEDORAS */
+                    <EmprendedorasAdmin
+                        emprendedoras={emprendedoras}
+                        setEmprendedoras={setEmprendedoras}
+                        asociaciones={asociaciones}
+                        asignaciones={asignaciones}
+                    />
+
+                ) : seccion === 'asociaciones' ? (
+
+                    /* MÓDULO ASOCIACIONES */
+                    <AsociacionesAdmin
+                        asociaciones={asociaciones}
+                        setAsociaciones={setAsociaciones}
+                    />
+
+                ) : seccion === 'asignaciones' ? (
+
+                    /* MÓDULO ASIGNACIONES */
+                    <AsignacionesAdmin
+                        emprendedoras={emprendedoras}
+                        setEmprendedoras={setEmprendedoras}
+                        asociaciones={asociaciones}
+                        asignaciones={asignaciones}
+                        setAsignaciones={setAsignaciones}
+                    />
+
+                ) : seccion === 'categorias' ? (
+
+                    /* MÓDULO CATEGORÍAS */
+                    <CategoriasAdmin
+                        categorias={categorias}
+                        setCategorias={setCategorias}
+                    />
+
+                ) : seccion === 'tipos' ? (
+
+                    /* MÓDULO TIPOS DE PRODUCTOS */
+                    <TiposProductosAdmin
+                        tipos={tiposProductos}
+                        setTipos={setTiposProductos}
+                    />
+
+                ) : (
+
+                    <section className="bora-card">
+                        <h3>
+                            Gestión de {obtenerNombreSeccion()}
+                        </h3>
+
+                        <p>
+                            Módulo pendiente de implementación.
+                        </p>
+                    </section>
+
+                )}
+
+            </main>
+        </div>
+    )
 }
 
 export default AdminDashboard
