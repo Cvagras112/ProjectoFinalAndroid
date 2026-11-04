@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Navbar from './components/Navbar'
 import RutaAdmin from './components/auth/RutaAdmin'
+import RutaEmprendedor from './components/auth/RutaEmprendedor'
 
 import Home from './pages/public/Home'
 import Productos from './pages/public/Productos'
@@ -18,6 +19,7 @@ import RecuperarContrasena from './pages/auth/RecuperarContrasena'
 import QuieroEmprender from './pages/public/QuieroEmprender'
 
 import MiPerfil from './pages/perfil/MiPerfil'
+import PanelEmprendedor from './pages/emprendedor/PanelEmprendedor'
 
 // Panel administrativo desarrollado por David
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -80,14 +82,13 @@ function App() {
           }
         />
 
-        {/* PANEL DE EMPRENDEDOR/A - PENDIENTE */}
+        {/* PANEL DE EMPRENDEDOR/A PROTEGIDO */}
         <Route
           path="/panel-emprendedora"
           element={
-            <PaginaPendiente
-              titulo="Panel de emprendedor/a"
-              descripcion="Aquí podrás administrar tu tienda y tus productos."
-            />
+            <RutaEmprendedor>
+              <PanelEmprendedor />
+            </RutaEmprendedor>
           }
         />
 
@@ -108,3 +109,4 @@ function App() {
 }
 
 export default App
+
