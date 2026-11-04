@@ -1,13 +1,16 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { productosDemo } from '../../data/productosDemo'
+import {
+  obtenerProductos,
+  IMAGEN_PRODUCTO_PREDETERMINADA,
+} from '../../services/productos/productoService'
 import BotonFavorito from '../../components/BotonFavorito'
 import './Productos.css'
 
 // Permite buscar con o sin tildes.
 function normalizarTexto(texto) {
-  return String(texto)
+  return String(texto ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
@@ -25,6 +28,10 @@ function formatoPrecio(precio) {
 export default function Productos() {
   const navigate = useNavigate()
 
+  const [productos, setProductos] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
+
   const [busqueda, setBusqueda] = useState('')
   const [orden, setOrden] = useState('relevancia')
   const [categoria, setCategoria] = useState('Todas')
@@ -32,34 +39,70 @@ export default function Productos() {
   const [precioMin, setPrecioMin] = useState('')
   const [precioMax, setPrecioMax] = useState('')
 
+  // Consultar productos reales de Firestore.
+  useEffect(() => {
+    let activo = true
+
+    async function cargarProductos() {
+      try {
+        setCargando(true)
+        setError('')
+
+        const resultado = await obtenerProductos()
+
+        if (activo) {
+          setProductos(resultado)
+        }
+      } catch (errorFirebase) {
+        console.error('Error al cargar productos:', errorFirebase)
+
+        if (activo) {
+          setError(
+            'No pudimos cargar los productos desde Firebase.'
+          )
+        }
+      } finally {
+        if (activo) {
+          setCargando(false)
+        }
+      }
+    }
+
+    cargarProductos()
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
   const categorias = [
     'Todas',
-    ...new Set(productosDemo.map((producto) => producto.categoria)),
+    ...new Set(productos.map((producto) => producto.categoria)),
   ]
 
   const tiendas = [
     'Todas',
-    ...new Set(productosDemo.map((producto) => producto.tienda)),
+    ...new Set(productos.map((producto) => producto.tienda)),
   ]
 
   function contarCategoria(nombre) {
-    if (nombre === 'Todas') return productosDemo.length
+    if (nombre === 'Todas') return productos.length
 
-    return productosDemo.filter(
+    return productos.filter(
       (producto) => producto.categoria === nombre
     ).length
   }
 
   function contarTienda(nombre) {
-    if (nombre === 'Todas') return productosDemo.length
+    if (nombre === 'Todas') return productos.length
 
-    return productosDemo.filter(
+    return productos.filter(
       (producto) => producto.tienda === nombre
     ).length
   }
 
   // Buscar, filtrar y ordenar productos.
-  const productosFiltrados = productosDemo
+  const productosFiltrados = productos
     .filter((producto) => {
       const contenido = normalizarTexto(
         `${producto.nombre} ${producto.categoria} ${producto.tienda}`
@@ -99,7 +142,8 @@ export default function Productos() {
         return a.nombre.localeCompare(b.nombre, 'es')
       }
 
-      return a.id - b.id
+      // Los IDs de Firestore son cadenas, no números.
+      return 0
     })
 
   function limpiarFiltros() {
@@ -111,7 +155,6 @@ export default function Productos() {
     setOrden('relevancia')
   }
 
-  // Navega a la página individual del producto.
   function abrirProducto(id) {
     navigate(`/productos/${id}`)
   }
@@ -268,126 +311,158 @@ export default function Productos() {
           {/* RESULTADOS */}
           <div className="bora-catalogo-resultados">
 
-            <div className="bora-catalogo-herramientas">
-              <p>
-                {productosFiltrados.length}{' '}
-                {productosFiltrados.length === 1
-                  ? 'producto encontrado'
-                  : 'productos encontrados'}
-              </p>
-
-              <div className="bora-catalogo-orden">
-                <label htmlFor="orden-productos">
-                  Ordenar por:
-                </label>
-
-                <select
-                  id="orden-productos"
-                  value={orden}
-                  onChange={(evento) =>
-                    setOrden(evento.target.value)
-                  }
-                >
-                  <option value="relevancia">
-                    Predeterminado
-                  </option>
-                  <option value="menor-precio">
-                    Menor precio
-                  </option>
-                  <option value="mayor-precio">
-                    Mayor precio
-                  </option>
-                  <option value="nombre">
-                    Nombre A-Z
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            {/* TARJETAS SELECCIONABLES */}
-            <div className="bora-catalogo-grid">
-              {productosFiltrados.map((producto) => (
-                <article
-                  key={producto.id}
-                  className="bora-catalogo-tarjeta bora-tarjeta-clickable"
-                  onClick={() => abrirProducto(producto.id)}
-                  onKeyDown={(evento) => {
-                    if (
-                      evento.target === evento.currentTarget &&
-                      (evento.key === 'Enter' ||
-                        evento.key === ' ')
-                    ) {
-                      evento.preventDefault()
-                      abrirProducto(producto.id)
-                    }
-                  }}
-                  tabIndex={0}
-                  role="link"
-                  aria-label={`Ver detalles de ${producto.nombre}`}
-                >
-                  <div className="bora-catalogo-imagen">
-                    <img
-                      src={producto.imagen}
-                      alt={producto.nombre}
-                      loading="lazy"
-                    />
-
-                    <span className="bora-catalogo-etiqueta">
-                      {producto.etiqueta}
-                    </span>
-
-                    {/* CORAZÓN INDEPENDIENTE */}
-                    <div
-                      onClick={(evento) =>
-                        evento.stopPropagation()
-                      }
-                      onKeyDown={(evento) =>
-                        evento.stopPropagation()
-                      }
-                    >
-                      <BotonFavorito productoId={producto.id} />
-                    </div>
-                  </div>
-
-                  <div className="bora-catalogo-info">
-                    <span className="bora-catalogo-categoria">
-                      {producto.categoria}
-                    </span>
-
-                    <h2>{producto.nombre}</h2>
-
-                    <p className="bora-catalogo-tienda">
-                      {producto.tienda}
-                    </p>
-
-                    <p className="bora-catalogo-descripcion">
-                      {producto.descripcion}
-                    </p>
-
-                    <strong>
-                      {formatoPrecio(producto.precio)}
-                    </strong>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            {/* SIN RESULTADOS */}
-            {productosFiltrados.length === 0 && (
+            {cargando ? (
               <div className="bora-catalogo-sin-resultados">
-                <h3>No encontramos productos</h3>
-
-                <p>
-                  Prueba con otra búsqueda o modifica los filtros.
-                </p>
-
+                <h3>🌿 Cargando productos...</h3>
+                <p>Estamos buscando los productos de nuestra comunidad.</p>
+              </div>
+            ) : error ? (
+              <div className="bora-catalogo-sin-resultados">
+                <h3>⚠️ No pudimos cargar los productos</h3>
+                <p>{error}</p>
                 <button
                   type="button"
-                  onClick={limpiarFiltros}
+                  onClick={() => window.location.reload()}
                 >
-                  Limpiar filtros
+                  Reintentar
                 </button>
               </div>
+            ) : (
+              <>
+                <div className="bora-catalogo-herramientas">
+                  <p>
+                    {productosFiltrados.length}{' '}
+                    {productosFiltrados.length === 1
+                      ? 'producto encontrado'
+                      : 'productos encontrados'}
+                  </p>
+
+                  <div className="bora-catalogo-orden">
+                    <label htmlFor="orden-productos">
+                      Ordenar por:
+                    </label>
+
+                    <select
+                      id="orden-productos"
+                      value={orden}
+                      onChange={(evento) =>
+                        setOrden(evento.target.value)
+                      }
+                    >
+                      <option value="relevancia">
+                        Predeterminado
+                      </option>
+                      <option value="menor-precio">
+                        Menor precio
+                      </option>
+                      <option value="mayor-precio">
+                        Mayor precio
+                      </option>
+                      <option value="nombre">
+                        Nombre A-Z
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* TARJETAS SELECCIONABLES */}
+                <div className="bora-catalogo-grid">
+                  {productosFiltrados.map((producto) => (
+                    <article
+                      key={producto.id}
+                      className="bora-catalogo-tarjeta bora-tarjeta-clickable"
+                      onClick={() => abrirProducto(producto.id)}
+                      onKeyDown={(evento) => {
+                        if (
+                          evento.target === evento.currentTarget &&
+                          (evento.key === 'Enter' ||
+                            evento.key === ' ')
+                        ) {
+                          evento.preventDefault()
+                          abrirProducto(producto.id)
+                        }
+                      }}
+                      tabIndex={0}
+                      role="link"
+                      aria-label={`Ver detalles de ${producto.nombre}`}
+                    >
+                      <div className="bora-catalogo-imagen">
+                        <img
+                          src={producto.imagen}
+                          alt={producto.nombre}
+                          loading="lazy"
+                          onError={(evento) => {
+                            evento.currentTarget.onerror = null
+                            evento.currentTarget.src =
+                              IMAGEN_PRODUCTO_PREDETERMINADA
+                          }}
+                        />
+
+                        <span className="bora-catalogo-etiqueta">
+                          {producto.etiqueta}
+                        </span>
+
+                        <div
+                          onClick={(evento) =>
+                            evento.stopPropagation()
+                          }
+                          onKeyDown={(evento) =>
+                            evento.stopPropagation()
+                          }
+                        >
+                          <BotonFavorito productoId={producto.id} />
+                        </div>
+                      </div>
+
+                      <div className="bora-catalogo-info">
+                        <span className="bora-catalogo-categoria">
+                          {producto.categoria}
+                        </span>
+
+                        <h2>{producto.nombre}</h2>
+
+                        <p className="bora-catalogo-tienda">
+                          {producto.tienda}
+                        </p>
+
+                        <p className="bora-catalogo-descripcion">
+                          {producto.descripcion}
+                        </p>
+
+                        <strong>
+                          {formatoPrecio(producto.precio)}
+                        </strong>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                {/* SIN RESULTADOS */}
+                {productosFiltrados.length === 0 && (
+                  <div className="bora-catalogo-sin-resultados">
+                    <h3>
+                      {productos.length === 0
+                        ? '🌱 Aún no hay productos disponibles'
+                        : 'No encontramos productos'}
+                    </h3>
+
+                    <p>
+                      {productos.length === 0
+                        ? 'Todavía no hay productos publicados en BORA.'
+                        : 'Prueba con otra búsqueda o modifica los filtros.'}
+                    </p>
+
+                    {productos.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={limpiarFiltros}
+                      >
+                        Limpiar filtros
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
             )}
 
           </div>

@@ -1,6 +1,13 @@
 
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { productosDemo } from '../../data/productosDemo'
+
+import {
+  obtenerProductoPorId,
+  obtenerProductos,
+  IMAGEN_PRODUCTO_PREDETERMINADA,
+} from '../../services/productos/productoService'
+
 import BotonFavorito from '../../components/BotonFavorito'
 import './ProductoDetalle.css'
 
@@ -13,37 +20,104 @@ function formatoPrecio(precio) {
 }
 
 export default function ProductoDetalle() {
-  // Obtiene el ID del producto desde la dirección web.
   const { id } = useParams()
 
-  // Busca el producto correspondiente.
-  const producto = productosDemo.find(
-    (item) => String(item.id) === id
-  )
+  const [producto, setProducto] = useState(null)
+  const [relacionados, setRelacionados] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
 
-  // Si el producto no existe.
-  if (!producto) {
+  useEffect(() => {
+    let activo = true
+
+    async function cargarProducto() {
+      setCargando(true)
+      setError('')
+      setProducto(null)
+      setRelacionados([])
+
+      try {
+        const productoFirebase = await obtenerProductoPorId(id)
+
+        if (!activo) return
+
+        if (!productoFirebase) {
+          setCargando(false)
+          return
+        }
+
+        setProducto(productoFirebase)
+
+        // Los relacionados son complementarios:
+        // si fallan, igualmente mostramos el producto.
+        try {
+          const productosFirebase = await obtenerProductos()
+
+          if (!activo) return
+
+          const productosRelacionados = productosFirebase
+            .filter(
+              (item) =>
+                item.categoria === productoFirebase.categoria &&
+                item.id !== productoFirebase.id
+            )
+            .slice(0, 4)
+
+          setRelacionados(productosRelacionados)
+        } catch (errorRelacionados) {
+          console.error(
+            'Error al cargar productos relacionados:',
+            errorRelacionados
+          )
+        }
+      } catch (errorFirebase) {
+        console.error('Error al cargar producto:', errorFirebase)
+
+        if (activo) {
+          setError(
+            'No pudimos cargar el producto. Inténtalo nuevamente.'
+          )
+        }
+      } finally {
+        if (activo) setCargando(false)
+      }
+    }
+
+    cargarProducto()
+
+    return () => {
+      activo = false
+    }
+  }, [id])
+
+  if (cargando) {
     return (
       <main className="bora-producto-no-encontrado">
-        <h1>Producto no encontrado</h1>
-        <p>
-          El producto que buscas no está disponible.
-        </p>
-        <Link to="/productos">
-          Volver al catálogo
-        </Link>
+        <h1>🌿 Cargando producto...</h1>
+        <p>Estamos preparando los detalles para ti.</p>
       </main>
     )
   }
 
-  // Productos de la misma categoría, excluyendo el actual.
-  const relacionados = productosDemo
-    .filter(
-      (item) =>
-        item.categoria === producto.categoria &&
-        item.id !== producto.id
+  if (error) {
+    return (
+      <main className="bora-producto-no-encontrado">
+        <h1>⚠️ Ocurrió un problema</h1>
+        <p>{error}</p>
+        <Link to="/productos">Volver al catálogo</Link>
+      </main>
     )
-    .slice(0, 4)
+  }
+
+  if (!producto) {
+    return (
+      <main className="bora-producto-no-encontrado">
+        <h1>Producto no encontrado</h1>
+        <p>El producto que buscas no está disponible.</p>
+        <Link to="/productos">Volver al catálogo</Link>
+      </main>
+    )
+  }
 
   return (
     <main className="bora-producto-pagina">
@@ -53,15 +127,11 @@ export default function ProductoDetalle() {
         className="bora-producto-ruta"
         aria-label="Ruta de navegación"
       >
-        <Link to="/productos">
-          ← Volver al catálogo
-        </Link>
+        <Link to="/productos">← Volver al catálogo</Link>
 
         <span>/</span>
 
-        <Link to="/productos">
-          Productos
-        </Link>
+        <Link to="/productos">Productos</Link>
 
         <span>/</span>
 
@@ -75,21 +145,26 @@ export default function ProductoDetalle() {
       {/* CONTENIDO PRINCIPAL */}
       <section className="bora-producto-contenedor">
 
-        {/* FOTOGRAFÍA PRINCIPAL */}
+        {/* FOTOGRAFÍA */}
         <div className="bora-producto-galeria">
           <div className="bora-producto-foto">
             <img
               src={producto.imagen}
               alt={producto.nombre}
+              onError={(evento) => {
+                evento.currentTarget.onerror = null
+                evento.currentTarget.src =
+                  IMAGEN_PRODUCTO_PREDETERMINADA
+              }}
             />
           </div>
 
           <p className="bora-producto-foto-nota">
-            Imagen ilustrativa del producto.
+            Fotografía referencial del producto.
           </p>
         </div>
 
-        {/* INFORMACIÓN DEL PRODUCTO */}
+        {/* INFORMACIÓN */}
         <div className="bora-producto-informacion">
 
           <span className="bora-producto-categoria">
@@ -103,13 +178,14 @@ export default function ProductoDetalle() {
           </div>
 
           <span className="bora-producto-etiqueta">
-            {producto.etiqueta}
+            ✨ {producto.etiqueta}
           </span>
 
           <strong className="bora-producto-precio">
             {formatoPrecio(producto.precio)}
           </strong>
 
+          {/* TIENDA */}
           <div className="bora-producto-vendedor">
             <span className="bora-producto-vendedor-icono">
               🏪
@@ -117,30 +193,58 @@ export default function ProductoDetalle() {
 
             <div>
               <small>Producto ofrecido por</small>
+
               <h2>{producto.tienda}</h2>
-              <p>Emprendimiento de nuestra comunidad</p>
+
+              {producto.tiendaId ? (
+                <Link
+                  to={`/tiendas/${producto.tiendaId}`}
+                  style={{
+                    color: '#236b4b',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                  }}
+                >
+                  Visitar emprendimiento →
+                </Link>
+              ) : (
+                <p>Emprendimiento de nuestra comunidad</p>
+              )}
             </div>
           </div>
 
+          {/* DESCRIPCIÓN */}
           <div className="bora-producto-descripcion">
-            <h2>Descripción del producto</h2>
+            <h2>📝 Descripción del producto</h2>
             <p>{producto.descripcion}</p>
           </div>
 
+          {/* DISPONIBILIDAD */}
+          <div className="bora-producto-descripcion">
+            <h2>📦 Disponibilidad</h2>
+
+            <p>
+              {producto.stock > 0
+                ? `Disponible · ${producto.stock} unidades en stock`
+                : 'Sin existencias por el momento'}
+            </p>
+          </div>
+
+          {/* CONTACTO */}
           <div className="bora-producto-acciones">
             <button
               type="button"
               className="bora-producto-contactar"
               disabled
-              title="Disponible al integrar los datos reales"
+              title="Función disponible próximamente"
             >
-              Contactar emprendimiento
+              💬 Contactar emprendimiento
             </button>
 
             <p>
-              La opción de contacto estará disponible
-              cuando integremos los emprendimientos
-              reales a BORA.
+              Próximamente podrás contactar directamente
+              a los emprendimientos de BORA.
             </p>
           </div>
 
@@ -150,8 +254,9 @@ export default function ProductoDetalle() {
       {/* PRODUCTOS RELACIONADOS */}
       {relacionados.length > 0 && (
         <section className="bora-producto-relacionados">
+
           <div className="bora-producto-relacionados-titulo">
-            <h2>También te puede interesar</h2>
+            <h2>✨ También te puede interesar</h2>
 
             <Link to="/productos">
               Explorar más productos
@@ -169,12 +274,20 @@ export default function ProductoDetalle() {
                   src={item.imagen}
                   alt={item.nombre}
                   loading="lazy"
+                  onError={(evento) => {
+                    evento.currentTarget.onerror = null
+                    evento.currentTarget.src =
+                      IMAGEN_PRODUCTO_PREDETERMINADA
+                  }}
                 />
 
                 <div>
                   <span>{item.categoria}</span>
+
                   <h3>{item.nombre}</h3>
+
                   <p>{item.tienda}</p>
+
                   <strong>
                     {formatoPrecio(item.precio)}
                   </strong>
@@ -182,6 +295,7 @@ export default function ProductoDetalle() {
               </Link>
             ))}
           </div>
+
         </section>
       )}
 
