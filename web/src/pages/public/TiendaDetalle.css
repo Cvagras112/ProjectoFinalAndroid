@@ -567,3 +567,323 @@
     transition: none;
   }
 }
+
+/* ==========================================
+   BORA - MEJORAS DEL PERFIL CON FIREBASE
+========================================== */
+
+/* CONTENEDOR PRINCIPAL */
+
+.bora-tienda-contenido {
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.bora-tienda-contenido > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0;
+  color: #236b4b;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.bora-tienda-contenido > a:hover {
+  color: #c8734e;
+}
+
+/* PERFIL DE LA TIENDA */
+
+.bora-tienda-contenido .bora-tienda-perfil {
+  max-width: none;
+  margin: 0;
+  padding: 35px;
+  border: 1px solid #e8eee7;
+  border-radius: 22px;
+  box-shadow: 0 10px 35px rgba(35, 107, 75, 0.07);
+}
+
+.bora-tienda-informacion {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.bora-tienda-informacion > span {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #c8734e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bora-tienda-informacion h1 {
+  margin: 0 0 15px;
+  color: #194c36;
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.bora-tienda-informacion p {
+  max-width: 650px;
+  margin: 0;
+  color: #69736d;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* BOTONES */
+
+.bora-tienda-contenido .bora-tienda-acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 0 1 200px;
+  gap: 12px;
+}
+
+.bora-tienda-acciones button {
+  width: 100%;
+  border: 1px solid #236b4b;
+  border-radius: 12px;
+  background: #236b4b;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(35, 107, 75, 0.12);
+}
+
+.bora-tienda-acciones button:nth-of-type(2) {
+  border-color: #e9d8b7;
+  background: #fff6e7;
+  color: #194c36;
+}
+
+.bora-tienda-acciones button:nth-of-type(2):hover {
+  background: #ffead0;
+}
+
+.bora-tienda-acciones p {
+  margin: 0;
+  color: #236b4b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* SECCIÓN DE PRODUCTOS */
+
+.bora-tienda-contenido .bora-tienda-productos {
+  max-width: none;
+  padding: 65px 0 0;
+}
+
+.bora-tienda-productos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.bora-tienda-productos-header h2 {
+  margin: 0 0 10px;
+  color: #194c36;
+  font-size: clamp(23px, 3vw, 32px);
+  font-weight: 800;
+}
+
+.bora-tienda-productos-header p {
+  margin: 0;
+  color: #69736d;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* BUSCADOR MODERNO */
+
+.bora-tienda-productos-header input {
+  width: 100%;
+  max-width: 350px;
+  height: 54px;
+  padding: 0 20px;
+  border: 1px solid #d6e5da;
+  border-radius: 15px;
+  outline: none;
+  background: #fff;
+  color: #293a30;
+  font-family: inherit;
+  font-size: 14px;
+  box-shadow: 0 5px 18px rgba(35, 107, 75, 0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bora-tienda-productos-header input:focus {
+  border-color: #236b4b;
+  box-shadow: 0 0 0 4px rgba(35, 107, 75, 0.1);
+}
+
+.bora-tienda-productos-header input::placeholder {
+  color: #89938d;
+}
+
+/* CONTADOR */
+
+.bora-tienda-productos-header + p {
+  margin: 0 0 26px;
+  color: #69736d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* TARJETAS DE PRODUCTOS */
+
+.bora-tienda-producto {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e7ece6;
+  border-radius: 20px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(35, 75, 48, 0.06);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.bora-tienda-producto:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(35, 75, 48, 0.13);
+}
+
+.bora-tienda-producto:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+.bora-tienda-producto > img {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  background: #f0f3ed;
+  transition: transform 0.3s;
+}
+
+.bora-tienda-producto:hover > img {
+  transform: scale(1.03);
+}
+
+.bora-tienda-producto > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.bora-tienda-producto > div > span {
+  color: #c8734e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bora-tienda-producto h3 {
+  flex: 1;
+  margin: 12px 0;
+  color: #293a30;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.bora-tienda-producto strong {
+  color: #236b4b;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+/* MENSAJE SIN PRODUCTOS */
+
+.bora-tienda-sin-productos {
+  max-width: 700px;
+  margin: 35px auto 0;
+  padding: 55px 30px;
+  border: 1px dashed #bad9c5;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #ffffff, #eef7f0);
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(35, 107, 75, 0.04);
+}
+
+.bora-tienda-sin-productos h3 {
+  margin: 0 0 15px;
+  color: #194c36;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.bora-tienda-sin-productos p {
+  margin: 0;
+  color: #69736d;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+  .bora-tienda-contenido {
+    padding: 0 18px;
+  }
+
+  .bora-tienda-contenido .bora-tienda-acciones {
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .bora-tienda-acciones button {
+    flex: 1 1 160px;
+  }
+
+  .bora-tienda-productos-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bora-tienda-productos-header input {
+    max-width: none;
+  }
+}
+
+@media (max-width: 550px) {
+  .bora-tienda-contenido {
+    padding: 0 12px;
+  }
+
+  .bora-tienda-contenido .bora-tienda-perfil {
+    margin: 0;
+    padding: 24px 18px;
+  }
+
+  .bora-tienda-contenido .bora-tienda-acciones {
+    flex-direction: column;
+  }
+
+  .bora-tienda-productos-header h2 {
+    font-size: 24px;
+  }
+
+  .bora-tienda-sin-productos {
+    padding: 38px 20px;
+  }
+
+  .bora-tienda-sin-productos h3 {
+    font-size: 19px;
+  }
+
+  .bora-tienda-producto > img {
+    height: 165px;
+  }
+}

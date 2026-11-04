@@ -1,64 +1,13 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { productosDemo } from '../../data/productosDemo'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../../firebase/config'
 import './Emprendimientos.css'
 
-// ==========================================
-// BORA - EMPRENDIMIENTOS DE DEMOSTRACIÓN
-// ==========================================
-
-const emprendimientosDemo = [
-  {
-    id: 1,
-    nombre: 'Taller Raíces',
-    categoria: 'Artesanía y cerámica',
-    descripcion:
-      'Creamos piezas artesanales únicas, inspiradas en nuestras tradiciones y en el trabajo hecho a mano.',
-    imagen:
-      'https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=900&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 2,
-    nombre: 'Manos Creativas',
-    categoria: 'Accesorios y papelería',
-    descripcion:
-      'Diseños originales y productos elaborados con creatividad, dedicación y mucho cariño.',
-    imagen:
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=900&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 3,
-    nombre: 'Casa Natural',
-    categoria: 'Decoración',
-    descripcion:
-      'Detalles decorativos que aportan calidez, naturaleza y personalidad a cada espacio.',
-    imagen:
-      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=900&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 4,
-    nombre: 'Tejidos del Sur',
-    categoria: 'Textiles y tejidos',
-    descripcion:
-      'Tejidos y accesorios artesanales que reflejan tradición, identidad y dedicación.',
-    imagen:
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=900&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 5,
-    nombre: 'Esencia Natural',
-    categoria: 'Cuidado personal',
-    descripcion:
-      'Productos artesanales pensados para acompañar tus momentos de bienestar.',
-    imagen:
-      'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=900&auto=format&fit=crop&q=85',
-  },
-]
-
-// ==========================================
-// FUNCIONES AUXILIARES
-// ==========================================
+// Imagen predeterminada para tiendas sin fotografía
+const IMAGEN_PREDETERMINADA =
+  'https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=900&auto=format&fit=crop&q=85'
 
 function normalizarTexto(texto) {
   return String(texto ?? '')
@@ -68,28 +17,58 @@ function normalizarTexto(texto) {
     .trim()
 }
 
-function crearSlug(texto) {
-  return normalizarTexto(texto)
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-}
-
-function contarProductos(nombreTienda) {
-  return productosDemo.filter(
-    (producto) =>
-      normalizarTexto(producto.tienda) ===
-      normalizarTexto(nombreTienda)
-  ).length
-}
-
-// ==========================================
-// COMPONENTE PRINCIPAL
-// ==========================================
-
 export default function Emprendimientos() {
   const [busqueda, setBusqueda] = useState('')
+  const [emprendimientos, setEmprendimientos] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
 
-  const emprendimientosFiltrados = emprendimientosDemo.filter(
+  useEffect(() => {
+    let activo = true
+
+    async function cargarEmprendimientos() {
+      try {
+        setCargando(true)
+        setError('')
+
+        const resultado = await getDocs(collection(db, 'tiendas'))
+
+        const tiendas = resultado.docs
+          .map((documento) => ({
+            id: documento.id,
+            ...documento.data(),
+          }))
+          .filter((tienda) => tienda.activo === true)
+
+        if (activo) {
+          setEmprendimientos(tiendas)
+        }
+      } catch (errorFirebase) {
+        console.error(
+          'Error al obtener emprendimientos:',
+          errorFirebase
+        )
+
+        if (activo) {
+          setError(
+            'No pudimos cargar los emprendimientos. Inténtalo nuevamente.'
+          )
+        }
+      } finally {
+        if (activo) {
+          setCargando(false)
+        }
+      }
+    }
+
+    cargarEmprendimientos()
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const emprendimientosFiltrados = emprendimientos.filter(
     (emprendimiento) => {
       const contenido = normalizarTexto(
         `${emprendimiento.nombre} ${emprendimiento.categoria} ${emprendimiento.descripcion}`
@@ -145,88 +124,117 @@ export default function Emprendimientos() {
           </div>
         </div>
 
-        {/* CONTADOR */}
-        <p className="bora-emprendimientos-contador">
-          {emprendimientosFiltrados.length}{' '}
-          {emprendimientosFiltrados.length === 1
-            ? 'emprendimiento encontrado'
-            : 'emprendimientos encontrados'}
-        </p>
-
-        {/* TARJETAS COMPLETAMENTE SELECCIONABLES */}
-        <div className="bora-emprendimientos-grid">
-
-          {emprendimientosFiltrados.map((emprendimiento) => (
-            <Link
-              key={emprendimiento.id}
-              to={`/tiendas/${crearSlug(emprendimiento.nombre)}`}
-              className="bora-emprendimiento-tarjeta"
-              aria-label={`Visitar tienda ${emprendimiento.nombre}`}
-            >
-
-              {/* IMAGEN */}
-              <div className="bora-emprendimiento-imagen">
-                <img
-                  src={emprendimiento.imagen}
-                  alt={emprendimiento.nombre}
-                  loading="lazy"
-                />
-
-                <span className="bora-emprendimiento-etiqueta">
-                  Emprendimiento BORA
-                </span>
-              </div>
-
-              {/* INFORMACIÓN */}
-              <div className="bora-emprendimiento-info">
-
-                <span className="bora-emprendimiento-categoria">
-                  {emprendimiento.categoria}
-                </span>
-
-                <h3>{emprendimiento.nombre}</h3>
-
-                <p className="bora-emprendimiento-descripcion">
-                  {emprendimiento.descripcion}
-                </p>
-
-                {/* PIE DE TARJETA */}
-                <div className="bora-emprendimiento-pie">
-                  <span>
-                    {contarProductos(emprendimiento.nombre)}{' '}
-                    {contarProductos(emprendimiento.nombre) === 1
-                      ? 'producto'
-                      : 'productos'}
-                  </span>
-
-                  <span className="bora-emprendimiento-visitar">
-                    Visitar tienda →
-                  </span>
-                </div>
-
-              </div>
-
-            </Link>
-          ))}
-
-        </div>
-
-        {/* SIN RESULTADOS */}
-        {emprendimientosFiltrados.length === 0 && (
+        {/* CARGANDO */}
+        {cargando && (
           <div className="bora-emprendimientos-vacio">
-            <h3>No encontramos emprendimientos</h3>
+            <h3>🌿 Cargando emprendimientos...</h3>
+            <p>Estamos buscando las tiendas de nuestra comunidad.</p>
+          </div>
+        )}
 
-            <p>
-              Prueba con otro nombre o categoría.
-            </p>
-
+        {/* ERROR */}
+        {!cargando && error && (
+          <div className="bora-emprendimientos-vacio" role="alert">
+            <h3>⚠️ No pudimos cargar las tiendas</h3>
+            <p>{error}</p>
             <button
               type="button"
-              onClick={() => setBusqueda('')}
+              onClick={() => window.location.reload()}
             >
-              Limpiar búsqueda
+              Reintentar
             </button>
           </div>
+        )}
+
+        {/* TIENDAS */}
+        {!cargando && !error && (
+          <>
+            <p className="bora-emprendimientos-contador">
+              {emprendimientosFiltrados.length}{' '}
+              {emprendimientosFiltrados.length === 1
+                ? 'emprendimiento encontrado'
+                : 'emprendimientos encontrados'}
+            </p>
+
+            <div className="bora-emprendimientos-grid">
+              {emprendimientosFiltrados.map((emprendimiento) => (
+                <Link
+                  key={emprendimiento.id}
+                  to={`/tiendas/${emprendimiento.id}`}
+                  className="bora-emprendimiento-tarjeta"
+                  aria-label={`Visitar tienda ${emprendimiento.nombre}`}
+                >
+                  {/* IMAGEN */}
+                  <div className="bora-emprendimiento-imagen">
+                    <img
+                      src={
+                        emprendimiento.imagen?.trim()
+                          ? emprendimiento.imagen
+                          : IMAGEN_PREDETERMINADA
+                      }
+                      alt={emprendimiento.nombre}
+                      loading="lazy"
+                      onError={(evento) => {
+                        evento.currentTarget.onerror = null
+                        evento.currentTarget.src =
+                          IMAGEN_PREDETERMINADA
+                      }}
+                    />
+
+                    <span className="bora-emprendimiento-etiqueta">
+                      ✨ Emprendimiento BORA
+                    </span>
+                  </div>
+
+                  {/* INFORMACIÓN */}
+                  <div className="bora-emprendimiento-info">
+
+                    <span className="bora-emprendimiento-categoria">
+                      {emprendimiento.categoria || 'Artesanía'}
+                    </span>
+
+                    <h3>{emprendimiento.nombre}</h3>
+
+                    <p className="bora-emprendimiento-descripcion">
+                      {emprendimiento.descripcion ||
+                        'Conoce este emprendimiento de nuestra comunidad.'}
+                    </p>
+
+                    <div className="bora-emprendimiento-pie">
+                      <span>💚 Talento local</span>
+
+                      <span className="bora-emprendimiento-visitar">
+                        Visitar tienda →
+                      </span>
+                    </div>
+
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* SIN RESULTADOS */}
+            {emprendimientosFiltrados.length === 0 && (
+              <div className="bora-emprendimientos-vacio">
+                <h3>🔎 No encontramos emprendimientos</h3>
+
+                <p>
+                  {busqueda
+                    ? 'Prueba con otro nombre o categoría.'
+                    : 'Todavía no hay tiendas activas registradas.'}
+                </p>
+
+                {busqueda && (
+                  <button
+                    type="button"
+                    onClick={() => setBusqueda('')}
+                  >
+                    Limpiar búsqueda
+                  </button>
+                )}
+              </div>
+            )}
+          </>
         )}
 
       </section>

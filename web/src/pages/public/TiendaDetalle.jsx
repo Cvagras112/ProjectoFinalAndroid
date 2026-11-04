@@ -1,60 +1,19 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { productosDemo } from '../../data/productosDemo'
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+} from 'firebase/firestore'
+import { db } from '../../firebase/config'
 import './TiendaDetalle.css'
 
-// ==========================================
-// BORA - DATOS TEMPORALES DE EMPRENDIMIENTOS
-// Más adelante se conectarán con Firestore.
-// ==========================================
+const IMAGEN_PREDETERMINADA =
+  'https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=1200&auto=format&fit=crop&q=85'
 
-const tiendasDemo = [
-  {
-    nombre: 'Taller Raíces',
-    categoria: 'Artesanía y cerámica',
-    descripcion:
-      'Piezas artesanales elaboradas con dedicación, creatividad y amor por nuestras tradiciones.',
-    portada:
-      'https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=1400&auto=format&fit=crop&q=85',
-  },
-  {
-    nombre: 'Manos Creativas',
-    categoria: 'Accesorios y papelería',
-    descripcion:
-      'Productos originales, llenos de creatividad y pequeños detalles que hacen la diferencia.',
-    portada:
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1400&auto=format&fit=crop&q=85',
-  },
-  {
-    nombre: 'Casa Natural',
-    categoria: 'Decoración',
-    descripcion:
-      'Objetos decorativos para transformar tus espacios en lugares cálidos y acogedores.',
-    portada:
-      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1400&auto=format&fit=crop&q=85',
-  },
-  {
-    nombre: 'Tejidos del Sur',
-    categoria: 'Textiles y tejidos',
-    descripcion:
-      'Tejidos artesanales que combinan tradición, identidad y diseños para cada ocasión.',
-    portada:
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&auto=format&fit=crop&q=85',
-  },
-  {
-    nombre: 'Esencia Natural',
-    categoria: 'Cuidado personal',
-    descripcion:
-      'Productos artesanales inspirados en la naturaleza y en los momentos de bienestar.',
-    portada:
-      'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=1400&auto=format&fit=crop&q=85',
-  },
-]
-
-// ==========================================
-// FUNCIONES AUXILIARES
-// ==========================================
+const CLAVE_SEGUIDAS = 'bora-tiendas-seguidas'
 
 function normalizarTexto(texto) {
   return String(texto ?? '')
@@ -64,24 +23,10 @@ function normalizarTexto(texto) {
     .trim()
 }
 
-function crearSlug(texto) {
-  return normalizarTexto(texto)
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-}
-
-function formatearPrecio(precio) {
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0,
-  }).format(Number(precio) || 0)
-}
-
-function obtenerTiendasSeguidas() {
+function obtenerSeguidas() {
   try {
     const datos = JSON.parse(
-      localStorage.getItem('bora-tiendas-seguidas') || '[]'
+      localStorage.getItem(CLAVE_SEGUIDAS) || '[]'
     )
 
     return Array.isArray(datos) ? datos : []
@@ -90,329 +35,309 @@ function obtenerTiendasSeguidas() {
   }
 }
 
-// ==========================================
-// COMPONENTE PRINCIPAL
-// ==========================================
-
 export default function TiendaDetalle() {
-  const { slug } = useParams()
+  const { slug: tiendaId } = useParams()
 
+  const [tienda, setTienda] = useState(null)
+  const [productos, setProductos] = useState([])
   const [busqueda, setBusqueda] = useState('')
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
+  const [seguida, setSeguida] = useState(false)
   const [mensajeCompartir, setMensajeCompartir] = useState('')
 
-  const [tiendasSeguidas, setTiendasSeguidas] = useState(
-    obtenerTiendasSeguidas
-  )
+  useEffect(() => {
+    setSeguida(obtenerSeguidas().includes(tiendaId))
+  }, [tiendaId])
 
-  // Identificar la tienda desde la URL.
-  const tienda = tiendasDemo.find(
-    (item) => crearSlug(item.nombre) === slug
-  )
+  useEffect(() => {
+    let activo = true
 
-  // Verificar si el comprador sigue esta tienda.
-  const siguiendo = tiendasSeguidas.includes(slug)
-
-  // Mostrar únicamente productos de esta tienda.
-  const productosTienda = tienda
-    ? productosDemo.filter(
-        (producto) =>
-          normalizarTexto(producto.tienda) ===
-          normalizarTexto(tienda.nombre)
-      )
-    : []
-
-  // Buscar solamente dentro de esta tienda.
-  const productosFiltrados = productosTienda.filter((producto) =>
-    normalizarTexto(
-      `${producto.nombre} ${producto.categoria} ${producto.descripcion}`
-    ).includes(normalizarTexto(busqueda))
-  )
-
-  // ==========================================
-  // SEGUIR / DEJAR DE SEGUIR
-  // ==========================================
-
-  function alternarSeguimiento() {
-    const nuevasTiendas = siguiendo
-      ? tiendasSeguidas.filter((item) => item !== slug)
-      : [...new Set([...tiendasSeguidas, slug])]
-
-    setTiendasSeguidas(nuevasTiendas)
-
-    localStorage.setItem(
-      'bora-tiendas-seguidas',
-      JSON.stringify(nuevasTiendas)
-    )
-  }
-
-  // ==========================================
-  // COMPARTIR TIENDA
-  // ==========================================
-
-  async function compartirTienda() {
-    if (!tienda) return
-
-    const enlace = window.location.href
-
-    const datosCompartir = {
-      title: `${tienda.nombre} | BORA`,
-      text: `¡Conoce los productos de ${tienda.nombre} en BORA!`,
-      url: enlace,
-    }
-
-    // Abrir menú de compartir del dispositivo.
-    if (navigator.share) {
+    async function cargarTienda() {
       try {
-        await navigator.share(datosCompartir)
-        setMensajeCompartir('')
-        return
-      } catch (error) {
-        if (error.name === 'AbortError') return
+        setCargando(true)
+        setError('')
+        setTienda(null)
+        setProductos([])
+
+        const referencia = doc(db, 'tiendas', tiendaId)
+        const resultado = await getDoc(referencia)
+
+        if (!resultado.exists() || resultado.data().activo !== true) {
+          return
+        }
+
+        const datosTienda = {
+          id: resultado.id,
+          ...resultado.data(),
+        }
+
+        const resultadoProductos = await getDocs(
+          collection(db, 'productos')
+        )
+
+        const productosTienda = resultadoProductos.docs
+          .map((documento) => ({
+            ...documento.data(),
+            id: documento.id,
+          }))
+          .filter(
+            (producto) =>
+              producto.ID_Tienda === tiendaId &&
+              producto.Disponible !== false
+          )
+
+        if (activo) {
+          setTienda(datosTienda)
+          setProductos(productosTienda)
+        }
+      } catch (errorFirebase) {
+        console.error('Error al cargar tienda:', errorFirebase)
+
+        if (activo) {
+          setError(
+            'No pudimos cargar esta tienda. Inténtalo nuevamente.'
+          )
+        }
+      } finally {
+        if (activo) {
+          setCargando(false)
+        }
       }
     }
 
-    // Alternativa: copiar el enlace.
+    cargarTienda()
+
+    return () => {
+      activo = false
+    }
+  }, [tiendaId])
+
+  const productosFiltrados = productos.filter((producto) => {
+    const contenido = normalizarTexto(
+      `${producto.Nombre || producto.nombre || ''} ${
+        producto.Categoria || producto.categoria || ''
+      }`
+    )
+
+    return contenido.includes(normalizarTexto(busqueda))
+  })
+
+  function cambiarSeguimiento() {
+    const seguidas = obtenerSeguidas()
+
+    const nuevas = seguida
+      ? seguidas.filter((id) => id !== tiendaId)
+      : [...new Set([...seguidas, tiendaId])]
+
+    localStorage.setItem(
+      CLAVE_SEGUIDAS,
+      JSON.stringify(nuevas)
+    )
+
+    setSeguida(!seguida)
+  }
+
+  async function compartirTienda() {
+    const datos = {
+      title: tienda?.nombre || 'Emprendimiento BORA',
+      text: `Conoce ${tienda?.nombre} en BORA`,
+      url: window.location.href,
+    }
+
     try {
-      await navigator.clipboard.writeText(enlace)
-      setMensajeCompartir('¡Enlace copiado al portapapeles!')
-    } catch {
-      setMensajeCompartir(
-        'No se pudo copiar el enlace automáticamente.'
-      )
+      if (navigator.share) {
+        await navigator.share(datos)
+      } else {
+        await navigator.clipboard.writeText(datos.url)
+        setMensajeCompartir('¡Enlace copiado!')
+      }
+    } catch (errorCompartir) {
+      if (errorCompartir.name !== 'AbortError') {
+        setMensajeCompartir('No se pudo compartir el enlace.')
+      }
     }
   }
 
-  // ==========================================
-  // TIENDA NO ENCONTRADA
-  // ==========================================
-
-  if (!tienda) {
+  if (cargando) {
     return (
-      <main className="bora-tienda-no-encontrada">
-        <h1>No encontramos este emprendimiento</h1>
-
-        <p>
-          La tienda que buscas no está disponible.
-        </p>
-
-        <Link to="/tiendas">
-          Volver a emprendimientos
-        </Link>
+      <main className="bora-tienda-detalle">
+        <div style={{ padding: 70, textAlign: 'center' }}>
+          <h2>🌿 Cargando emprendimiento...</h2>
+          <p>Estamos preparando la información de la tienda.</p>
+        </div>
       </main>
     )
   }
 
-  // ==========================================
-  // VISTA DE LA TIENDA
-  // ==========================================
+  if (error) {
+    return (
+      <main className="bora-tienda-detalle">
+        <div style={{ padding: 70, textAlign: 'center' }}>
+          <h2>⚠️ No pudimos cargar la tienda</h2>
+          <p>{error}</p>
+          <Link to="/tiendas">Volver a emprendimientos</Link>
+        </div>
+      </main>
+    )
+  }
+
+  if (!tienda) {
+    return (
+      <main className="bora-tienda-detalle">
+        <div style={{ padding: 70, textAlign: 'center' }}>
+          <h1>No encontramos este emprendimiento</h1>
+          <p>La tienda que buscas no está disponible.</p>
+          <Link to="/tiendas">Volver a emprendimientos</Link>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="bora-tienda-detalle">
 
-      {/* PORTADA DEL EMPRENDIMIENTO */}
       <section className="bora-tienda-portada">
         <img
-          src={tienda.portada}
-          alt={`Portada de ${tienda.nombre}`}
+          src={tienda.imagen?.trim() || IMAGEN_PREDETERMINADA}
+          alt={tienda.nombre}
+          onError={(evento) => {
+            evento.currentTarget.onerror = null
+            evento.currentTarget.src = IMAGEN_PREDETERMINADA
+          }}
         />
-
-        <div className="bora-tienda-portada-overlay" />
       </section>
 
-      {/* PERFIL DE LA EMPRENDEDORA */}
-      <section className="bora-tienda-perfil">
-
-        <div className="bora-tienda-avatar">
-          {tienda.nombre.charAt(0)}
-        </div>
-
-        <div className="bora-tienda-identidad">
-          <span className="bora-tienda-distintivo">
-            EMPRENDIMIENTO BORA
-          </span>
-
-          <h1>{tienda.nombre}</h1>
-
-          <p className="bora-tienda-categoria">
-            {tienda.categoria}
-          </p>
-
-          <p className="bora-tienda-descripcion">
-            {tienda.descripcion}
-          </p>
-        </div>
-
-        {/* BOTONES DE SEGUIR Y COMPARTIR */}
-        <div className="bora-tienda-acciones">
-
-          <button
-            type="button"
-            className={`bora-tienda-seguir ${
-              siguiendo ? 'activo' : ''
-            }`}
-            onClick={alternarSeguimiento}
-            aria-pressed={siguiendo}
-          >
-            {siguiendo ? '✓ Siguiendo' : '+ Seguir tienda'}
-          </button>
-
-          <button
-            type="button"
-            className="bora-tienda-compartir"
-            onClick={compartirTienda}
-          >
-            ↗ Compartir tienda
-          </button>
-
-          {mensajeCompartir && (
-            <span
-              className="bora-tienda-mensaje-compartir"
-              role="status"
-            >
-              {mensajeCompartir}
-            </span>
-          )}
-
-        </div>
-
-        {/* CANTIDAD DE PRODUCTOS */}
-        <div className="bora-tienda-resumen">
-          <strong>{productosTienda.length}</strong>
-
-          <span>
-            {productosTienda.length === 1
-              ? 'Producto publicado'
-              : 'Productos publicados'}
-          </span>
-        </div>
-
-      </section>
-
-      {/* NAVEGACIÓN DE LA TIENDA */}
-      <nav
-        className="bora-tienda-navegacion"
-        aria-label="Navegación de la tienda"
-      >
-        <a href="#productos-tienda">
-          Productos
-        </a>
+      <section className="bora-tienda-contenido">
 
         <Link to="/tiendas">
-          Otros emprendimientos
+          ← Volver a emprendimientos
         </Link>
-      </nav>
 
-      {/* CATÁLOGO EXCLUSIVO DE LA TIENDA */}
-      <section
-        className="bora-tienda-productos"
-        id="productos-tienda"
-      >
+        <div className="bora-tienda-perfil">
+          <div className="bora-tienda-avatar">
+            {tienda.nombre?.charAt(0).toUpperCase() || 'B'}
+          </div>
 
-        <div className="bora-tienda-productos-encabezado">
+          <div className="bora-tienda-informacion">
+            <span>{tienda.categoria || 'Emprendimiento BORA'}</span>
 
-          <div>
-            <span className="bora-tienda-seccion-etiqueta">
-              HECHO CON DEDICACIÓN
-            </span>
-
-            <h2>
-              Productos de {tienda.nombre}
-            </h2>
+            <h1>{tienda.nombre}</h1>
 
             <p>
-              Descubre los productos creados por este
-              emprendimiento.
+              {tienda.descripcion ||
+                'Conoce los productos de este emprendimiento.'}
             </p>
           </div>
 
-          <input
-            type="search"
-            aria-label="Buscar productos de esta tienda"
-            placeholder="Buscar en esta tienda..."
-            value={busqueda}
-            onChange={(evento) =>
-              setBusqueda(evento.target.value)
-            }
-          />
-
-        </div>
-
-        <p className="bora-tienda-resultados">
-          {productosFiltrados.length}{' '}
-          {productosFiltrados.length === 1
-            ? 'producto encontrado'
-            : 'productos encontrados'}
-        </p>
-
-        {/* TARJETAS DE PRODUCTOS */}
-        <div className="bora-tienda-productos-grid">
-
-          {productosFiltrados.map((producto) => (
-            <Link
-              key={producto.id}
-              to={`/productos/${producto.id}`}
-              className="bora-tienda-producto-card"
+          <div className="bora-tienda-acciones">
+            <button
+              type="button"
+              onClick={cambiarSeguimiento}
             >
+              {seguida ? '💚 Siguiendo' : '🤍 Seguir tienda'}
+            </button>
 
-              <div className="bora-tienda-producto-imagen">
-                <img
-                  src={producto.imagen}
-                  alt={producto.nombre}
-                  loading="lazy"
-                />
-              </div>
+            <button
+              type="button"
+              onClick={compartirTienda}
+            >
+              🔗 Compartir tienda
+            </button>
 
-              <div className="bora-tienda-producto-info">
-
-                <span>
-                  {producto.categoria}
-                </span>
-
-                <h3>
-                  {producto.nombre}
-                </h3>
-
-                <strong>
-                  {formatearPrecio(producto.precio)}
-                </strong>
-
-                <span className="bora-tienda-ver-producto">
-                  Ver producto →
-                </span>
-
-              </div>
-
-            </Link>
-          ))}
-
+            {mensajeCompartir && (
+              <p role="status">{mensajeCompartir}</p>
+            )}
+          </div>
         </div>
 
-        {/* SIN PRODUCTOS */}
-        {productosFiltrados.length === 0 && (
-          <div className="bora-tienda-vacio">
+        <section className="bora-tienda-productos">
 
-            <h3>
-              No hay productos para mostrar
-            </h3>
+          <div className="bora-tienda-productos-header">
+            <div>
+              <h2>🛍️ Productos de {tienda.nombre}</h2>
+              <p>
+                Descubre los productos de este emprendimiento.
+              </p>
+            </div>
 
-            <p>
-              Prueba otra búsqueda o revisa más adelante.
-            </p>
-
-            {busqueda && (
-              <button
-                type="button"
-                onClick={() => setBusqueda('')}
-              >
-                Limpiar búsqueda
-              </button>
-            )}
-
+            <input
+              type="search"
+              placeholder="Buscar en esta tienda..."
+              aria-label="Buscar productos de esta tienda"
+              value={busqueda}
+              onChange={(evento) =>
+                setBusqueda(evento.target.value)
+              }
+            />
           </div>
-        )}
 
+          <p>
+            {productosFiltrados.length}{' '}
+            {productosFiltrados.length === 1
+              ? 'producto encontrado'
+              : 'productos encontrados'}
+          </p>
+
+          {productosFiltrados.length > 0 ? (
+            <div className="bora-tienda-productos-grid">
+              {productosFiltrados.map((producto) => {
+                const nombre =
+                  producto.Nombre || producto.nombre || 'Producto'
+
+                const precio =
+                  producto.Precio ?? producto.precio ?? 0
+
+                return (
+                  <Link
+                    key={producto.id}
+                    to={`/productos/${producto.id}`}
+                    className="bora-tienda-producto"
+                  >
+                    <img
+                      src={
+                        producto.imagen?.trim() ||
+                        IMAGEN_PREDETERMINADA
+                      }
+                      alt={nombre}
+                      loading="lazy"
+                      onError={(evento) => {
+                        evento.currentTarget.onerror = null
+                        evento.currentTarget.src =
+                          IMAGEN_PREDETERMINADA
+                      }}
+                    />
+
+                    <div>
+                      <span>
+                        {producto.Categoria ||
+                          producto.categoria ||
+                          'Artesanía'}
+                      </span>
+
+                      <h3>{nombre}</h3>
+
+                      <strong>
+                        ${Number(precio).toLocaleString('es-CL')}
+                      </strong>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="bora-tienda-sin-productos">
+              <h3>🌱 Aún no hay productos disponibles</h3>
+              <p>
+                {busqueda
+                  ? 'Prueba con otra búsqueda.'
+                  : 'Esta tienda todavía no tiene productos publicados.'}
+              </p>
+            </div>
+          )}
+
+        </section>
       </section>
-
     </main>
   )
 }
