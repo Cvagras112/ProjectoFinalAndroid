@@ -1,5 +1,6 @@
 
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import './AdminDashboard.css'
 
 import EmprendedorasAdmin from './EmprendedorasAdmin'
@@ -9,7 +10,6 @@ import CategoriasAdmin from './CategoriasAdmin'
 import TiposProductosAdmin from './TiposProductosAdmin'
 
 function AdminDashboard() {
-
     // SECCIÓN ACTUAL
     const [seccion, setSeccion] = useState('dashboard')
 
@@ -20,27 +20,78 @@ function AdminDashboard() {
     const [categorias, setCategorias] = useState([])
     const [tiposProductos, setTiposProductos] = useState([])
 
-    // ESTADÍSTICAS DEL DASHBOARD
+    // ESTADÍSTICAS
     const totalEmprendedoras = emprendedoras.length
     const totalAsociaciones = asociaciones.length
     const totalCategorias = categorias.length
     const totalTiposProductos = tiposProductos.length
 
-    // OPCIONES DEL MENÚ
+    // MENÚ ADMINISTRATIVO
     const opciones = [
-        { id: 'dashboard', nombre: 'Panel principal' },
-        { id: 'emprendedoras', nombre: 'Emprendedoras' },
-        { id: 'asociaciones', nombre: 'Asociaciones' },
-        { id: 'asignaciones', nombre: 'Asignaciones' },
-        { id: 'categorias', nombre: 'Categorías' },
-        { id: 'tipos', nombre: 'Tipos de productos' }
+        {
+            id: 'dashboard',
+            nombre: 'Panel principal',
+            icono: '🏠'
+        },
+        {
+            id: 'emprendedoras',
+            nombre: 'Emprendedores/as',
+            icono: '👩‍💼'
+        },
+        {
+            id: 'asociaciones',
+            nombre: 'Asociaciones',
+            icono: '🤝'
+        },
+        {
+            id: 'asignaciones',
+            nombre: 'Asignaciones',
+            icono: '📋'
+        },
+        {
+            id: 'categorias',
+            nombre: 'Categorías',
+            icono: '🏷️'
+        },
+        {
+            id: 'tipos',
+            nombre: 'Tipos de productos',
+            icono: '📦'
+        }
     ]
 
     const obtenerNombreSeccion = () => {
         return opciones.find(
             (opcion) => opcion.id === seccion
-        )?.nombre
+        )?.nombre || 'Administración'
     }
+
+    const estadisticas = [
+        {
+            titulo: 'Emprendedores/as',
+            valor: totalEmprendedoras,
+            icono: '🧑‍🎨',
+            descripcion: 'Perfiles registrados'
+        },
+        {
+            titulo: 'Asociaciones',
+            valor: totalAsociaciones,
+            icono: '🤝',
+            descripcion: 'Organizaciones registradas'
+        },
+        {
+            titulo: 'Categorías',
+            valor: totalCategorias,
+            icono: '🏷️',
+            descripcion: 'Categorías disponibles'
+        },
+        {
+            titulo: 'Tipos de productos',
+            valor: totalTiposProductos,
+            icono: '📦',
+            descripcion: 'Tipos registrados'
+        }
+    ]
 
     return (
         <div className="bora-admin">
@@ -49,14 +100,17 @@ function AdminDashboard() {
             <aside className="bora-sidebar">
 
                 <div className="bora-logo">
-                    BORA
+                    🛍️ BORA
                 </div>
 
                 <p className="bora-subtitle">
-                    Panel de administración
+                    ✨ Panel de administración
                 </p>
 
-                <nav className="bora-menu">
+                <nav
+                    className="bora-menu"
+                    aria-label="Menú administrativo"
+                >
                     {opciones.map((opcion) => (
                         <button
                             key={opcion.id}
@@ -66,10 +120,22 @@ function AdminDashboard() {
                             }
                             onClick={() => setSeccion(opcion.id)}
                         >
+                            <span aria-hidden="true">
+                                {opcion.icono}{' '}
+                            </span>
                             {opcion.nombre}
                         </button>
                     ))}
                 </nav>
+
+                {/* BOTÓN VOLVER AL INICIO */}
+                <Link
+                    to="/"
+                    className="bora-volver-inicio"
+                >
+                    <span aria-hidden="true">🏠</span>
+                    Volver al inicio
+                </Link>
 
             </aside>
 
@@ -82,23 +148,26 @@ function AdminDashboard() {
                     {seccion === 'dashboard' ? (
                         <>
                             <h1>
-                                ¡Bienvenido al panel BORA!
+                                ✨ ¡Bienvenido al panel BORA!
                             </h1>
 
                             <p>
-                                Gestiona las emprendedoras, asociaciones
-                                y categorías de la plataforma desde
-                                un solo lugar.
+                                Administra tu comunidad de emprendedores,
+                                asociaciones y productos desde un solo lugar.
+                                💚
                             </p>
                         </>
                     ) : (
                         <>
                             <h1>
+                                {opciones.find(
+                                    (opcion) => opcion.id === seccion
+                                )?.icono}{' '}
                                 {obtenerNombreSeccion()}
                             </h1>
 
                             <p>
-                                Administración de la plataforma BORA
+                                🛠️ Gestión y administración de BORA
                             </p>
                         </>
                     )}
@@ -113,7 +182,7 @@ function AdminDashboard() {
                         <section className="bora-acciones">
 
                             <h2>
-                                Accesos rápidos
+                                🚀 Accesos rápidos
                             </h2>
 
                             <div className="bora-acciones-botones">
@@ -124,7 +193,7 @@ function AdminDashboard() {
                                         setSeccion('emprendedoras')
                                     }
                                 >
-                                    Gestionar emprendedoras
+                                    🧑‍🎨 Gestionar emprendedores/as
                                 </button>
 
                                 <button
@@ -133,7 +202,7 @@ function AdminDashboard() {
                                         setSeccion('asociaciones')
                                     }
                                 >
-                                    Gestionar asociaciones
+                                    🤝 Gestionar asociaciones
                                 </button>
 
                                 <button
@@ -142,7 +211,7 @@ function AdminDashboard() {
                                         setSeccion('categorias')
                                     }
                                 >
-                                    Gestionar categorías
+                                    🏷️ Gestionar categorías
                                 </button>
 
                             </div>
@@ -150,42 +219,86 @@ function AdminDashboard() {
                         </section>
 
                         {/* TARJETAS DE ESTADÍSTICAS */}
-                        <section className="bora-cards">
+                        <section
+                            className="bora-cards"
+                            aria-label="Resumen de la plataforma"
+                        >
+                            {estadisticas.map((estadistica) => (
+                                <article
+                                    key={estadistica.titulo}
+                                    className="bora-card"
+                                >
+                                    <div
+                                        style={{
+                                            fontSize: '30px',
+                                            marginBottom: '12px'
+                                        }}
+                                        aria-hidden="true"
+                                    >
+                                        {estadistica.icono}
+                                    </div>
 
-                            <article className="bora-card">
-                                <h3>Emprendedoras</h3>
-                                <div className="value">
-                                    {totalEmprendedoras}
-                                </div>
-                            </article>
+                                    <h3>
+                                        {estadistica.titulo}
+                                    </h3>
 
-                            <article className="bora-card">
-                                <h3>Asociaciones</h3>
-                                <div className="value">
-                                    {totalAsociaciones}
-                                </div>
-                            </article>
+                                    <div className="value">
+                                        {estadistica.valor}
+                                    </div>
 
-                            <article className="bora-card">
-                                <h3>Categorías</h3>
-                                <div className="value">
-                                    {totalCategorias}
-                                </div>
-                            </article>
+                                    <p
+                                        style={{
+                                            fontSize: '12px',
+                                            color: '#69736D',
+                                            marginTop: '8px'
+                                        }}
+                                    >
+                                        {estadistica.descripcion}
+                                    </p>
+                                </article>
+                            ))}
+                        </section>
 
-                            <article className="bora-card">
-                                <h3>Tipos de productos</h3>
-                                <div className="value">
-                                    {totalTiposProductos}
-                                </div>
-                            </article>
+                        {/* MENSAJE DE BIENVENIDA */}
+                        <section
+                            style={{
+                                marginTop: '30px',
+                                padding: '24px',
+                                background: '#F0F7F1',
+                                borderRadius: '18px',
+                                border: '1px solid #DCEBDD'
+                            }}
+                        >
+                            <h2
+                                style={{
+                                    color: '#194C36',
+                                    fontSize: '18px',
+                                    marginBottom: '10px'
+                                }}
+                            >
+                                🌿 Una comunidad que crece
+                            </h2>
 
+                            <p
+                                style={{
+                                    color: '#52665B',
+                                    lineHeight: '1.7',
+                                    fontSize: '14px'
+                                }}
+                            >
+                                BORA conecta a emprendedores y
+                                emprendedoras con nuevas oportunidades.
+                                Desde este espacio podrás organizar
+                                la información de la plataforma y
+                                apoyar el crecimiento de la comunidad.
+                                💚🧡
+                            </p>
                         </section>
                     </>
 
                 ) : seccion === 'emprendedoras' ? (
 
-                    /* MÓDULO EMPRENDEDORAS */
+                    /* MÓDULO EMPRENDEDORES/AS */
                     <EmprendedorasAdmin
                         emprendedoras={emprendedoras}
                         setEmprendedoras={setEmprendedoras}

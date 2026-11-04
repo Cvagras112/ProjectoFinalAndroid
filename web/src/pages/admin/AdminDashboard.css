@@ -496,3 +496,34 @@
   color: #888888;
   cursor: not-allowed;
 }
+
+/* BOTÓN VOLVER AL INICIO */
+
+.bora-volver-inicio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 30px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: #FFF6E5;
+  color: #194C36;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bora-volver-inicio:hover {
+  background: #FFE5B5;
+  color: #194C36;
+  transform: translateY(-2px);
+}
+
+.bora-volver-inicio:focus-visible {
+  outline: 3px solid #FFAD39;
+  outline-offset: 3px;
+}

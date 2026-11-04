@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Navbar from './components/Navbar'
+import RutaAdmin from './components/auth/RutaAdmin'
 
 import Home from './pages/public/Home'
 import Productos from './pages/public/Productos'
@@ -16,15 +17,20 @@ import RecuperarContrasena from './pages/auth/RecuperarContrasena'
 
 import MiPerfil from './pages/perfil/MiPerfil'
 
+// Panel administrativo desarrollado por David
+import AdminDashboard from './pages/admin/AdminDashboard'
+
 import './App.css'
 
 function PaginaPendiente({ titulo, descripcion }) {
   return (
-    <main style={{
-      maxWidth: '1100px',
-      margin: '70px auto',
-      padding: '0 24px'
-    }}>
+    <main
+      style={{
+        maxWidth: '1100px',
+        margin: '70px auto',
+        padding: '0 24px'
+      }}
+    >
       <h1>{titulo}</h1>
       <p>{descripcion || 'Estamos preparando esta sección de BORA.'}</p>
     </main>
@@ -59,26 +65,25 @@ function App() {
           element={<RecuperarContrasena />}
         />
 
-        {/* PERFIL DEL USUARIO */}
+        {/* PERFIL */}
         <Route path="/perfil" element={<MiPerfil />} />
 
-        {/* PANEL ADMINISTRATIVO - DAVID */}
+        {/* PANEL ADMINISTRATIVO PROTEGIDO */}
         <Route
           path="/admin"
           element={
-            <PaginaPendiente
-              titulo="Panel de administración"
-              descripcion="El panel administrativo de BORA se encuentra en desarrollo."
-            />
+            <RutaAdmin>
+              <AdminDashboard />
+            </RutaAdmin>
           }
         />
 
-        {/* PANEL DE EMPRENDEDORAS */}
+        {/* PANEL DE EMPRENDEDOR/A - PENDIENTE */}
         <Route
           path="/panel-emprendedora"
           element={
             <PaginaPendiente
-              titulo="Panel de emprendedora"
+              titulo="Panel de emprendedor/a"
               descripcion="Aquí podrás administrar tu tienda y tus productos."
             />
           }
