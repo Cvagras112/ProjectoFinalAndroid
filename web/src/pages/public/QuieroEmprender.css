@@ -1,0 +1,236 @@
+
+/* =========================================
+   BORA - SOLICITUD PARA EMPRENDEDORES
+========================================= */
+
+.bora-emprender {
+  min-height: calc(100vh - 80px);
+  padding: 65px 24px;
+  background: #fbf9f4;
+  font-family: 'Poppins', sans-serif;
+}
+
+.bora-emprender-contenedor {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  max-width: 1120px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 20px 55px rgba(24, 65, 43, 0.09);
+}
+
+/* PRESENTACIÓN */
+
+.bora-emprender-intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 55px 45px;
+  background: linear-gradient(145deg, #005a39, #00834e);
+  color: #ffffff;
+}
+
+.bora-emprender-intro::before {
+  content: '';
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  top: -140px;
+  right: -125px;
+  border: 1px solid rgba(255, 173, 57, 0.5);
+  border-radius: 50%;
+  box-shadow: 0 0 0 35px rgba(255, 255, 255, 0.035);
+  pointer-events: none;
+}
+
+.bora-emprender-etiqueta {
+  align-self: flex-start;
+  padding: 12px 20px;
+  border-radius: 40px;
+  background: #ffbd65;
+  color: #064c34;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.bora-emprender-intro h1 {
+  margin: 30px 0 20px;
+  font-size: clamp(30px, 3vw, 43px);
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.bora-emprender-intro > p {
+  font-size: 15px;
+  line-height: 1.9;
+  color: #e6f5ed;
+}
+
+.bora-emprender-beneficios {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.bora-emprender-beneficios p {
+  margin: 12px 0;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* FORMULARIO */
+
+.bora-emprender-formulario {
+  padding: 48px 46px;
+}
+
+.bora-emprender-icono {
+  color: #ed8c1b;
+  font-size: 25px;
+}
+
+.bora-emprender-formulario h2 {
+  margin: 10px 0;
+  color: #075d3c;
+  font-size: 29px;
+  font-weight: 800;
+}
+
+.bora-emprender-subtitulo {
+  margin-bottom: 30px;
+  color: #78847c;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.bora-emprender-formulario form {
+  display: flex;
+  flex-direction: column;
+}
+
+.bora-emprender-formulario label {
+  margin: 15px 0 8px;
+  color: #164b36;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bora-emprender-formulario input,
+.bora-emprender-formulario select,
+.bora-emprender-formulario textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 15px;
+  border: 1px solid #d7e2da;
+  border-radius: 11px;
+  background: #fcfdfb;
+  color: #273c30;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bora-emprender-formulario input:focus,
+.bora-emprender-formulario select:focus,
+.bora-emprender-formulario textarea:focus {
+  border-color: #168357;
+  box-shadow: 0 0 0 3px rgba(22, 131, 87, 0.1);
+}
+
+.bora-emprender-formulario textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.bora-emprender-submit {
+  width: 100%;
+  margin-top: 27px;
+  padding: 16px;
+  border: none;
+  border-radius: 11px;
+  background: linear-gradient(90deg, #00834e, #00633d);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.bora-emprender-submit:hover {
+  background: #005335;
+  transform: translateY(-2px);
+}
+
+.bora-emprender-mensaje {
+  padding: 13px;
+  margin-top: 20px;
+  border-radius: 9px;
+  background: #fff3df;
+  color: #85520b;
+  font-size: 13px;
+}
+
+.bora-emprender-acceso {
+  margin-top: 25px;
+  text-align: center;
+  color: #78847c;
+  font-size: 13px;
+}
+
+.bora-emprender-acceso a {
+  color: #00784a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.bora-emprender-acceso a:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+  .bora-emprender-contenedor {
+    grid-template-columns: 1fr;
+  }
+
+  .bora-emprender-intro {
+    padding: 40px 30px;
+  }
+
+  .bora-emprender-intro h1 {
+    font-size: 32px;
+  }
+
+  .bora-emprender-formulario {
+    padding: 35px 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bora-emprender {
+    padding: 25px 12px;
+  }
+
+  .bora-emprender-contenedor {
+    border-radius: 18px;
+  }
+
+  .bora-emprender-intro,
+  .bora-emprender-formulario {
+    padding: 30px 22px;
+  }
+
+  .bora-emprender-formulario h2 {
+    font-size: 24px;
+  }
+}

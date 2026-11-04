@@ -15,6 +15,8 @@ import Login from './pages/auth/Login'
 import Registro from './pages/auth/Registro'
 import RecuperarContrasena from './pages/auth/RecuperarContrasena'
 
+import QuieroEmprender from './pages/public/QuieroEmprender'
+
 import MiPerfil from './pages/perfil/MiPerfil'
 
 // Panel administrativo desarrollado por David
@@ -87,6 +89,12 @@ function App() {
               descripcion="Aquí podrás administrar tu tienda y tus productos."
             />
           }
+        />
+
+        {/* SOLICITUD PARA SER EMPRENDEDOR/A */}
+        <Route
+          path="/quiero-emprender"
+          element={<QuieroEmprender />}
         />
 
         {/* PÁGINA NO ENCONTRADA */}

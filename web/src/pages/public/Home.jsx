@@ -578,8 +578,8 @@ export default function Home() {
           </p>
 
           <div className="bora-invitacion-botones">
-            <a href="/login" className="bora-boton-claro">
-              Comenzar en BORA →
+            <a href="/quiero-emprender" className="bora-boton-claro">
+              Quiero ser emprendedor/a →
             </a>
 
             <a href="/ayuda" className="bora-boton-transparente">
