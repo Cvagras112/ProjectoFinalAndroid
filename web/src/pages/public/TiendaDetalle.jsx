@@ -115,8 +115,7 @@ export default function TiendaDetalle() {
 
   const productosFiltrados = productos.filter((producto) => {
     const contenido = normalizarTexto(
-      `${producto.Nombre || producto.nombre || ''} ${
-        producto.Categoria || producto.categoria || ''
+      `${producto.Nombre || producto.nombre || ''} ${producto.Categoria || producto.categoria || ''
       }`
     )
 
@@ -230,7 +229,66 @@ export default function TiendaDetalle() {
             </p>
           </div>
 
+
           <div className="bora-tienda-acciones">
+
+
+            {(() => {
+              const telefono = String(
+                tienda.whatsapp || tienda.telefono || ''
+              ).replace(/\D/g, '')
+
+              const numeroWhatsApp =
+                telefono.length === 9 && telefono.startsWith('9')
+                  ? `56${telefono}`
+                  : telefono
+
+
+              const correo = String(
+                tienda.emailContacto || tienda.correo || tienda.email || ''
+              ).trim()
+
+
+              const mensaje = `¡Hola! Vi tu tienda "${tienda.nombre}" en BORA y me gustaría obtener más información sobre tus productos.`
+
+              const asunto = `Consulta sobre ${tienda.nombre} - BORA`
+
+              return (
+                <div className="bora-tienda-contactos">
+
+                  {numeroWhatsApp && (
+                    <a
+                      href={`https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bora-tienda-contacto-whatsapp"
+                    >
+                      <span aria-hidden="true">💬</span>
+                      WhatsApp
+                    </a>
+                  )}
+
+                  {correo && (
+                    <a
+                      href={`mailto:${correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`}
+                      className="bora-tienda-contacto-email"
+                    >
+                      <span aria-hidden="true">✉️</span>
+                      Correo 
+                    </a>
+                  )}
+
+                  {!numeroWhatsApp && !correo && (
+                    <span className="bora-tienda-contacto-no-disponible">
+                      Contacto no disponible
+                    </span>
+                  )}
+
+                </div>
+              )
+            })()}
+
+
             <button
               type="button"
               onClick={cambiarSeguimiento}
@@ -248,8 +306,10 @@ export default function TiendaDetalle() {
             {mensajeCompartir && (
               <p role="status">{mensajeCompartir}</p>
             )}
+
           </div>
         </div>
+
 
         <section className="bora-tienda-productos">
 

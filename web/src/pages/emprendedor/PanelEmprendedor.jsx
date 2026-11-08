@@ -1,16 +1,24 @@
 
+
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../../firebase/config'
-import { obtenerTiendaEmprendedor } from '../../services/tiendas/tiendaService'
+
+import {
+    obtenerTiendaEmprendedor,
+    actualizarTiendaEmprendedor,
+} from '../../services/tiendas/tiendaService'
+
 import {
     obtenerProductosPorTienda,
     crearProducto,
     editarProducto,
     eliminarProducto,
 } from '../../services/productos/productoService'
+
 import './PanelEmprendedor.css'
+
 
 const FORMULARIO_VACIO = {
     nombre: '',
@@ -32,6 +40,20 @@ function formatoPrecio(precio) {
 
 export default function PanelEmprendedor() {
     const [tienda, setTienda] = useState(null)
+
+    const [editandoTienda, setEditandoTienda] = useState(false)
+
+    const [formularioTienda, setFormularioTienda] = useState({
+        nombre: '',
+        descripcion: '',
+        categoria: '',
+        imagen: '',
+    })
+
+    const [guardandoTienda, setGuardandoTienda] = useState(false)
+    const [mensajeTienda, setMensajeTienda] = useState('')
+    const [errorTienda, setErrorTienda] = useState('')
+
     const [productos, setProductos] = useState([])
     const [cargando, setCargando] = useState(true)
     const [error, setError] = useState('')
@@ -93,6 +115,72 @@ export default function PanelEmprendedor() {
             cancelar()
         }
     }, [])
+
+
+    function abrirEditarTienda() {
+        if (!tienda) return
+
+        setFormularioTienda({
+            nombre: tienda.nombre || '',
+            descripcion: tienda.descripcion || '',
+            categoria: tienda.categoria || '',
+            imagen: tienda.imagen || '',
+        })
+
+        setMensajeTienda('')
+        setErrorTienda('')
+        setEditandoTienda(true)
+    }
+
+    function cerrarEditarTienda() {
+        if (guardandoTienda) return
+
+        setEditandoTienda(false)
+        setErrorTienda('')
+    }
+
+    function cambiarCampoTienda(evento) {
+        const { name, value } = evento.target
+
+        setFormularioTienda((anterior) => ({
+            ...anterior,
+            [name]: value,
+        }))
+    }
+
+
+    async function guardarCambiosTienda(evento) {
+        evento.preventDefault()
+
+        if (guardandoTienda || !tienda || !auth.currentUser) return
+
+        setGuardandoTienda(true)
+        setErrorTienda('')
+        setMensajeTienda('')
+
+        try {
+            const tiendaActualizada = await actualizarTiendaEmprendedor(
+                auth.currentUser.uid,
+                formularioTienda
+            )
+
+            setTienda(tiendaActualizada)
+            setEditandoTienda(false)
+            setMensajeTienda('¡Los datos de tu tienda se actualizaron correctamente!')
+        } catch (err) {
+            console.error('Error al actualizar la tienda:', err)
+
+            setErrorTienda(
+                err.code === 'permission-denied'
+                    ? 'No tienes permisos para modificar esta tienda.'
+                    : err.message || 'No pudimos actualizar tu tienda.'
+            )
+        } finally {
+            setGuardandoTienda(false)
+        }
+    }
+
+
 
     function abrirCrear() {
         setProductoEditando(null)
@@ -571,6 +659,21 @@ export default function PanelEmprendedor() {
                     <div className="panel-emprendedor__titulo-seccion">
                         <h2>🏪 Mi tienda</h2>
                     </div>
+
+                    <Link
+                        to="/emprendedor/editar-tienda"
+                        className="panel-emprendedor__boton-crear"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            marginBottom: '20px',
+                            textDecoration: 'none',
+                        }}
+                    >
+                        ✏️ Editar mi tienda
+                    </Link>
 
                     <h3 className="panel-emprendedor__tienda-nombre">
                         {tienda.nombre}

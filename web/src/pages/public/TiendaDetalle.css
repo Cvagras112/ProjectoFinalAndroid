@@ -887,3 +887,55 @@
     height: 165px;
   }
 }
+
+.bora-tienda-contactos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.bora-tienda-contactos a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 20px;
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.bora-tienda-contactos a:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.bora-tienda-contactos .bora-tienda-contacto-whatsapp {
+  background: #16834a;
+}
+
+.bora-tienda-contactos .bora-tienda-contacto-email {
+  background: #d97706;
+}
+
+.bora-tienda-contactos a span {
+  font-size: 19px;
+}
+
+@media (max-width: 600px) {
+  .bora-tienda-contactos {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .bora-tienda-contactos a {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

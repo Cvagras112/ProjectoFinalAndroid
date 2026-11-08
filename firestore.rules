@@ -1,0 +1,409 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================
+    // FUNCIONES DE SEGURIDAD
+    // ========================================
+
+    function esAdministrador() {
+      return request.auth != null
+        && exists(
+          /databases/$(database)/documents/usuarios/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/usuarios/$(request.auth.uid)
+        ).data.rol == 'administrador'
+        && get(
+          /databases/$(database)/documents/usuarios/$(request.auth.uid)
+        ).data.activo == true;
+    }
+
+    function esDuenoTienda(tiendaId) {
+      return request.auth != null
+        && tiendaId is string
+        && exists(
+          /databases/$(database)/documents/emprendedores/$(request.auth.uid)
+        )
+        && exists(
+          /databases/$(database)/documents/tiendas/$(tiendaId)
+        )
+        && get(
+          /databases/$(database)/documents/emprendedores/$(request.auth.uid)
+        ).data.activo == true
+        && get(
+          /databases/$(database)/documents/emprendedores/$(request.auth.uid)
+        ).data.ID_Tienda == tiendaId
+        && get(
+          /databases/$(database)/documents/tiendas/$(tiendaId)
+        ).data.activo == true
+        && get(
+          /databases/$(database)/documents/tiendas/$(tiendaId)
+        ).data.ID_Dueno == request.auth.uid;
+    }
+
+    // ========================================
+    // USUARIOS
+    // ========================================
+
+    match /usuarios/{usuarioId} {
+
+      allow get: if request.auth != null
+        && (
+          request.auth.uid == usuarioId
+          || esAdministrador()
+        );
+
+      allow list: if esAdministrador();
+
+      // Registro público solo para compradores.
+      allow create: if request.auth != null
+        && request.auth.uid == usuarioId
+
+        && request.resource.data.keys().hasAll([
+          'ID', 'nombre', 'email', 'rol', 'activo'
+        ])
+
+        && request.resource.data.keys().hasOnly([
+          'ID', 'nombre', 'email', 'rol', 'activo'
+        ])
+
+        && request.resource.data.ID == usuarioId
+
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 150
+
+        && request.resource.data.email is string
+        && request.auth.token.email is string
+        && request.auth.token.email_verified == true
+        && request.resource.data.email == request.auth.token.email
+
+        && request.resource.data.rol == 'comprador'
+        && request.resource.data.activo == true;
+
+      allow update, delete: if false;
+    }
+
+    // ========================================
+    // EMPRENDEDORES
+    // ========================================
+
+    match /emprendedores/{emprendedorId} {
+
+      allow read: if request.auth != null
+        && (
+          request.auth.uid == emprendedorId
+          || esAdministrador()
+        );
+
+      allow update: if esAdministrador()
+
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            'nombre',
+            'telefono',
+            'descripcion',
+            'direccion',
+            'activo'
+          ])
+
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 150
+
+        && request.resource.data.telefono is string
+        && request.resource.data.descripcion is string
+        && request.resource.data.direccion is string
+        && request.resource.data.activo is bool;
+
+      allow create, delete: if false;
+    }
+
+    // ========================================
+    // TIENDAS
+    // ========================================
+
+   
+
+match /tiendas/{tiendaId} {
+
+  // Las tiendas pueden consultarse públicamente.
+  allow read: if true;
+
+  // Solo la propietaria de una tienda activa
+  // puede editar sus datos públicos.
+  allow update: if esDuenoTienda(tiendaId)
+
+    // Campos que la emprendedora puede modificar.
+    && request.resource.data.diff(resource.data)
+      .affectedKeys()
+      .hasOnly([
+        'nombre',
+        'descripcion',
+        'categoria',
+        'sector',
+        'telefono',
+        'whatsapp',
+        'emailContacto',
+        'imagen'
+      ])
+
+    // Nombre de la tienda.
+    && request.resource.data.nombre is string
+    && request.resource.data.nombre.size() > 0
+    && request.resource.data.nombre.size() <= 150
+
+    // Descripción.
+    && request.resource.data.descripcion is string
+    && request.resource.data.descripcion.size() <= 2000
+
+    // Categoría.
+    && request.resource.data.categoria is string
+    && request.resource.data.categoria.size() > 0
+    && request.resource.data.categoria.size() <= 100
+
+    // Comuna.
+    && request.resource.data.sector is string
+    && request.resource.data.sector.size() <= 100
+
+    // Teléfono.
+    && request.resource.data.telefono is string
+    && request.resource.data.telefono.size() <= 25
+
+    // WhatsApp.
+    && request.resource.data.whatsapp is string
+    && request.resource.data.whatsapp.size() <= 25
+
+    // Correo de contacto.
+    && request.resource.data.emailContacto is string
+    && request.resource.data.emailContacto.size() <= 254
+
+    // Imagen de la tienda.
+    && request.resource.data.imagen is string
+    && request.resource.data.imagen.size() <= 2000;
+
+  // La creación y eliminación siguen protegidas.
+  allow create, delete: if false;
+}
+
+
+
+    // ========================================
+    // PRODUCTOS
+    // ========================================
+
+    match /productos/{productoId} {
+
+      // Lectura pública para el catálogo BORA.
+      allow read: if true;
+
+      // Validar estructura y datos del producto.
+      function productoValido() {
+        return request.resource.data.keys().hasAll([
+          'ID_Producto',
+          'ID_Tienda',
+          'Nombre',
+          'Categoria',
+          'Precio',
+          'Stock',
+          'Disponible',
+          'imagen'
+        ])
+
+        && request.resource.data.keys().hasOnly([
+          'ID_Producto',
+          'ID_Tienda',
+          'Nombre',
+          'Categoria',
+          'Precio',
+          'Stock',
+          'Disponible',
+          'imagen',
+          'Descripcion'
+        ])
+
+        // El ID almacenado debe coincidir
+        // con el ID del documento.
+        && request.resource.data.ID_Producto == productoId
+
+        && request.resource.data.ID_Tienda is string
+        && request.resource.data.ID_Tienda.size() > 0
+
+        && request.resource.data.Nombre is string
+        && request.resource.data.Nombre.size() > 0
+        && request.resource.data.Nombre.size() <= 150
+
+        && request.resource.data.Categoria is string
+        && request.resource.data.Categoria.size() > 0
+        && request.resource.data.Categoria.size() <= 100
+
+        && request.resource.data.Precio is number
+        && request.resource.data.Precio >= 0
+
+        && request.resource.data.Stock is int
+        && request.resource.data.Stock >= 0
+
+        && request.resource.data.Disponible is bool
+
+        && request.resource.data.imagen is string
+        && request.resource.data.imagen.size() <= 2000
+
+        // Descripción opcional.
+        && request.resource.data.get('Descripcion', '') is string
+        && request.resource.data.get('Descripcion', '').size() <= 2000;
+      }
+
+      // CREAR PRODUCTOS
+      // Solo el propietario de la tienda activa.
+      allow create: if productoValido()
+        && esDuenoTienda(
+          request.resource.data.ID_Tienda
+        );
+
+      // EDITAR PRODUCTOS
+      // No se permite cambiar identificadores
+      // ni transferir productos entre tiendas.
+      allow update: if productoValido()
+
+        && esDuenoTienda(resource.data.ID_Tienda)
+
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            'Nombre',
+            'Categoria',
+            'Precio',
+            'Stock',
+            'Disponible',
+            'imagen',
+            'Descripcion'
+          ])
+
+        && request.resource.data.ID_Tienda ==
+          resource.data.ID_Tienda
+
+        && request.resource.data.ID_Producto ==
+          resource.data.ID_Producto;
+
+      // ELIMINAR PRODUCTOS
+      // Solo el propietario de la tienda.
+      allow delete: if esDuenoTienda(
+        resource.data.ID_Tienda
+      );
+    }
+
+    // ========================================
+    // FERIAS
+    // ========================================
+
+    match /ferias/{feriaId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ========================================
+    // SOLICITUDES PARA SER EMPRENDEDOR/A
+    // ========================================
+
+    match /solicitudes_emprendedores/{usuarioId} {
+
+      // Consultar solicitud propia o administrar.
+      allow read: if request.auth != null
+        && (
+          request.auth.uid == usuarioId
+          || esAdministrador()
+        );
+
+      // Crear solicitud pendiente.
+      allow create: if request.auth != null
+        && request.auth.uid == usuarioId
+        && request.auth.token.email_verified == true
+
+        && request.resource.data.keys().hasAll([
+          'usuarioId',
+          'email',
+          'nombre',
+          'telefono',
+          'emprendimiento',
+          'categoria',
+          'descripcion',
+          'estado',
+          'fechaSolicitud'
+        ])
+
+        && request.resource.data.keys().hasOnly([
+          'usuarioId',
+          'email',
+          'nombre',
+          'telefono',
+          'emprendimiento',
+          'categoria',
+          'descripcion',
+          'estado',
+          'fechaSolicitud'
+        ])
+
+        && request.resource.data.usuarioId == usuarioId
+        && request.resource.data.email ==
+          request.auth.token.email
+
+        && request.resource.data.estado == 'pendiente'
+
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 150
+
+        && request.resource.data.telefono is string
+        && request.resource.data.telefono.size() > 0
+        && request.resource.data.telefono.size() <= 30
+
+        && request.resource.data.emprendimiento is string
+        && request.resource.data.emprendimiento.size() > 0
+        && request.resource.data.emprendimiento.size() <= 150
+
+        && request.resource.data.categoria in [
+          'Artesanía',
+          'Textiles y tejidos',
+          'Gastronomía',
+          'Belleza y bienestar',
+          'Decoración',
+          'Otros'
+        ]
+
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() > 0
+        && request.resource.data.descripcion.size() <= 1000
+
+        && request.resource.data.fechaSolicitud == request.time;
+
+      // Aprobar o rechazar solicitudes pendientes.
+      allow update: if esAdministrador()
+
+        && resource.data.estado == 'pendiente'
+
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly(['estado'])
+
+        && request.resource.data.estado in [
+          'aprobada',
+          'rechazada'
+        ];
+
+      allow delete: if false;
+    }
+
+    // ========================================
+    // BLOQUEO GENERAL
+    // ========================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

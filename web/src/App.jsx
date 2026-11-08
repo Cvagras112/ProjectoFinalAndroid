@@ -20,6 +20,7 @@ import QuieroEmprender from './pages/public/QuieroEmprender'
 
 import MiPerfil from './pages/perfil/MiPerfil'
 import PanelEmprendedor from './pages/emprendedor/PanelEmprendedor'
+import EditarTienda from './pages/emprendedor/EditarTienda'
 
 // Panel administrativo desarrollado por David
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -91,6 +92,18 @@ function App() {
             </RutaEmprendedor>
           }
         />
+
+
+        {/* EDITAR MI TIENDA - RUTA PROTEGIDA */}
+        <Route
+          path="/emprendedor/editar-tienda"
+          element={
+            <RutaEmprendedor>
+              <EditarTienda />
+            </RutaEmprendedor>
+          }
+        />
+
 
         {/* SOLICITUD PARA SER EMPRENDEDOR/A */}
         <Route

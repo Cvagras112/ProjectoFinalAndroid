@@ -1,5 +1,5 @@
 
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../../firebase/config'
 
 export async function obtenerTiendaEmprendedor(uid) {
@@ -42,5 +42,103 @@ export async function obtenerTiendaEmprendedor(uid) {
   return {
     id: tiendaDoc.id,
     ...tienda,
+  }
+}
+
+export async function actualizarTiendaEmprendedor(uid, datos) {
+  const tienda = await obtenerTiendaEmprendedor(uid)
+
+  const nombre = String(datos.nombre || '').trim()
+  const descripcion = String(datos.descripcion || '').trim()
+  const categoria = String(datos.categoria || '').trim()
+  const sector = String(datos.sector || '').trim()
+  const telefono = String(datos.telefono || '').trim()
+  const whatsapp = String(datos.whatsapp || '').trim()
+  const emailContacto = String(datos.emailContacto || '').trim()
+  const imagen = String(datos.imagen || '').trim()
+
+  // Validaciones generales
+  if (!nombre || nombre.length > 150) {
+    throw new Error('El nombre debe tener entre 1 y 150 caracteres.')
+  }
+
+  if (!categoria || categoria.length > 100) {
+    throw new Error('Selecciona una categoría válida.')
+  }
+
+  if (descripcion.length > 2000) {
+    throw new Error('La descripción no puede superar los 2000 caracteres.')
+  }
+
+  if (sector.length > 100) {
+    throw new Error('La comuna seleccionada no es válida.')
+  }
+
+  // Validación de teléfono y WhatsApp
+  function validarTelefono(numero, campo) {
+    if (!numero) return
+
+    const digitos = numero.replace(/\D/g, '')
+
+    if (
+      !/^(?:9\d{8}|56\d{9})$/.test(digitos)
+    ) {
+      throw new Error(
+        `Ingresa un número válido para ${campo}. Ejemplo: +56 9 1234 5678.`
+      )
+    }
+  }
+
+  validarTelefono(telefono, 'teléfono')
+  validarTelefono(whatsapp, 'WhatsApp')
+
+  // Validación del correo
+  if (
+    emailContacto &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailContacto)
+  ) {
+    throw new Error('Ingresa un correo electrónico válido.')
+  }
+
+  if (emailContacto.length > 254) {
+    throw new Error('El correo electrónico es demasiado largo.')
+  }
+
+  // Validación de imagen
+  if (imagen.length > 2000) {
+    throw new Error('La URL de la imagen es demasiado larga.')
+  }
+
+  if (imagen) {
+    try {
+      const url = new URL(imagen)
+
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        throw new Error('Protocolo no permitido.')
+      }
+    } catch {
+      throw new Error('Ingresa una URL de imagen válida.')
+    }
+  }
+
+  // Guardar todos los datos en Firestore
+  const datosActualizados = {
+    nombre,
+    descripcion,
+    categoria,
+    sector,
+    telefono,
+    whatsapp,
+    emailContacto,
+    imagen,
+  }
+
+  const tiendaRef = doc(db, 'tiendas', tienda.id)
+
+  await updateDoc(tiendaRef, datosActualizados)
+
+  return {
+    ...tienda,
+    ...datosActualizados,
   }
 }
