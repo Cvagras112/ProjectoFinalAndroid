@@ -1,12 +1,8 @@
 
 import { useEffect, useState } from 'react'
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-} from 'firebase/firestore'
+import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../../firebase/config'
+import { aprobarSolicitudEmprendedor } from '../../services/solicitudes/aprobacionService'
 import './SolicitudesAdmin.css'
 
 function formatearFecha(fecha) {
@@ -76,16 +72,13 @@ function SolicitudesAdmin() {
     cargarSolicitudes()
   }, [])
 
-  async function cambiarEstado(solicitud, nuevoEstado) {
+  async function aprobarSolicitud(solicitud) {
     if (solicitud.estado !== 'pendiente' || procesando) {
       return
     }
 
-    const accion =
-      nuevoEstado === 'aprobada' ? 'aprobar' : 'rechazar'
-
     const confirmado = window.confirm(
-      `¿Estás seguro de que deseas ${accion} la solicitud de ${solicitud.nombre}?`
+      `¿Estás seguro de que deseas aprobar la solicitud de ${solicitud.nombre}?`
     )
 
     if (!confirmado) return
@@ -95,44 +88,27 @@ function SolicitudesAdmin() {
     setMensaje('')
 
     try {
-      const referencia = doc(
-        db,
-        'solicitudes_emprendedores',
+      const resultado = await aprobarSolicitudEmprendedor(
         solicitud.id
       )
 
-      await updateDoc(referencia, {
-        estado: nuevoEstado,
-      })
-
-      setSolicitudes((anteriores) =>
-        anteriores.map((item) =>
-          item.id === solicitud.id
-            ? { ...item, estado: nuevoEstado }
-            : item
-        )
-      )
+      await cargarSolicitudes()
 
       setSeleccionada((actual) =>
         actual?.id === solicitud.id
-          ? { ...actual, estado: nuevoEstado }
+          ? { ...actual, estado: 'aprobada' }
           : actual
       )
 
       setMensaje(
-        `La solicitud de ${solicitud.nombre} fue ${
-          nuevoEstado === 'aprobada'
-            ? 'aprobada'
-            : 'rechazada'
-        } correctamente.`
+        resultado.mensaje ||
+          `La solicitud de ${solicitud.nombre} fue aprobada correctamente.`
       )
     } catch (err) {
-      console.error('Error al actualizar solicitud:', err)
-
+      console.error('Error al aprobar solicitud:', err)
       setError(
-        err.code === 'permission-denied'
-          ? 'Firebase rechazó la operación. Comprueba los permisos del administrador.'
-          : 'No fue posible actualizar la solicitud. Intenta nuevamente.'
+        err.message ||
+          'No fue posible aprobar la solicitud.'
       )
     } finally {
       setProcesando(null)
@@ -322,16 +298,13 @@ function SolicitudesAdmin() {
                             <button
                               type="button"
                               className="bora-solicitudes-ver"
-                              disabled={ocupado}
+                              disabled={ocupado || cargando}
                               onClick={() =>
-                                cambiarEstado(
-                                  solicitud,
-                                  'aprobada'
-                                )
+                                aprobarSolicitud(solicitud)
                               }
                             >
                               {procesando === solicitud.id
-                                ? 'Guardando...'
+                                ? 'Procesando...'
                                 : '✓ Aprobar'}
                             </button>
 
@@ -340,14 +313,11 @@ function SolicitudesAdmin() {
                               className="bora-solicitudes-ver"
                               style={{
                                 background: '#c96d4e',
+                                opacity: 0.6,
+                                cursor: 'not-allowed',
                               }}
-                              disabled={ocupado}
-                              onClick={() =>
-                                cambiarEstado(
-                                  solicitud,
-                                  'rechazada'
-                                )
-                              }
+                              disabled
+                              title="Pendiente de implementar rechazo seguro"
                             >
                               ✕ Rechazar
                             </button>
