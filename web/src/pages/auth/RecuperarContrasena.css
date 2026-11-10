@@ -291,3 +291,86 @@
     font-size: 26px;
   }
 }
+
+/* =========================================
+   BORA - BOTONES RECUPERAR CONTRASEÑA
+========================================= */
+
+/* Botón principal */
+.bora-recuperar-formulario button[type="submit"] {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #087c52, #00643f);
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 105, 67, 0.18);
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.bora-recuperar-formulario button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #099866, #087c52);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0, 105, 67, 0.25);
+}
+
+.bora-recuperar-formulario button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.bora-recuperar-formulario button[type="submit"]:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Botón secundario: volver al inicio de sesión */
+.bora-recuperar-formulario a[href="/login"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 20px;
+  border: 2px solid #ff9700;
+  border-radius: 14px;
+  background: #fff8ef;
+  color: #c76c00;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.bora-recuperar-formulario a[href="/login"]:hover {
+  background: #ff9700;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(255, 151, 0, 0.18);
+}
+
+/* Accesibilidad */
+.bora-recuperar-formulario button:focus-visible,
+.bora-recuperar-formulario a:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+/* Adaptación para celulares */
+@media (max-width: 600px) {
+  .bora-recuperar-formulario button[type="submit"],
+  .bora-recuperar-formulario a[href="/login"] {
+    min-height: 50px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+}

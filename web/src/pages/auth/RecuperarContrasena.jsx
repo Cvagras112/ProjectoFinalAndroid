@@ -1,15 +1,20 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth } from '../../firebase/config'
 import './RecuperarContrasena.css'
 
 function RecuperarContrasena() {
   const [correo, setCorreo] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [tipoMensaje, setTipoMensaje] = useState('')
+  const [enviando, setEnviando] = useState(false)
 
-  const recuperarContrasena = (e) => {
+  const recuperarContrasena = async (e) => {
     e.preventDefault()
+
+    if (enviando) return
 
     const correoLimpio = correo.trim()
 
@@ -27,10 +32,45 @@ function RecuperarContrasena() {
       return
     }
 
-    setTipoMensaje('informacion')
-    setMensaje(
-      'El formulario está preparado. El envío del correo de recuperación estará disponible cuando conectemos Firebase.'
-    )
+    setEnviando(true)
+    setMensaje('')
+    setTipoMensaje('')
+
+    try {
+      await sendPasswordResetEmail(auth, correoLimpio)
+
+      setTipoMensaje('informacion')
+      setMensaje(
+        'Si existe una cuenta asociada a este correo, recibirás un enlace para restablecer tu contraseña. Revisa también la carpeta de spam.'
+      )
+    } catch (error) {
+      console.error(
+        'Error al recuperar contraseña:',
+        error.code
+      )
+
+      setTipoMensaje('error')
+
+      if (error.code === 'auth/too-many-requests') {
+        setMensaje(
+          'Se realizaron demasiados intentos. Espera unos minutos antes de intentarlo nuevamente.'
+        )
+      } else if (error.code === 'auth/invalid-email') {
+        setMensaje(
+          'El correo electrónico ingresado no es válido.'
+        )
+      } else if (error.code === 'auth/network-request-failed') {
+        setMensaje(
+          'No se pudo conectar con Firebase. Revisa tu conexión a Internet.'
+        )
+      } else {
+        setMensaje(
+          'No pudimos procesar tu solicitud. Inténtalo nuevamente más tarde.'
+        )
+      }
+    } finally {
+      setEnviando(false)
+    }
   }
 
   return (
@@ -56,62 +96,71 @@ function RecuperarContrasena() {
         </div>
 
         <div className="bora-recuperar-formulario">
+
           <div className="bora-recuperar-icono">
             🔐
           </div>
 
           <h2>¿Olvidaste tu contraseña?</h2>
 
-          <p className="bora-recuperar-subtitulo">
-            Ingresa el correo electrónico asociado
-            a tu cuenta. Cuando habilitemos la
-            recuperación, podrás recibir un enlace
-            para restablecer tu contraseña.
+          <p>
+            Ingresa el correo electrónico asociado a tu
+            cuenta. Te enviaremos un enlace para
+            restablecer tu contraseña.
           </p>
 
-          <form onSubmit={recuperarContrasena} noValidate>
-            <label htmlFor="recuperar-correo">
+          <form onSubmit={recuperarContrasena}>
+
+            <label htmlFor="correo-recuperacion">
               Correo electrónico
             </label>
 
             <input
-              id="recuperar-correo"
+              id="correo-recuperacion"
               type="email"
+              name="correo"
               placeholder="ejemplo@correo.com"
               value={correo}
-              onChange={(e) => {
-                setCorreo(e.target.value)
-                setMensaje('')
-              }}
+              onChange={(e) => setCorreo(e.target.value)}
               autoComplete="email"
+              maxLength={254}
+              disabled={enviando}
+              required
             />
 
             {mensaje && (
-              <p
-                className={`bora-recuperar-mensaje ${tipoMensaje}`}
+              <div
+                className={`bora-recuperar-mensaje bora-recuperar-mensaje--${tipoMensaje}`}
                 role="status"
+                aria-live="polite"
               >
                 {mensaje}
-              </p>
+              </div>
             )}
 
             <button
               type="submit"
-              className="bora-recuperar-submit"
+              disabled={enviando}
             >
-              Continuar →
+              {enviando
+                ? 'Enviando correo...'
+                : 'Enviar enlace de recuperación →'}
             </button>
+
           </form>
 
-          <div className="bora-recuperar-volver">
-            <p>¿Recordaste tu contraseña?</p>
-
-            <Link to="/login">
-              ← Volver a iniciar sesión
-            </Link>
+          <div className="bora-recuperar-ayuda">
+            ¿Recordaste tu contraseña?
           </div>
-        </div>
 
+          <Link
+            to="/login"
+            className="bora-recuperar-volver"
+          >
+            ← Volver a iniciar sesión
+          </Link>
+
+        </div>
       </section>
     </main>
   )
