@@ -21,6 +21,7 @@ import QuieroEmprender from './pages/public/QuieroEmprender'
 import MiPerfil from './pages/perfil/MiPerfil'
 import PanelEmprendedor from './pages/emprendedor/PanelEmprendedor'
 import EditarTienda from './pages/emprendedor/EditarTienda'
+import MisFavoritos from './pages/perfil/MisFavoritos'
 
 // Panel administrativo desarrollado por David
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -72,6 +73,7 @@ function App() {
 
         {/* PERFIL */}
         <Route path="/perfil" element={<MiPerfil />} />
+        <Route path="/mis-favoritos" element={<MisFavoritos />} />
 
         {/* PANEL ADMINISTRATIVO PROTEGIDO */}
         <Route

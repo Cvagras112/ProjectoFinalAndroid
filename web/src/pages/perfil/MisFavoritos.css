@@ -1,0 +1,331 @@
+
+/* =========================================
+   BORA - MIS FAVORITOS
+========================================= */
+
+.bora-favoritos {
+  min-height: 75vh;
+  padding: 55px 24px 85px;
+  background: #fbf9f4;
+  color: #303b34;
+}
+
+.bora-favoritos *,
+.bora-favoritos *::before,
+.bora-favoritos *::after {
+  box-sizing: border-box;
+}
+
+.bora-favoritos-contenedor {
+  max-width: 1250px;
+  margin: 0 auto;
+}
+
+.bora-favoritos-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 38px;
+  padding: 32px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #eaf5ed, #f8f4e9);
+  border: 1px solid #e1eadf;
+}
+
+.bora-favoritos-etiqueta {
+  color: #28744e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.bora-favoritos-encabezado h1 {
+  margin: 12px 0;
+  color: #244433;
+  font-size: clamp(30px, 4vw, 40px);
+}
+
+.bora-favoritos-encabezado h1 span {
+  color: #e54865;
+}
+
+.bora-favoritos-encabezado p {
+  max-width: 570px;
+  margin: 0;
+  color: #69766c;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.bora-favoritos-contador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 125px;
+  min-height: 115px;
+  padding: 18px;
+  border-radius: 17px;
+  background: white;
+  border: 1px solid #e3ebe2;
+}
+
+.bora-favoritos-contador strong {
+  color: #236b4b;
+  font-size: 36px;
+}
+
+.bora-favoritos-contador span {
+  color: #758078;
+  font-size: 11px;
+  text-align: center;
+}
+
+.bora-favoritos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 23px;
+}
+
+.bora-favorito-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e7eae4;
+  border-radius: 17px;
+  background: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bora-favorito-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(30, 65, 45, 0.1);
+}
+
+.bora-favorito-imagen {
+  display: block;
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  background: #f4f5ef;
+}
+
+.bora-favorito-imagen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.bora-favorito-card:hover .bora-favorito-imagen img {
+  transform: scale(1.04);
+}
+
+.bora-favorito-quitar {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border: 1px solid #f0dce0;
+  border-radius: 50%;
+  background: white;
+  color: #e54865;
+  font-size: 21px;
+  cursor: pointer;
+  box-shadow: 0 3px 12px #00000012;
+  transition: transform 0.2s ease;
+}
+
+.bora-favorito-quitar:hover {
+  transform: scale(1.12);
+}
+
+.bora-favorito-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 18px;
+}
+
+.bora-favorito-info > span {
+  color: #28744e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bora-favorito-nombre {
+  color: #29392e;
+  font-size: 17px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.bora-favorito-nombre:hover {
+  color: #236b4b;
+}
+
+.bora-favorito-info small {
+  color: #859086;
+  font-size: 12px;
+}
+
+.bora-favorito-info strong {
+  margin-top: 5px;
+  color: #236b4b;
+  font-size: 21px;
+}
+
+.bora-favorito-ver {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  padding: 11px;
+  border-radius: 9px;
+  background: #236b4b;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.2s ease;
+}
+
+.bora-favorito-ver:hover {
+  background: #185437;
+  color: white;
+}
+
+/* ESTADO VACÍO */
+
+.bora-favoritos-vacio {
+  max-width: 570px;
+  margin: 65px auto;
+  padding: 45px 30px;
+  border: 1px solid #e8ebe4;
+  border-radius: 20px;
+  background: white;
+  text-align: center;
+}
+
+.bora-favoritos-corazon {
+  color: #e54865;
+  font-size: 65px;
+  line-height: 1.2;
+}
+
+.bora-favoritos-vacio h2 {
+  margin: 18px 0 10px;
+  color: #29392e;
+  font-size: 24px;
+}
+
+.bora-favoritos-vacio p {
+  color: #758078;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.bora-favoritos-vacio a {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 13px 24px;
+  border-radius: 10px;
+  background: #236b4b;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.bora-favoritos-vacio a:hover {
+  background: #185437;
+}
+
+/* CARGA Y ERRORES */
+
+.bora-favoritos-cargando {
+  max-width: 1250px;
+  margin: 100px auto;
+  color: #236b4b;
+  text-align: center;
+  font-weight: 600;
+}
+
+.bora-favoritos-error {
+  padding: 18px;
+  border: 1px solid #f0d0cb;
+  border-radius: 12px;
+  background: #fff3f1;
+  color: #a32d22;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .bora-favoritos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .bora-favoritos {
+    padding: 30px 15px 55px;
+  }
+
+  .bora-favoritos-encabezado {
+    align-items: flex-start;
+    padding: 23px;
+  }
+
+  .bora-favoritos-contador {
+    min-width: 90px;
+    min-height: 90px;
+  }
+
+  .bora-favoritos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .bora-favorito-imagen {
+    height: 160px;
+  }
+
+  .bora-favorito-info {
+    padding: 13px;
+  }
+
+  .bora-favorito-nombre {
+    font-size: 14px;
+  }
+
+  .bora-favorito-info strong {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .bora-favoritos-encabezado {
+    flex-direction: column;
+  }
+
+  .bora-favoritos-contador {
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .bora-favoritos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bora-favorito-imagen {
+    height: 220px;
+  }
+}
