@@ -196,6 +196,7 @@ match /tiendas/{tiendaId} {
     // PRODUCTOS
     // ========================================
 
+    
     match /productos/{productoId} {
 
       // Lectura pública para el catálogo BORA.
@@ -223,48 +224,65 @@ match /tiendas/{tiendaId} {
           'Stock',
           'Disponible',
           'imagen',
-          'Descripcion'
+          'Descripcion',
+          'OfrecerPedido',
+          'PiezaUnica',
+          'AccionAgotado'
         ])
 
-        // El ID almacenado debe coincidir
-        // con el ID del documento.
+        // Identificadores.
         && request.resource.data.ID_Producto == productoId
-
         && request.resource.data.ID_Tienda is string
         && request.resource.data.ID_Tienda.size() > 0
 
+        // Nombre.
         && request.resource.data.Nombre is string
         && request.resource.data.Nombre.size() > 0
         && request.resource.data.Nombre.size() <= 150
 
+        // Categoría.
         && request.resource.data.Categoria is string
         && request.resource.data.Categoria.size() > 0
         && request.resource.data.Categoria.size() <= 100
 
+        // Precio.
         && request.resource.data.Precio is number
         && request.resource.data.Precio >= 0
 
+        // Stock.
         && request.resource.data.Stock is int
         && request.resource.data.Stock >= 0
 
+        // Disponibilidad.
         && request.resource.data.Disponible is bool
 
+        // Imagen.
         && request.resource.data.imagen is string
         && request.resource.data.imagen.size() <= 2000
 
         // Descripción opcional.
         && request.resource.data.get('Descripcion', '') is string
-        && request.resource.data.get('Descripcion', '').size() <= 2000;
+        && request.resource.data.get('Descripcion', '').size() <= 2000
+
+        // Modalidades nuevas.
+        && request.resource.data.get('OfrecerPedido', false) is bool
+        && request.resource.data.get('PiezaUnica', false) is bool
+
+        // Comportamiento al agotarse.
+        && request.resource.data.get('AccionAgotado', 'mostrar') in [
+          'mostrar',
+          'ocultar'
+        ];
       }
 
-      // CREAR PRODUCTOS
+      // CREAR PRODUCTOS.
       // Solo el propietario de la tienda activa.
       allow create: if productoValido()
         && esDuenoTienda(
           request.resource.data.ID_Tienda
         );
 
-      // EDITAR PRODUCTOS
+      // EDITAR PRODUCTOS.
       // No se permite cambiar identificadores
       // ni transferir productos entre tiendas.
       allow update: if productoValido()
@@ -280,7 +298,10 @@ match /tiendas/{tiendaId} {
             'Stock',
             'Disponible',
             'imagen',
-            'Descripcion'
+            'Descripcion',
+            'OfrecerPedido',
+            'PiezaUnica',
+            'AccionAgotado'
           ])
 
         && request.resource.data.ID_Tienda ==
@@ -289,12 +310,13 @@ match /tiendas/{tiendaId} {
         && request.resource.data.ID_Producto ==
           resource.data.ID_Producto;
 
-      // ELIMINAR PRODUCTOS
+      // ELIMINAR PRODUCTOS.
       // Solo el propietario de la tienda.
       allow delete: if esDuenoTienda(
         resource.data.ID_Tienda
       );
     }
+
 
     // ========================================
     // FERIAS
@@ -401,9 +423,62 @@ match /tiendas/{tiendaId} {
     // BLOQUEO GENERAL
     // ========================================
 
+    // ========================================
+    // CATEGORÍAS
+    // ========================================
+
+    match /categorias/{categoriaId} {
+      allow read: if true;
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasAll(['nombre', 'estado'])
+        && request.resource.data.keys().hasOnly(['nombre', 'estado'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 3
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.estado in ['Activa', 'Inactiva'];
+
+      allow delete: if false;
+    }
+
+    // ========================================
+    // TIPOS DE PRODUCTOS
+    // ========================================
+
+    match /tipos_productos/{tipoId} {
+      allow read: if true;
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasAll(['nombre', 'estado'])
+        && request.resource.data.keys().hasOnly(['nombre', 'estado'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 3
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.estado in ['Activa', 'Inactiva'];
+
+      allow delete: if false;
+    }
+    // ========================================
+    // ASOCIACIONES
+    // ========================================
+
+    match /asociaciones/{asociacionId} {
+      allow read: if esAdministrador();
+
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasAll(['nombre', 'descripcion', 'estado'])
+        && request.resource.data.keys().hasOnly(['nombre', 'descripcion', 'estado'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 3
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() <= 500
+        && request.resource.data.estado in ['Activa', 'Inactiva'];
+
+      allow delete: if false;
+    }
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
 

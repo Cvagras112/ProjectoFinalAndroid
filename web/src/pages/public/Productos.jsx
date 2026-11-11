@@ -428,6 +428,75 @@ export default function Productos() {
                         <strong>
                           {formatoPrecio(producto.precio)}
                         </strong>
+
+
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            flexWrap: 'wrap',
+                            marginTop: '12px',
+                          }}
+                        >
+                          {/* Estado del producto */}
+                          <span
+                            style={{
+                              backgroundColor:
+                                producto.disponible && Number(producto.stock) > 0
+                                  ? '#e1f5e9'
+                                  : '#fff0db',
+                              color:
+                                producto.disponible && Number(producto.stock) > 0
+                                  ? '#087344'
+                                  : '#b76500',
+                              padding: '6px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                            }}
+                          >
+                            {producto.disponible && Number(producto.stock) > 0
+                              ? 'Disponible'
+                              : 'Agotado'}
+                          </span>
+
+                          {/* A pedido */}
+                          {producto.ofrecerPedido && (
+                            <span style={{
+                              backgroundColor: '#fff0df',
+                              color: '#bd681e',
+                              padding: '6px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                            }}>
+                              A pedido
+                            </span>
+                          )}
+
+                          {/* Pieza única */}
+                          {producto.piezaUnica && (
+                            <span style={{
+                              backgroundColor: '#f0eaff',
+                              color: '#7652b5',
+                              padding: '6px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                            }}>
+                              Pieza única
+                            </span>
+                          )}
+
+                          {/* Stock: mostrar solamente cuando hay unidades */}
+                          {producto.disponible && Number(producto.stock) > 0 && (
+                            <span style={{ fontSize: '12px', color: '#687a70' }}>
+                              {producto.stock} unidades disponibles
+                            </span>
+                          )}
+                        </div>
+
                       </div>
                     </article>
                   ))}

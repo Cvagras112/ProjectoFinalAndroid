@@ -28,6 +28,13 @@ const FORMULARIO_VACIO = {
     stock: '',
     imagen: '',
     disponible: true,
+
+    // Características del producto
+    ofrecerPedido: false,
+    piezaUnica: false,
+
+    // Comportamiento cuando se agote
+    accionAgotado: 'mostrar',
 }
 
 function formatoPrecio(precio) {
@@ -190,8 +197,10 @@ export default function PanelEmprendedor() {
         setFormularioAbierto(true)
     }
 
+
     function abrirEditar(producto) {
         setProductoEditando(producto.id)
+
         setFormulario({
             nombre: producto.nombre,
             categoria: producto.categoria,
@@ -202,7 +211,15 @@ export default function PanelEmprendedor() {
                 ? ''
                 : producto.imagen || '',
             disponible: producto.disponible,
+
+            // Características del producto
+            ofrecerPedido: producto.ofrecerPedido === true,
+            piezaUnica: producto.piezaUnica === true,
+
+            // Comportamiento cuando se agote
+            accionAgotado: producto.accionAgotado || 'mostrar',
         })
+
         setErrorOperacion('')
         setMensaje('')
         setFormularioAbierto(true)
@@ -540,6 +557,56 @@ export default function PanelEmprendedor() {
                                 Mostrar producto como disponible
                             </label>
 
+                            <div className="panel-emprendedor__campo-ancho">
+                                <strong>Características del producto</strong>
+
+                                <label className="panel-emprendedor__campo-check">
+                                    <input
+                                        name="ofrecerPedido"
+                                        type="checkbox"
+                                        checked={formulario.ofrecerPedido}
+                                        onChange={cambiarCampo}
+                                    />
+                                    Ofrecer a pedido
+                                </label>
+
+                                <label className="panel-emprendedor__campo-check">
+                                    <input
+                                        name="piezaUnica"
+                                        type="checkbox"
+                                        checked={formulario.piezaUnica}
+                                        onChange={cambiarCampo}
+                                    />
+                                    Pieza única
+                                </label>
+                            </div>
+
+                            <div className="panel-emprendedor__campo-ancho">
+                                <strong>¿Qué hacer cuando se agote el producto?</strong>
+
+                                <label className="panel-emprendedor__campo-check">
+                                    <input
+                                        type="radio"
+                                        name="accionAgotado"
+                                        value="mostrar"
+                                        checked={formulario.accionAgotado === 'mostrar'}
+                                        onChange={cambiarCampo}
+                                    />
+                                    Mostrar como agotado
+                                </label>
+
+                                <label className="panel-emprendedor__campo-check">
+                                    <input
+                                        type="radio"
+                                        name="accionAgotado"
+                                        value="ocultar"
+                                        checked={formulario.accionAgotado === 'ocultar'}
+                                        onChange={cambiarCampo}
+                                    />
+                                    Ocultar del catálogo
+                                </label>
+                            </div>
+
                             {errorOperacion && (
                                 <p className="panel-emprendedor__alerta-error" role="alert">
                                     {errorOperacion}
@@ -603,23 +670,41 @@ export default function PanelEmprendedor() {
                                             {formatoPrecio(producto.precio)}
                                         </p>
 
+
                                         <div className="panel-emprendedor__producto-detalles">
                                             <span
                                                 className={
-                                                    producto.disponible
+                                                    producto.disponible && Number(producto.stock) > 0
                                                         ? 'panel-emprendedor__estado'
                                                         : 'panel-emprendedor__estado panel-emprendedor__estado--inactivo'
                                                 }
                                             >
-                                                {producto.disponible
-                                                    ? 'Disponible'
-                                                    : 'No disponible'}
+                                                {!producto.disponible
+                                                    ? 'No disponible'
+                                                    : Number(producto.stock) <= 0
+                                                        ? producto.accionAgotado === 'ocultar'
+                                                            ? 'Agotado · Oculto del catálogo'
+                                                            : 'Agotado'
+                                                        : `Disponible · ${producto.stock} unidades`}
                                             </span>
+
+                                            {producto.ofrecerPedido && (
+                                                <span className="panel-emprendedor__etiqueta-modalidad panel-emprendedor__etiqueta-modalidad--pedido">
+                                                    A pedido
+                                                </span>
+                                            )}
+
+                                            {producto.piezaUnica && (
+                                                <span className="panel-emprendedor__etiqueta-modalidad panel-emprendedor__etiqueta-modalidad--unica">
+                                                    Pieza única
+                                                </span>
+                                            )}
 
                                             <span className="panel-emprendedor__stock">
                                                 Stock: {producto.stock}
                                             </span>
                                         </div>
+
 
                                         <div className="panel-emprendedor__acciones-producto">
                                             <button

@@ -27,6 +27,9 @@ function adaptarProducto(documento, tiendas = {}) {
     precio: Number(datos.Precio ?? datos.precio ?? 0),
     stock: Number(datos.Stock ?? datos.stock ?? 0),
     disponible: datos.Disponible !== false,
+    ofrecerPedido: datos.OfrecerPedido === true,
+    piezaUnica: datos.PiezaUnica === true,
+    accionAgotado: datos.AccionAgotado || 'mostrar',
     imagen:
       datos.imagen?.trim() ||
       datos.Imagen?.trim() ||
@@ -39,9 +42,9 @@ function adaptarProducto(documento, tiendas = {}) {
     tienda: tienda?.nombre || 'Emprendimiento BORA',
     whatsapp: tienda?.whatsapp || tienda?.telefono || '',
     emailContacto:
-     tienda?.emailContacto ||
-     tienda?.correo ||
-     tienda?.email ||
+      tienda?.emailContacto ||
+      tienda?.correo ||
+      tienda?.email ||
       '',
     etiqueta: tienda?.nombre || 'Emprendimiento BORA',
   }
@@ -106,6 +109,7 @@ export async function obtenerProductosPorTienda(tiendaId) {
     .map((documento) => adaptarProducto(documento))
 }
 
+
 // Validar la información antes de guardar.
 function validarProducto(datos) {
   const nombre = String(datos.nombre ?? '').trim()
@@ -114,6 +118,11 @@ function validarProducto(datos) {
   const imagen = String(datos.imagen ?? '').trim()
   const precio = Number(datos.precio)
   const stock = Number(datos.stock)
+
+  const ofrecerPedido = datos.ofrecerPedido === true
+  const piezaUnica = datos.piezaUnica === true
+
+  const accionAgotado = datos.accionAgotado || 'mostrar'
 
   if (!nombre || nombre.length > 150) {
     throw new Error('El nombre debe tener entre 1 y 150 caracteres.')
@@ -127,10 +136,7 @@ function validarProducto(datos) {
     throw new Error('El precio debe ser mayor que cero.')
   }
 
-  if (
-    !Number.isSafeInteger(stock) ||
-    stock < 0
-  ) {
+  if (!Number.isSafeInteger(stock) || stock < 0) {
     throw new Error('El stock debe ser un número entero positivo o cero.')
   }
 
@@ -142,6 +148,10 @@ function validarProducto(datos) {
     throw new Error('La imagen debe tener una URL válida.')
   }
 
+  if (!['mostrar', 'ocultar'].includes(accionAgotado)) {
+    throw new Error('Selecciona una opción válida para cuando se agote.')
+  }
+
   return {
     Nombre: nombre,
     Categoria: categoria,
@@ -150,8 +160,14 @@ function validarProducto(datos) {
     Stock: stock,
     imagen,
     Disponible: datos.disponible !== false,
+
+    // Nuevas opciones de producto
+    OfrecerPedido: ofrecerPedido,
+    PiezaUnica: piezaUnica,
+    AccionAgotado: accionAgotado,
   }
 }
+
 
 // Comprobar que la sesión actual pertenece
 // al propietario de una tienda activa.

@@ -700,6 +700,40 @@
   font-weight: 800;
 }
 
+
+/* Etiquetas de modalidades de productos */
+.bora-tienda-modalidad {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 6px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.bora-tienda-modalidad--pedido {
+  background: #fff0df;
+  color: #bd681e;
+  border: 1px solid #f5d5b3;
+}
+
+.bora-tienda-modalidad--unica {
+  background: #f0eaff;
+  color: #7652b5;
+  border: 1px solid #ded0fa;
+}
+
+/* Distribución de estados y modalidades */
+.bora-tienda-disponibilidad {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+
 /* ==========================================
    ESTADOS Y MENSAJES
 ========================================== */
@@ -944,4 +978,42 @@
   .bora-tienda-producto-imagen {
     height: 220px;
   }
+}
+
+/* Disponibilidad de productos en la tienda pública */
+
+.bora-tienda-disponibilidad {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bora-tienda-con-stock,
+.bora-tienda-sin-stock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.bora-tienda-con-stock {
+  background-color: #e4f5e9;
+  color: #087a48;
+}
+
+.bora-tienda-sin-stock {
+  background-color: #fff0dd;
+  color: #bd6500;
+}
+
+.bora-tienda-disponibilidad small {
+  color: #81918a;
+  font-size: 11px;
+  font-weight: 500;
 }

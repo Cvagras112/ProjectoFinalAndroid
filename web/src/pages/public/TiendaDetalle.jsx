@@ -202,8 +202,7 @@ export default function TiendaDetalle() {
 
     const filtrados = productos.filter((producto) => {
       const contenido = normalizarTexto(
-        `${nombreProducto(producto)} ${categoriaProducto(producto)} ${
-          producto.Descripcion || producto.descripcion || ''
+        `${nombreProducto(producto)} ${categoriaProducto(producto)} ${producto.Descripcion || producto.descripcion || ''
         }`
       )
 
@@ -214,7 +213,7 @@ export default function TiendaDetalle() {
       const coincideCategoria =
         categoriaSeleccionada === TODAS ||
         normalizarTexto(categoriaProducto(producto)) ===
-          normalizarTexto(categoriaSeleccionada)
+        normalizarTexto(categoriaSeleccionada)
 
       const precio = precioProducto(producto)
       const coincideMinimo = minimo === null || precio >= minimo
@@ -475,9 +474,8 @@ export default function TiendaDetalle() {
 
               <button
                 type="button"
-                className={`bora-tienda-seguir ${
-                  seguida ? 'activo' : ''
-                }`}
+                className={`bora-tienda-seguir ${seguida ? 'activo' : ''
+                  }`}
                 onClick={cambiarSeguimiento}
               >
                 {seguida ? '💚 Siguiendo' : '🤍 Seguir tienda'}
@@ -557,11 +555,10 @@ export default function TiendaDetalle() {
 
                 <button
                   type="button"
-                  className={`bora-tienda-filtro-opcion ${
-                    categoriaSeleccionada === TODAS
-                      ? 'seleccionada'
-                      : ''
-                  }`}
+                  className={`bora-tienda-filtro-opcion ${categoriaSeleccionada === TODAS
+                    ? 'seleccionada'
+                    : ''
+                    }`}
                   onClick={() => setCategoriaSeleccionada(TODAS)}
                 >
                   <span>Todas</span>
@@ -572,12 +569,11 @@ export default function TiendaDetalle() {
                   <button
                     type="button"
                     key={normalizarTexto(nombre)}
-                    className={`bora-tienda-filtro-opcion ${
-                      normalizarTexto(categoriaSeleccionada) ===
+                    className={`bora-tienda-filtro-opcion ${normalizarTexto(categoriaSeleccionada) ===
                       normalizarTexto(nombre)
-                        ? 'seleccionada'
-                        : ''
-                    }`}
+                      ? 'seleccionada'
+                      : ''
+                      }`}
                     onClick={() => setCategoriaSeleccionada(nombre)}
                   >
                     <span>{nombre}</span>
@@ -750,28 +746,65 @@ export default function TiendaDetalle() {
                           </p>
 
                           {producto.Descripcion ||
-                          producto.descripcion ? (
+                            producto.descripcion ? (
                             <p className="bora-tienda-producto-descripcion">
                               {producto.Descripcion ||
                                 producto.descripcion}
                             </p>
                           ) : null}
 
+
                           <div className="bora-tienda-producto-pie">
                             <strong>{formatoPrecio(precio)}</strong>
 
-                            <span
-                              className={
-                                stock === 0
-                                  ? 'bora-tienda-sin-stock'
-                                  : 'bora-tienda-con-stock'
-                              }
-                            >
-                              {stock === 0
-                                ? 'Sin stock'
-                                : 'Ver producto →'}
-                            </span>
+
+                            <div className="bora-tienda-disponibilidad">
+                              {/* Estado del producto */}
+                              <span
+                                className={
+                                  producto.Disponible === false ||
+                                    producto.disponible === false ||
+                                    (stock !== null && stock <= 0)
+                                    ? 'bora-tienda-sin-stock'
+                                    : 'bora-tienda-con-stock'
+                                }
+                              >
+                                {producto.Disponible === false ||
+                                  producto.disponible === false
+                                  ? 'No disponible'
+                                  : stock !== null && stock <= 0
+                                    ? 'Agotado'
+                                    : 'Disponible'}
+                              </span>
+
+                              {/* Modalidad a pedido */}
+                              {(producto.OfrecerPedido === true ||
+                                producto.ofrecerPedido === true) && (
+                                  <span className="bora-tienda-modalidad bora-tienda-modalidad--pedido">
+                                    A pedido
+                                  </span>
+                                )}
+
+                              {/* Modalidad pieza única */}
+                              {(producto.PiezaUnica === true ||
+                                producto.piezaUnica === true) && (
+                                  <span className="bora-tienda-modalidad bora-tienda-modalidad--unica">
+                                    Pieza única
+                                  </span>
+                                )}
+
+                              {/* Cantidad disponible */}
+
+                              {producto.disponible !== false &&
+                                producto.Disponible !== false &&
+                                stock !== null &&
+                                stock > 0 && (
+                                  <small>{stock} unidades disponibles</small>
+                                )}
+                            </div>
+
                           </div>
+
                         </div>
                       </Link>
                     )
