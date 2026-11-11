@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../../firebase/config'
 import {
   obtenerProductos,
   IMAGEN_PRODUCTO_PREDETERMINADA,
@@ -29,6 +31,7 @@ export default function Productos() {
   const navigate = useNavigate()
 
   const [productos, setProductos] = useState([])
+  const [categoriasFirebase, setCategoriasFirebase] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
@@ -75,9 +78,45 @@ export default function Productos() {
     }
   }, [])
 
+  // Obtener categorias activas desde Firestore.
+  useEffect(() => {
+    let activo = true
+
+    async function cargarCategorias() {
+      try {
+        const resultado = await getDocs(collection(db, 'categorias'))
+
+        if (activo) {
+          setCategoriasFirebase(
+            resultado.docs
+              .map((documento) => documento.data())
+              .filter((item) =>
+                item.estado === 'Activa' &&
+                typeof item.nombre === 'string' &&
+                item.nombre.trim()
+              )
+              .map((item) => item.nombre.trim())
+          )
+        }
+      } catch (error) {
+        console.error('Error cargando categorias:', error)
+      }
+    }
+
+    cargarCategorias()
+
+    return () => {
+      activo = false
+    }
+  }, [])
   const categorias = [
     'Todas',
-    ...new Set(productos.map((producto) => producto.categoria)),
+    ...new Set([
+      ...categoriasFirebase,
+      ...productos
+        .map((producto) => producto.categoria)
+        .filter(Boolean),
+    ]),
   ]
 
   const tiendas = [

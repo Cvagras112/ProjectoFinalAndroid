@@ -1,163 +1,94 @@
-
 import { useState } from 'react'
+import { doc, setDoc, deleteDoc } from 'firebase/firestore'
+import { db } from '../../firebase/config'
 
 export default function AsignacionesAdmin({
   emprendedoras,
-  setEmprendedoras,
   asociaciones,
   asignaciones,
   setAsignaciones
 }) {
   const [emprendedoraId, setEmprendedoraId] = useState('')
   const [asociacionId, setAsociacionId] = useState('')
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
 
-  // Solo permitir nuevas asignaciones a registros activos.
-  const emprendedorasDisponibles = emprendedoras.filter(
-    (emprendedora) =>
-      emprendedora.estado === 'Activa' &&
-      !asignaciones.some(
-        (asignacion) =>
-          asignacion.emprendedoraId === emprendedora.id
-      )
+  const disponibles = emprendedoras.filter(item =>
+    item.estado === 'Activa' &&
+    !asignaciones.some(a => a.emprendedoraId === item.id)
   )
 
-  const asociacionesActivas = asociaciones.filter(
-    (asociacion) => asociacion.estado === 'Activa'
-  )
+  const activas = asociaciones.filter(item => item.estado === 'Activa')
 
-  // Registrar una nueva asignación.
-  const guardarAsignacion = (e) => {
+  const guardar = async (e) => {
     e.preventDefault()
+    if (guardando) return
 
-    const emprendedora = emprendedorasDisponibles.find(
-      (item) => item.id === emprendedoraId
-    )
-
-    const asociacion = asociacionesActivas.find(
-      (item) => item.id === asociacionId
-    )
-
-    if (!emprendedora) {
-      window.alert(
-        'Selecciona una emprendedora activa que no tenga una asociación asignada.'
-      )
+    if (!disponibles.some(item => item.id === emprendedoraId) ||
+        !activas.some(item => item.id === asociacionId)) {
+      setError('Selecciona una emprendedora y una asociación disponibles.')
       return
     }
 
-    if (!asociacion) {
-      window.alert('Selecciona una asociación activa.')
-      return
+    setGuardando(true)
+    setError('')
+
+    try {
+      const datos = { emprendedoraId, asociacionId }
+
+      await setDoc(doc(db, 'asignaciones', emprendedoraId), datos)
+
+      setAsignaciones(anteriores => [
+        ...anteriores.filter(item => item.emprendedoraId !== emprendedoraId),
+        { id: emprendedoraId, ...datos }
+      ])
+
+      setEmprendedoraId('')
+      setAsociacionId('')
+    } catch (err) {
+      console.error(err)
+      setError('No se pudo guardar: ' + err.message)
+    } finally {
+      setGuardando(false)
     }
-
-    const asignacionExistente = asignaciones.some(
-      (item) => item.emprendedoraId === emprendedoraId
-    )
-
-    if (asignacionExistente) {
-      window.alert(
-        'Esta emprendedora ya tiene una asociación asignada.'
-      )
-      return
-    }
-
-    setAsignaciones((anteriores) => [
-      ...anteriores,
-      {
-        id: crypto.randomUUID(),
-        emprendedoraId,
-        asociacionId
-      }
-    ])
-
-    setEmprendedoras((anteriores) =>
-      anteriores.map((item) =>
-        item.id === emprendedoraId
-          ? {
-              ...item,
-              asociacion: asociacion.nombre
-            }
-          : item
-      )
-    )
-
-    setEmprendedoraId('')
-    setAsociacionId('')
   }
 
-  // Desvincular una emprendedora de su asociación.
-  const quitarAsignacion = (asignacion) => {
-    const emprendedora = emprendedoras.find(
-      (item) => item.id === asignacion.emprendedoraId
-    )
+  const quitar = async (item) => {
+    if (!window.confirm('¿Desvincular esta emprendedora?')) return
 
-    const confirmar = window.confirm(
-      `¿Deseas desvincular a ${
-        emprendedora?.nombre || 'esta emprendedora'
-      } de su asociación?`
-    )
-
-    if (!confirmar) return
-
-    setAsignaciones((anteriores) =>
-      anteriores.filter(
-        (item) => item.id !== asignacion.id
+    try {
+      await deleteDoc(doc(db, 'asignaciones', item.id))
+      setAsignaciones(anteriores =>
+        anteriores.filter(actual => actual.id !== item.id)
       )
-    )
-
-    setEmprendedoras((anteriores) =>
-      anteriores.map((item) =>
-        item.id === asignacion.emprendedoraId
-          ? {
-              ...item,
-              asociacion: null
-            }
-          : item
-      )
-    )
+    } catch (err) {
+      console.error(err)
+      window.alert('No se pudo desvincular: ' + err.message)
+    }
   }
 
   return (
     <div className="bora-seccion-admin">
-
-      {/* ENCABEZADO */}
       <div className="bora-emprendedoras-header">
         <div>
           <h2>Gestión de asignaciones</h2>
-          <p>
-            Vincula emprendedoras con las asociaciones de BORA.
-          </p>
+          <p>Vincula emprendedoras con asociaciones de BORA.</p>
         </div>
       </div>
 
-      {/* FORMULARIO */}
       <div className="bora-formulario">
-        <h3>Asignar emprendedora a una asociación</h3>
-        <p>
-          Solo puedes seleccionar emprendedoras y asociaciones activas.
-        </p>
-
-        <form
-          className="bora-formulario-campos"
-          onSubmit={guardarAsignacion}
-        >
-
-          {/* EMPRENDEDORA */}
+        <h3>Asignar emprendedora</h3>
+        <form className="bora-formulario-campos" onSubmit={guardar}>
           <div className="bora-campo">
-            <label htmlFor="asignacion-emprendedora">
-              Emprendedora
-            </label>
-
+            <label htmlFor="asig-emprendedora">Emprendedora</label>
             <select
-              id="asignacion-emprendedora"
+              id="asig-emprendedora"
               value={emprendedoraId}
-              onChange={(e) => setEmprendedoraId(e.target.value)}
+              onChange={e => setEmprendedoraId(e.target.value)}
               required
             >
-              <option value="">
-                Seleccionar emprendedora
-              </option>
-
-              {emprendedorasDisponibles.map((item) => (
+              <option value="">Seleccionar emprendedora</option>
+              {disponibles.map(item => (
                 <option key={item.id} value={item.id}>
                   {item.nombre} - {item.emprendimiento}
                 </option>
@@ -165,23 +96,16 @@ export default function AsignacionesAdmin({
             </select>
           </div>
 
-          {/* ASOCIACIÓN */}
           <div className="bora-campo">
-            <label htmlFor="asignacion-asociacion">
-              Asociación
-            </label>
-
+            <label htmlFor="asig-asociacion">Asociación</label>
             <select
-              id="asignacion-asociacion"
+              id="asig-asociacion"
               value={asociacionId}
-              onChange={(e) => setAsociacionId(e.target.value)}
+              onChange={e => setAsociacionId(e.target.value)}
               required
             >
-              <option value="">
-                Seleccionar asociación
-              </option>
-
-              {asociacionesActivas.map((item) => (
+              <option value="">Seleccionar asociación</option>
+              {activas.map(item => (
                 <option key={item.id} value={item.id}>
                   {item.nombre}
                 </option>
@@ -189,17 +113,16 @@ export default function AsignacionesAdmin({
             </select>
           </div>
 
-          <button type="submit">
-            Guardar asignación
-          </button>
+          {error && <p role="alert" style={{ color: '#b42318' }}>{error}</p>}
 
+          <button type="submit" disabled={guardando}>
+            {guardando ? 'Guardando...' : 'Guardar asignación'}
+          </button>
         </form>
       </div>
 
-      {/* TABLA DE ASIGNACIONES */}
       <div className="bora-tabla-contenedor">
         <table className="bora-tabla">
-
           <thead>
             <tr>
               <th>Emprendedora</th>
@@ -208,70 +131,42 @@ export default function AsignacionesAdmin({
               <th>Acciones</th>
             </tr>
           </thead>
-
           <tbody>
             {asignaciones.length === 0 ? (
               <tr>
-                <td colSpan={4}>
-                  Todavía no hay asignaciones registradas.
-                </td>
+                <td colSpan={4}>No hay asignaciones registradas.</td>
               </tr>
-            ) : (
-              asignaciones.map((asignacion) => {
-                const emprendedora = emprendedoras.find(
-                  (item) =>
-                    item.id === asignacion.emprendedoraId
-                )
+            ) : asignaciones.map(item => {
+              const emprendedora = emprendedoras.find(
+                e => e.id === item.emprendedoraId
+              )
+              const asociacion = asociaciones.find(
+                a => a.id === item.asociacionId
+              )
+              const vigente =
+                emprendedora?.estado === 'Activa' &&
+                asociacion?.estado === 'Activa'
 
-                const asociacion = asociaciones.find(
-                  (item) =>
-                    item.id === asignacion.asociacionId
-                )
-
-                const registrosActivos =
-                  emprendedora?.estado === 'Activa' &&
-                  asociacion?.estado === 'Activa'
-
-                return (
-                  <tr key={asignacion.id}>
-
-                    <td>
-                      {emprendedora?.nombre ||
-                        'Emprendedora no disponible'}
-                    </td>
-
-                    <td>
-                      {asociacion?.nombre ||
-                        'Asociación no disponible'}
-                    </td>
-
-                    <td>
-                      {registrosActivos
-                        ? 'Vigente'
-                        : 'Revisar: registro inactivo o no disponible'}
-                    </td>
-
-                    <td>
-                      <button
-                        type="button"
-                        className="bora-boton-eliminar"
-                        onClick={() =>
-                          quitarAsignacion(asignacion)
-                        }
-                      >
-                        Desvincular
-                      </button>
-                    </td>
-
-                  </tr>
-                )
-              })
-            )}
+              return (
+                <tr key={item.id}>
+                  <td>{emprendedora?.nombre || 'No disponible'}</td>
+                  <td>{asociacion?.nombre || 'No disponible'}</td>
+                  <td>{vigente ? 'Vigente' : 'Revisar'}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="bora-boton-eliminar"
+                      onClick={() => quitar(item)}
+                    >
+                      Desvincular
+                    </button>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
-
         </table>
       </div>
-
     </div>
   )
 }

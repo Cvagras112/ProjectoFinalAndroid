@@ -1,7 +1,19 @@
+import './credenciales-bora.css'
 
 import { useEffect, useState } from 'react'
-import { doc, updateDoc } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import { doc, updateDoc, writeBatch } from 'firebase/firestore'
+
+
+import { db, secondaryAuth } from '../../firebase/config'
+import { createUserWithEmailAndPassword, updateProfile, deleteUser, signOut } from 'firebase/auth'
+
+function generarPasswordTemporal() {
+  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+  const valores = new Uint8Array(16)
+  globalThis.crypto.getRandomValues(valores)
+
+  return Array.from(valores, (valor) => caracteres[valor % caracteres.length]).join('')
+}
 
 function EmprendedorasAdmin({
   emprendedoras,
@@ -16,6 +28,9 @@ function EmprendedorasAdmin({
   const [busqueda, setBusqueda] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [idProcesando, setIdProcesando] = useState(null)
+  const [creandoEmprendedora, setCreandoEmprendedora] = useState(false)
+  const [formularioNuevo, setFormularioNuevo] = useState(false)
+  const [credencialesTemporales, setCredencialesTemporales] = useState(null)
 
   const normalizarTexto = (texto) =>
     String(texto || '')
@@ -49,7 +64,7 @@ function EmprendedorasAdmin({
   }
 
   const cambiarEstado = async (emprendedora) => {
-    if (idProcesando || guardando) return
+    if (idProcesando || guardando || creandoEmprendedora) return
 
     const nuevoEstado =
       emprendedora.estado === 'Inactiva' ? 'Activa' : 'Inactiva'
@@ -97,16 +112,150 @@ function EmprendedorasAdmin({
     }
   }
 
+  const abrirNuevaEmprendedora = () => {
+    setCredencialesTemporales(null)
+    setMostrarFormulario(false)
+    setEmprendedoraEditando(null)
+    setFormularioNuevo(true)
+    setMensajeValidacion('')
+  }
+
+  const crearEmprendedora = async (evento) => {
+    evento.preventDefault()
+    if (creandoEmprendedora) return
+
+    const formulario = evento.currentTarget
+    if (!formulario.reportValidity()) return
+
+    const datos = new FormData(formulario)
+
+    const nombre = String(datos.get('nombre') || '').trim()
+    const email = String(datos.get('email') || '').trim().toLowerCase()
+    const password = generarPasswordTemporal()
+    const nombreTienda = String(datos.get('nombreTienda') || '').trim()
+    const categoria = String(datos.get('categoria') || '').trim()
+    const telefono = String(datos.get('telefono') || '').trim()
+    const descripcion = String(datos.get('descripcion') || '').trim()
+
+    if (!window.confirm(`¿Crear la cuenta de ${nombre} y su tienda?`)) return
+
+    setCreandoEmprendedora(true)
+    setMensajeValidacion('')
+
+    let credencial = null
+    let documentosGuardados = false
+
+    try {
+      // Crear cuenta sin cerrar la sesion del administrador.
+      credencial = await createUserWithEmailAndPassword(
+        secondaryAuth,
+        email,
+        password
+      )
+
+      await updateProfile(credencial.user, {
+        displayName: nombre,
+      })
+
+      const uid = credencial.user.uid
+
+      // Los tres documentos utilizan el mismo UID.
+      const lote = writeBatch(db)
+
+      lote.set(doc(db, 'usuarios', uid), {
+        ID: uid,
+        nombre,
+        email,
+        rol: 'emprendedor',
+        activo: true,
+      })
+
+      lote.set(doc(db, 'emprendedores', uid), {
+        ID_Tienda: uid,
+        activo: true,
+        nombre,
+        telefono,
+        descripcion: '',
+        direccion: '',
+      })
+
+      lote.set(doc(db, 'tiendas', uid), {
+        ID_Dueno: uid,
+        activo: true,
+        nombre: nombreTienda,
+        categoria,
+        descripcion,
+        sector: '',
+        telefono,
+        whatsapp: '',
+        emailContacto: email,
+        imagen: '',
+      })
+
+      // Escritura atomica protegida por las reglas Firestore.
+      await lote.commit()
+      documentosGuardados = true
+
+      try {
+        await signOut(secondaryAuth)
+      } catch (error) {
+        console.warn('No se pudo cerrar la sesion secundaria:', error)
+      }
+
+      setEmprendedoras((anteriores) => [
+        ...anteriores,
+        {
+          id: uid,
+          nombre,
+          correo: email,
+          telefono,
+          emprendimiento: nombreTienda,
+          estado: 'Activa',
+        },
+      ])
+
+      setFormularioNuevo(false)
+      formulario.reset()
+      setCredencialesTemporales({ email, password })
+
+      setMensajeValidacion(
+        'Emprendedora, cuenta y tienda creadas correctamente.'
+      )
+
+    } catch (error) {
+      console.error('Error al crear emprendedora:', error)
+
+      // Si Firestore falla, eliminar la cuenta recien creada.
+      if (credencial && !documentosGuardados) {
+        try {
+          await deleteUser(credencial.user)
+        } catch (errorLimpieza) {
+          console.error('Error al limpiar cuenta:', errorLimpieza)
+        }
+      }
+
+      setMensajeValidacion(
+        error.code === 'permission-denied'
+          ? 'Firestore rechazo la operacion. Revisa las reglas y los permisos del administrador.'
+          : error.message || 'No fue posible crear la cuenta.'
+      )
+
+    } finally {
+      setCreandoEmprendedora(false)
+    }
+  }
   const editarEmprendedora = (emprendedora) => {
     setEmprendedoraViendo(null)
+    setFormularioNuevo(false)
     setEmprendedoraEditando(emprendedora)
     setMostrarFormulario(true)
     setMensajeValidacion('')
   }
 
   const cerrarFormulario = () => {
-    if (guardando) return
+    if (guardando || creandoEmprendedora) return
 
+    setFormularioNuevo(false)
     setMostrarFormulario(false)
     setEmprendedoraEditando(null)
     setMensajeValidacion('')
@@ -213,21 +362,80 @@ function EmprendedorasAdmin({
         <button
           type="button"
           onClick={
-            mostrarFormulario
+            mostrarFormulario || formularioNuevo
               ? cerrarFormulario
-              : () =>
-                  setMensajeValidacion(
-                    'El registro de nuevas emprendedoras se habilitará mediante un flujo seguro de creación de cuentas.'
-                  )
+              : abrirNuevaEmprendedora
           }
-          disabled={guardando}
+          disabled={
+            guardando ||
+            creandoEmprendedora
+          }
         >
-          {mostrarFormulario
+          {mostrarFormulario || formularioNuevo
             ? 'Cancelar'
             : '+ Nueva emprendedora'}
         </button>
       </div>
 
+      {formularioNuevo && (
+        <div className="bora-formulario">
+          <h3>Crear cuenta de emprendedora</h3>
+          <p>Registra una nueva emprendedora y su tienda.</p>
+
+          <form
+            className="bora-formulario-campos"
+            onSubmit={crearEmprendedora}
+          >
+            <div className="bora-campo">
+              <label>Nombre completo</label>
+              <input name="nombre" type="text" maxLength={150} required disabled={creandoEmprendedora} />
+            </div>
+
+            <div className="bora-campo">
+              <label>Correo electrónico</label>
+              <input name="email" type="email" maxLength={254} required disabled={creandoEmprendedora} />
+            </div>
+
+
+
+            <div className="bora-campo">
+              <label>Nombre de la tienda</label>
+              <input name="nombreTienda" type="text" maxLength={150} required disabled={creandoEmprendedora} />
+            </div>
+
+            <div className="bora-campo">
+              <label>Categoría</label>
+              <select name="categoria" defaultValue="" required disabled={creandoEmprendedora}>
+                <option value="" disabled>Selecciona una categoría</option>
+                {[
+                  'Artesanía',
+                  'Textiles y tejidos',
+                  'Gastronomía',
+                  'Belleza y bienestar',
+                  'Decoración',
+                  'Otros',
+                ].map((categoria) => (
+                  <option key={categoria} value={categoria}>{categoria}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bora-campo">
+              <label>Teléfono (opcional)</label>
+              <input name="telefono" type="tel" pattern="[0-9]{9}" maxLength={9} placeholder="912345678" disabled={creandoEmprendedora} />
+            </div>
+
+            <div className="bora-campo">
+              <label>Descripción</label>
+              <textarea name="descripcion" maxLength={2000} rows={3} disabled={creandoEmprendedora} />
+            </div>
+
+            <button type="submit" disabled={creandoEmprendedora}>
+              {creandoEmprendedora ? 'Creando cuenta...' : 'Crear emprendedora'}
+            </button>
+          </form>
+        </div>
+      )}
       {mostrarFormulario && emprendedoraEditando && (
         <div className="bora-formulario">
           <h3>Editar emprendedora</h3>
@@ -247,6 +455,7 @@ function EmprendedorasAdmin({
               <label htmlFor="nombre-emprendedora">
                 Nombre de la emprendedora
               </label>
+
               <input
                 type="text"
                 id="nombre-emprendedora"
@@ -263,6 +472,7 @@ function EmprendedorasAdmin({
               <label htmlFor="correo-emprendedora">
                 Correo electrónico
               </label>
+
               <input
                 type="email"
                 id="correo-emprendedora"
@@ -276,6 +486,7 @@ function EmprendedorasAdmin({
               <label htmlFor="telefono-emprendedora">
                 Teléfono de contacto
               </label>
+
               <input
                 type="tel"
                 id="telefono-emprendedora"
@@ -293,6 +504,7 @@ function EmprendedorasAdmin({
               <label htmlFor="emprendimiento-nombre">
                 Nombre del emprendimiento
               </label>
+
               <input
                 type="text"
                 id="emprendimiento-nombre"
@@ -320,10 +532,61 @@ function EmprendedorasAdmin({
         </p>
       )}
 
+      {credencialesTemporales && (
+        <div className="bora-formulario" style={{ marginTop: '16px' }}>
+          <h3>Credenciales de acceso creadas</h3>
+          <p>Entrega estos datos de forma privada a la emprendedora. La contraseña no se guarda en Firestore.</p>
+
+          <div className="bora-campo">
+            <label>Correo de acceso</label>
+            <input
+              type="text"
+              readOnly
+              value={credencialesTemporales.email}
+            />
+          </div>
+
+          <div className="bora-campo">
+            <label>Contraseña temporal</label>
+            <input
+              type="text"
+              readOnly
+              value={credencialesTemporales.password}
+            />
+          </div>
+
+          <button
+            className="bora-btn-credenciales-copiar"
+            type="button"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(
+                  `Correo: ${credencialesTemporales.email}\nContraseña: ${credencialesTemporales.password}`
+                )
+                window.alert('Credenciales copiadas.')
+              } catch {
+                window.alert('No se pudo copiar. Copia los datos manualmente.')
+              }
+            }}
+          >
+            Copiar credenciales
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCredencialesTemporales(null)}
+            className="bora-btn-credenciales-ocultar"
+          >
+            Ocultar credenciales
+          </button>
+        </div>
+      )}
+
       <div className="bora-buscador">
         <label htmlFor="buscar-emprendedora">
           Buscar emprendedora
         </label>
+
         <input
           type="search"
           id="buscar-emprendedora"
@@ -385,7 +648,11 @@ function EmprendedorasAdmin({
                           editarEmprendedora(emprendedora)
                         }
                         className="bora-boton-editar"
-                        disabled={guardando || Boolean(idProcesando)}
+                        disabled={
+                          guardando ||
+                          creandoEmprendedora ||
+                          Boolean(idProcesando)
+                        }
                       >
                         Editar
                       </button>
@@ -400,7 +667,11 @@ function EmprendedorasAdmin({
                             ? 'bora-boton-editar'
                             : 'bora-boton-eliminar'
                         }
-                        disabled={guardando || Boolean(idProcesando)}
+                        disabled={
+                          guardando ||
+                          creandoEmprendedora ||
+                          Boolean(idProcesando)
+                        }
                       >
                         {idProcesando === emprendedora.id
                           ? 'Guardando...'
@@ -464,6 +735,7 @@ function EmprendedorasAdmin({
                 <p style={{ color: '#B97426', fontSize: '12px' }}>
                   ✦ FICHA DE EMPRENDEDORA
                 </p>
+
                 <h2
                   id="bora-ficha-titulo"
                   style={{
@@ -520,6 +792,7 @@ function EmprendedorasAdmin({
                 >
                   {etiqueta}
                 </div>
+
                 <div
                   style={{
                     fontSize: '15px',
@@ -558,3 +831,4 @@ function EmprendedorasAdmin({
 }
 
 export default EmprendedorasAdmin
+

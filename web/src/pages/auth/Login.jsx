@@ -61,12 +61,11 @@ function Login() {
         .trim()
         .toLowerCase()
 
-      // Administradores y emprendedores:
-      // acceso mediante Google.
-      if (rol === 'administrador' || rol === 'emprendedor') {
+      // Administradores: acceso mediante Google.
+      if (rol === 'administrador') {
         if (!ingresoGoogle) {
           throw new Error(
-            'Los administradores y emprendedores deben iniciar sesión con Google.'
+            'Los administradores deben iniciar sesión con Google.'
           )
         }
 
@@ -84,15 +83,35 @@ function Login() {
           )
         }
 
-        if (rol === 'administrador') {
-          navigate('/admin', { replace: true })
-        } else {
-          navigate('/panel-emprendedora', { replace: true })
-        }
-
+        navigate('/admin', { replace: true })
         return
       }
 
+      // Emprendedoras: acceso mediante correo y contraseña.
+      if (rol === 'emprendedor') {
+        if (ingresoGoogle) {
+          throw new Error(
+            'Las emprendedoras deben iniciar sesión con correo y contraseña.'
+          )
+        }
+
+        const correoAutorizado = String(datos.email || '')
+          .trim()
+          .toLowerCase()
+
+        const correoActual = String(usuario.email || '')
+          .trim()
+          .toLowerCase()
+
+        if (!correoAutorizado || correoAutorizado !== correoActual) {
+          throw new Error(
+            'El correo no coincide con el perfil autorizado.'
+          )
+        }
+
+        navigate('/panel-emprendedora', { replace: true })
+        return
+      }
       // Compradores: acceso mediante correo y contraseña.
       if (rol === 'comprador') {
         if (ingresoGoogle) {

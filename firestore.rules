@@ -48,6 +48,27 @@ service cloud.firestore {
     // USUARIOS
     // ========================================
 
+    // Alta directa y atomica de emprendedor y tienda.
+    function altaCompleta(uid) {
+      return getAfter(
+        /databases/$(database)/documents/usuarios/$(uid)
+      ).data.rol == 'emprendedor'
+        && getAfter(
+          /databases/$(database)/documents/usuarios/$(uid)
+        ).data.activo == true
+        && getAfter(
+          /databases/$(database)/documents/emprendedores/$(uid)
+        ).data.ID_Tienda == uid
+        && getAfter(
+          /databases/$(database)/documents/emprendedores/$(uid)
+        ).data.activo == true
+        && getAfter(
+          /databases/$(database)/documents/tiendas/$(uid)
+        ).data.ID_Dueno == uid
+        && getAfter(
+          /databases/$(database)/documents/tiendas/$(uid)
+        ).data.activo == true;
+    }
     match /usuarios/{usuarioId} {
 
       allow get: if request.auth != null
@@ -58,35 +79,56 @@ service cloud.firestore {
 
       allow list: if esAdministrador();
 
-      // Registro público solo para compradores.
-      allow create: if request.auth != null
+      // Registro publico exclusivamente para compradores.
+      // El administrador puede crear emprendedores directamente.
+      allow create: if (
+        request.auth != null
         && request.auth.uid == usuarioId
-
         && request.resource.data.keys().hasAll([
           'ID', 'nombre', 'email', 'rol', 'activo'
         ])
-
         && request.resource.data.keys().hasOnly([
           'ID', 'nombre', 'email', 'rol', 'activo'
         ])
-
         && request.resource.data.ID == usuarioId
-
         && request.resource.data.nombre is string
         && request.resource.data.nombre.size() > 0
         && request.resource.data.nombre.size() <= 150
-
         && request.resource.data.email is string
-        && request.auth.token.email is string
         && request.auth.token.email_verified == true
         && request.resource.data.email == request.auth.token.email
-
         && request.resource.data.rol == 'comprador'
-        && request.resource.data.activo == true;
+        && request.resource.data.activo == true
+      ) || (
+        esAdministrador()
+        && usuarioId != request.auth.uid
+        && request.resource.data.keys().hasAll([
+          'ID', 'nombre', 'email', 'rol', 'activo'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'ID', 'nombre', 'email', 'rol', 'activo'
+        ])
+        && request.resource.data.ID == usuarioId
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 150
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 0
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.rol == 'emprendedor'
+        && request.resource.data.activo == true
+        && altaCompleta(usuarioId)
+      );
 
-      allow update, delete: if false;
+      // El administrador puede activar o desactivar usuarios.
+      // No puede convertir compradores en emprendedores.
+      allow update: if esAdministrador()
+        && request.resource.data.diff(resource.data)
+          .affectedKeys().hasOnly(['activo'])
+        && request.resource.data.activo is bool;
+
+      allow delete: if false;
     }
-
     // ========================================
     // EMPRENDEDORES
     // ========================================
@@ -99,30 +141,50 @@ service cloud.firestore {
           || esAdministrador()
         );
 
-      allow update: if esAdministrador()
-
-        && request.resource.data.diff(resource.data)
-          .affectedKeys()
-          .hasOnly([
-            'nombre',
-            'telefono',
-            'descripcion',
-            'direccion',
-            'activo'
-          ])
-
+      // El administrador crea el perfil junto con usuario y tienda.
+      allow create: if esAdministrador()
+        && emprendedorId != request.auth.uid
+        && request.resource.data.keys().hasAll([
+          'ID_Tienda', 'activo', 'nombre',
+          'telefono', 'descripcion', 'direccion'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'ID_Tienda', 'activo', 'nombre',
+          'telefono', 'descripcion', 'direccion'
+        ])
+        && request.resource.data.ID_Tienda == emprendedorId
+        && request.resource.data.activo == true
         && request.resource.data.nombre is string
         && request.resource.data.nombre.size() > 0
         && request.resource.data.nombre.size() <= 150
+        && request.resource.data.nombre ==
+          getAfter(
+            /databases/$(database)/documents/usuarios/$(emprendedorId)
+          ).data.nombre
+        && request.resource.data.telefono is string
+        && request.resource.data.telefono.size() <= 25
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() <= 2000
+        && request.resource.data.direccion is string
+        && request.resource.data.direccion.size() <= 200
+        && altaCompleta(emprendedorId);
 
+      allow update: if esAdministrador()
+        && request.resource.data.diff(resource.data)
+          .affectedKeys().hasOnly([
+            'nombre', 'telefono', 'descripcion',
+            'direccion', 'activo'
+          ])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 150
         && request.resource.data.telefono is string
         && request.resource.data.descripcion is string
         && request.resource.data.direccion is string
         && request.resource.data.activo is bool;
 
-      allow create, delete: if false;
+      allow delete: if false;
     }
-
     // ========================================
     // TIENDAS
     // ========================================
@@ -186,8 +248,42 @@ match /tiendas/{tiendaId} {
     && request.resource.data.imagen is string
     && request.resource.data.imagen.size() <= 2000;
 
-  // La creación y eliminación siguen protegidas.
-  allow create, delete: if false;
+  // Crear tienda mediante alta administrativa atomica.
+  allow create: if esAdministrador()
+    && tiendaId != request.auth.uid
+    && request.resource.data.keys().hasAll([
+      'ID_Dueno', 'activo', 'nombre', 'categoria',
+      'descripcion', 'sector', 'telefono',
+      'whatsapp', 'emailContacto', 'imagen'
+    ])
+    && request.resource.data.keys().hasOnly([
+      'ID_Dueno', 'activo', 'nombre', 'categoria',
+      'descripcion', 'sector', 'telefono',
+      'whatsapp', 'emailContacto', 'imagen'
+    ])
+    && request.resource.data.ID_Dueno == tiendaId
+    && request.resource.data.activo == true
+    && request.resource.data.nombre is string
+    && request.resource.data.nombre.size() > 0
+    && request.resource.data.nombre.size() <= 150
+    && request.resource.data.categoria is string
+    && request.resource.data.categoria.size() > 0
+    && request.resource.data.categoria.size() <= 100
+    && request.resource.data.descripcion is string
+    && request.resource.data.descripcion.size() <= 2000
+    && request.resource.data.sector is string
+    && request.resource.data.sector.size() <= 100
+    && request.resource.data.telefono is string
+    && request.resource.data.telefono.size() <= 25
+    && request.resource.data.whatsapp is string
+    && request.resource.data.whatsapp.size() <= 25
+    && request.resource.data.emailContacto is string
+    && request.resource.data.emailContacto.size() <= 254
+    && request.resource.data.imagen is string
+    && request.resource.data.imagen.size() <= 2000
+    && altaCompleta(tiendaId);
+
+  allow delete: if false;
 }
 
 
@@ -401,9 +497,111 @@ match /tiendas/{tiendaId} {
     // BLOQUEO GENERAL
     // ========================================
 
+    // ========================================
+    // CATEGORÍAS
+    // ========================================
+
+    match /categorias/{categoriaId} {
+      allow read: if true;
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasAll(['nombre', 'estado'])
+        && request.resource.data.keys().hasOnly(['nombre', 'estado'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 3
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.estado in ['Activa', 'Inactiva'];
+
+      allow delete: if false;
+    }
+
+    // ========================================
+    // TIPOS DE PRODUCTOS
+    // ========================================
+
+    // TIPOS DE EMPRENDIMIENTO - W20
+    match /tipos_emprendimiento/{tipoId} {
+      allow read: if esAdministrador();
+
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasAll(['nombre', 'estado'])
+        && request.resource.data.keys().hasOnly(['nombre', 'estado'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 3
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.estado in ['Activa', 'Inactiva'];
+
+      allow delete: if false;
+    }
+    match /tipos_productos/{tipoId} {
+      allow read: if true;
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasAll(['nombre', 'estado'])
+        && request.resource.data.keys().hasOnly(['nombre', 'estado'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 3
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.estado in ['Activa', 'Inactiva'];
+
+      allow delete: if false;
+    }
+    // ========================================
+    // ASOCIACIONES
+    // ========================================
+
+    match /asociaciones/{asociacionId} {
+      allow read: if esAdministrador();
+
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasAll([
+          'nombre', 'descripcion', 'estado',
+          'sector', 'contacto', 'logo'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'nombre', 'descripcion', 'estado',
+          'sector', 'contacto', 'logo'
+        ])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 3
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() <= 500
+        && request.resource.data.sector is string
+        && request.resource.data.sector.size() <= 150
+        && request.resource.data.contacto is string
+        && request.resource.data.contacto.size() <= 200
+        && request.resource.data.logo is string
+        && request.resource.data.logo.size() <= 2000
+        && request.resource.data.estado in ['Activa', 'Inactiva'];
+
+      allow delete: if false;
+    }
+
+    match /asignaciones/{emprendedoraId} {
+      allow read: if esAdministrador();
+
+      allow create, update: if esAdministrador()
+        && request.resource.data.keys().hasOnly([
+          'emprendedoraId', 'asociacionId'
+        ])
+        && request.resource.data.keys().hasAll([
+          'emprendedoraId', 'asociacionId'
+        ])
+        && request.resource.data.emprendedoraId == emprendedoraId
+        && request.resource.data.asociacionId is string
+        && exists(/databases/$(database)/documents/emprendedores/$(emprendedoraId))
+        && exists(/databases/$(database)/documents/asociaciones/$(request.resource.data.asociacionId))
+        && get(/databases/$(database)/documents/emprendedores/$(emprendedoraId)).data.activo == true
+        && get(/databases/$(database)/documents/asociaciones/$(request.resource.data.asociacionId)).data.estado == 'Activa';
+
+      allow delete: if esAdministrador();
+    }
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
+
+
+
 

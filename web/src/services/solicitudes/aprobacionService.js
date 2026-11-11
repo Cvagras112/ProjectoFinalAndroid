@@ -53,9 +53,7 @@ export async function aprobarSolicitudEmprendedor(usuarioId) {
         )
       } catch (err) {
         if (err instanceof SyntaxError) {
-          throw new Error(
-            'La función de aprobación devolvió una respuesta inválida.'
-          )
+          throw new Error('La función de aprobación devolvió una respuesta inválida.', { cause: err })
         }
 
         throw err

@@ -43,12 +43,8 @@ export default function TiendaDetalle() {
   const [busqueda, setBusqueda] = useState('')
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
-  const [seguida, setSeguida] = useState(false)
+  const [seguida, setSeguida] = useState(() => obtenerSeguidas().includes(tiendaId))
   const [mensajeCompartir, setMensajeCompartir] = useState('')
-
-  useEffect(() => {
-    setSeguida(obtenerSeguidas().includes(tiendaId))
-  }, [tiendaId])
 
   useEffect(() => {
     let activo = true

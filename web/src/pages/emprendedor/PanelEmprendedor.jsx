@@ -1,4 +1,4 @@
-
+﻿
 
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -7,7 +7,6 @@ import { auth } from '../../firebase/config'
 
 import {
     obtenerTiendaEmprendedor,
-    actualizarTiendaEmprendedor,
 } from '../../services/tiendas/tiendaService'
 
 import {
@@ -41,19 +40,6 @@ function formatoPrecio(precio) {
 export default function PanelEmprendedor() {
     const [tienda, setTienda] = useState(null)
 
-    const [editandoTienda, setEditandoTienda] = useState(false)
-
-    const [formularioTienda, setFormularioTienda] = useState({
-        nombre: '',
-        descripcion: '',
-        categoria: '',
-        imagen: '',
-    })
-
-    const [guardandoTienda, setGuardandoTienda] = useState(false)
-    const [mensajeTienda, setMensajeTienda] = useState('')
-    const [errorTienda, setErrorTienda] = useState('')
-
     const [productos, setProductos] = useState([])
     const [cargando, setCargando] = useState(true)
     const [error, setError] = useState('')
@@ -81,7 +67,7 @@ export default function PanelEmprendedor() {
             setProductos([])
 
             if (!usuario) {
-                setError('Debes iniciar sesión para acceder a tu tienda.')
+                setError('Debes iniciar sesi?n para acceder a tu tienda.')
                 setCargando(false)
                 return
             }
@@ -116,69 +102,6 @@ export default function PanelEmprendedor() {
         }
     }, [])
 
-
-    function abrirEditarTienda() {
-        if (!tienda) return
-
-        setFormularioTienda({
-            nombre: tienda.nombre || '',
-            descripcion: tienda.descripcion || '',
-            categoria: tienda.categoria || '',
-            imagen: tienda.imagen || '',
-        })
-
-        setMensajeTienda('')
-        setErrorTienda('')
-        setEditandoTienda(true)
-    }
-
-    function cerrarEditarTienda() {
-        if (guardandoTienda) return
-
-        setEditandoTienda(false)
-        setErrorTienda('')
-    }
-
-    function cambiarCampoTienda(evento) {
-        const { name, value } = evento.target
-
-        setFormularioTienda((anterior) => ({
-            ...anterior,
-            [name]: value,
-        }))
-    }
-
-
-    async function guardarCambiosTienda(evento) {
-        evento.preventDefault()
-
-        if (guardandoTienda || !tienda || !auth.currentUser) return
-
-        setGuardandoTienda(true)
-        setErrorTienda('')
-        setMensajeTienda('')
-
-        try {
-            const tiendaActualizada = await actualizarTiendaEmprendedor(
-                auth.currentUser.uid,
-                formularioTienda
-            )
-
-            setTienda(tiendaActualizada)
-            setEditandoTienda(false)
-            setMensajeTienda('¡Los datos de tu tienda se actualizaron correctamente!')
-        } catch (err) {
-            console.error('Error al actualizar la tienda:', err)
-
-            setErrorTienda(
-                err.code === 'permission-denied'
-                    ? 'No tienes permisos para modificar esta tienda.'
-                    : err.message || 'No pudimos actualizar tu tienda.'
-            )
-        } finally {
-            setGuardandoTienda(false)
-        }
-    }
 
 
 
@@ -261,7 +184,7 @@ export default function PanelEmprendedor() {
             console.error('Error al guardar producto:', err)
             setErrorOperacion(
                 err.code === 'permission-denied'
-                    ? 'Firestore rechazó la operación. Debemos revisar las reglas de seguridad.'
+                    ? 'Firestore rechaz? la operaci?n. Debemos revisar las reglas de seguridad.'
                     : err.message || 'No pudimos guardar el producto.'
             )
         } finally {
@@ -273,7 +196,7 @@ export default function PanelEmprendedor() {
         if (eliminandoId || guardando) return
 
         const confirmar = window.confirm(
-            `¿Quieres eliminar "${producto.nombre}"? Esta acción no se puede deshacer.`
+            `?Quieres eliminar "${producto.nombre}"? Esta acci?n no se puede deshacer.`
         )
 
         if (!confirmar) return
@@ -290,7 +213,7 @@ export default function PanelEmprendedor() {
             console.error('Error al eliminar producto:', err)
             setErrorOperacion(
                 err.code === 'permission-denied'
-                    ? 'Firestore rechazó la eliminación. Debemos revisar las reglas.'
+                    ? 'Firestore rechaz? la eliminaci?n. Debemos revisar las reglas.'
                     : err.message || 'No pudimos eliminar el producto.'
             )
         } finally {
@@ -303,7 +226,7 @@ export default function PanelEmprendedor() {
             <main className="panel-emprendedor">
                 <div className="panel-emprendedor__mensaje">
                     <h1>Cargando tu emprendimiento...</h1>
-                    <p>Estamos preparando la información de tu tienda.</p>
+                    <p>Estamos preparando la informaci?n de tu tienda.</p>
                 </div>
             </main>
         )
@@ -341,7 +264,7 @@ export default function PanelEmprendedor() {
                     <h1>¡Bienvenida a tu emprendimiento!</h1>
 
                     <p>
-                        Desde aquí puedes conocer el estado de tu tienda,
+                        Desde aqu?­ puedes conocer el estado de tu tienda,
                         administrar tus productos y seguir haciendo crecer
                         tu emprendimiento en BORA.
                     </p>
@@ -351,7 +274,7 @@ export default function PanelEmprendedor() {
                     to={`/tiendas/${tienda.id}`}
                     className="panel-emprendedor__hero-accion"
                 >
-                    🛍️ Ver mi tienda ↗
+                    🏪 Ver mi tienda ↗
                 </Link>
             </section>
 
@@ -393,7 +316,7 @@ export default function PanelEmprendedor() {
             <div className="panel-emprendedor__contenido">
                 <section className="panel-emprendedor__tarjeta">
                     <div className="panel-emprendedor__titulo-seccion">
-                        <h2>🛍️ Mis productos</h2>
+                        <h2>📦 Mis productos</h2>
                         <span className="panel-emprendedor__estado">
                             {productos.length} registrados
                         </span>
@@ -471,8 +394,8 @@ export default function PanelEmprendedor() {
                                         <option value="Belleza y bienestar">
                                             Belleza y bienestar
                                         </option>
-                                        <option value="Decoración">
-                                            Decoración
+                                        <option value="Decoraci?n">
+                                            Decoraci?n
                                         </option>
                                         <option value="Otros">
                                             Otros
@@ -508,7 +431,7 @@ export default function PanelEmprendedor() {
                                 </label>
 
                                 <label className="panel-emprendedor__campo-ancho">
-                                    Descripción
+                                    Descripci?n
                                     <textarea
                                         name="descripcion"
                                         value={formulario.descripcion}
@@ -577,9 +500,9 @@ export default function PanelEmprendedor() {
                                 <span className="panel-emprendedor__vacio-icono">
                                     📦
                                 </span>
-                                <h3>Aún no tienes productos</h3>
+                                <h3>A?n no tienes productos</h3>
                                 <p>
-                                    Usa el botón Agregar producto para registrar
+                                    Usa el bot?n Agregar producto para registrar
                                     tu primer artículo en BORA.
                                 </p>
                             </div>
@@ -680,7 +603,7 @@ export default function PanelEmprendedor() {
                     </h3>
 
                     <p className="panel-emprendedor__descripcion">
-                        {tienda.descripcion || 'Sin descripción registrada.'}
+                        {tienda.descripcion || 'Sin descripci?n registrada.'}
                     </p>
 
                     <div className="panel-emprendedor__dato">
@@ -710,10 +633,12 @@ export default function PanelEmprendedor() {
                         to={`/tiendas/${tienda.id}`}
                         className="panel-emprendedor__tienda-link"
                     >
-                        Visitar mi tienda pública ↗
+                        Visitar mi tienda ↗
                     </Link>
                 </aside>
             </div>
         </main>
     )
 }
+
+
