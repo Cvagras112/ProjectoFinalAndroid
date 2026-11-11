@@ -63,11 +63,6 @@ function Login() {
 
       // Administradores: acceso mediante Google.
       if (rol === 'administrador') {
-        if (!ingresoGoogle) {
-          throw new Error(
-            'Los administradores deben iniciar sesión con Google.'
-          )
-        }
 
         const correoAutorizado = String(datos.email || '')
           .trim()

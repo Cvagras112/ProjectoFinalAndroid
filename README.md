@@ -7,7 +7,7 @@ El proyecto BORA es desarrollado por un equipo de cinco integrantes.
 Las responsabilidades principales se distribuyen de la siguiente manera:
 
 ### Desarrollo de aplicación móvil
-**Jordan Rosas y Cristóbal Vargas**
+**Jordan Rosas, Cristóbal Vargas y Benjamín Cárcamo**
 
 Responsables principalmente del desarrollo de la aplicación Android,
 implementación de pantallas, navegación y funcionalidades móviles.
