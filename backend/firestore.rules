@@ -1,0 +1,292 @@
+// Firestore schema/access policy for Android BORA.
+// Keep security tests in backend/tests/firestore.rules.test.mjs.
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function profile(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function hasProfile() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return hasProfile() && profile(request.auth.uid).role == 'admin';
+    }
+
+    function isEntrepreneur() {
+      return hasProfile() && profile(request.auth.uid).role == 'emprendedora';
+    }
+
+    function isGoogleBuyer() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    function validImageUrl(url) {
+      return url is string && url.size() <= 2048 && url.matches('^https://.*$');
+    }
+
+    function validVariant(variant) {
+      return variant is map
+        && variant.keys().hasOnly(['id', 'name', 'price', 'stock', 'imageUrl', 'imagePath'])
+        && variant.keys().hasAll(['id', 'name', 'price', 'stock', 'imageUrl', 'imagePath'])
+        && variant.id is string && variant.id.size() > 0 && variant.id.size() <= 64
+        && variant.name is string && variant.name.size() > 0 && variant.name.size() <= 60
+        && variant.price is int && variant.price > 0 && variant.price <= 999999999
+        && variant.stock is int && variant.stock >= 0 && variant.stock <= 100000
+        && validImageUrl(variant.imageUrl)
+        && variant.imagePath is string && variant.imagePath.size() <= 512
+        && variant.imagePath.matches('^products/' + request.auth.uid + '/.*$');
+    }
+
+    function validVariantAt(data, index) {
+      return data.variants.size() <= index || validVariant(data.variants[index]);
+    }
+
+    function validVariants(data) {
+      return data.variants is list && data.variants.size() <= 10
+        && validVariantAt(data, 0) && validVariantAt(data, 1)
+        && validVariantAt(data, 2) && validVariantAt(data, 3)
+        && validVariantAt(data, 4) && validVariantAt(data, 5)
+        && validVariantAt(data, 6) && validVariantAt(data, 7)
+        && validVariantAt(data, 8) && validVariantAt(data, 9);
+    }
+
+    function validProduct(data) {
+      return data.keys().hasOnly([
+          'storeId', 'ownerUid', 'name', 'description', 'price', 'imageUrl', 'imagePath',
+          'category', 'productType', 'modality', 'managesStock', 'stock', 'exhaustedBehavior',
+          'available', 'sold', 'variants', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasAll([
+          'storeId', 'ownerUid', 'name', 'description', 'price', 'imageUrl', 'imagePath',
+          'category', 'productType', 'modality', 'managesStock', 'stock', 'exhaustedBehavior',
+          'available', 'sold', 'variants', 'createdAt', 'updatedAt'
+        ])
+        && data.storeId is string && data.storeId.size() > 0 && data.storeId.size() <= 128
+        && data.ownerUid == request.auth.uid
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 80
+        && data.description is string && data.description.size() <= 500
+        && data.price is int && data.price > 0 && data.price <= 999999999
+        && validImageUrl(data.imageUrl)
+        && data.imagePath is string && data.imagePath.size() <= 512
+        && data.imagePath.matches('^products/' + request.auth.uid + '/.*$')
+        && data.category in [
+          'Artesanía', 'Alimentos', 'Textil', 'Joyería',
+          'Hogar y decoración', 'Cosmética', 'Otro'
+        ]
+        && data.productType is string && data.productType.size() > 0 && data.productType.size() <= 60
+        && data.modality in ['Regular', 'A pedido', 'Pieza única']
+        && data.managesStock is bool
+        && data.stock is int && data.stock >= 0 && data.stock <= 100000
+        && data.exhaustedBehavior in ['Mostrar agotado', 'Ocultar', 'A pedido']
+        && data.available is bool && data.sold is bool
+        && validVariants(data)
+        && data.createdAt is timestamp && data.updatedAt is timestamp
+        && data.updatedAt == request.time;
+    }
+
+    function validSale(data) {
+      return data.keys().hasOnly([
+          'ownerUid', 'productId', 'productName', 'variantId', 'variantName',
+          'quantity', 'unitPrice', 'totalPrice', 'placeType', 'placeName', 'soldAt'
+        ])
+        && data.keys().hasAll([
+          'ownerUid', 'productId', 'productName', 'variantId', 'variantName',
+          'quantity', 'unitPrice', 'totalPrice', 'placeType', 'placeName', 'soldAt'
+        ])
+        && data.ownerUid == request.auth.uid
+        && data.productId is string && data.productId.size() > 0 && data.productId.size() <= 128
+        && data.productName is string && data.productName.size() > 0 && data.productName.size() <= 80
+        && data.variantId is string && data.variantId.size() <= 64
+        && data.variantName is string && data.variantName.size() <= 60
+        && data.quantity is int && data.quantity > 0 && data.quantity <= 100000
+        && data.unitPrice is int && data.unitPrice > 0 && data.unitPrice <= 999999999
+        && data.totalPrice is int && data.totalPrice == data.unitPrice * data.quantity
+        && data.totalPrice <= 99999999900000
+        && data.placeType in ['feria', 'otro']
+        && data.placeName is string && data.placeName.size() <= 100
+        && data.soldAt is timestamp && data.soldAt == request.time
+        && exists(/databases/$(database)/documents/products/$(data.productId))
+        && get(/databases/$(database)/documents/products/$(data.productId)).data.ownerUid == request.auth.uid;
+    }
+
+    function validParticipant(data, participantUid) {
+      return data.keys().hasOnly([
+          'entrepreneurUid', 'entrepreneurName', 'status', 'invitedBy', 'updatedAt'
+        ])
+        && data.keys().hasAll([
+          'entrepreneurUid', 'entrepreneurName', 'status', 'invitedBy', 'updatedAt'
+        ])
+        && data.entrepreneurUid == participantUid
+        && data.entrepreneurName is string && data.entrepreneurName.size() <= 100
+        && data.status in ['invitada', 'confirmada', 'rechazada', 'agregada_admin']
+        && data.invitedBy is string && data.invitedBy == request.auth.uid
+        && data.updatedAt is timestamp && data.updatedAt == request.time;
+    }
+
+    function validFair(data) {
+      return data.keys().hasOnly([
+          'name', 'description', 'imageUrl', 'address', 'latitude', 'longitude',
+          'startsAt', 'endsAt', 'organizer', 'published', 'cancelled', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasAll([
+          'name', 'description', 'imageUrl', 'address', 'latitude', 'longitude',
+          'startsAt', 'endsAt', 'organizer', 'published', 'cancelled', 'createdAt', 'updatedAt'
+        ])
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.description is string && data.description.size() <= 1000
+        && validImageUrl(data.imageUrl)
+        && data.address is string && data.address.size() > 0 && data.address.size() <= 200
+        && data.latitude is number && data.latitude >= -90 && data.latitude <= 90
+        && data.longitude is number && data.longitude >= -180 && data.longitude <= 180
+        && data.startsAt is timestamp && data.endsAt is timestamp && data.endsAt >= data.startsAt
+        && data.organizer is string && data.organizer.size() > 0 && data.organizer.size() <= 100
+        && data.published is bool && data.cancelled is bool
+        && data.createdAt is timestamp && data.updatedAt is timestamp
+        && data.updatedAt == request.time;
+    }
+
+    match /users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+
+      match /follows/{followId} {
+        allow read: if request.auth.uid == uid || isAdmin();
+        allow create, update: if request.auth.uid == uid && isGoogleBuyer()
+          && request.resource.data.keys().hasOnly([
+            'targetId', 'targetType', 'notificationsEnabled', 'createdAt', 'updatedAt'
+          ])
+          && request.resource.data.keys().hasAll([
+            'targetId', 'targetType', 'notificationsEnabled', 'createdAt', 'updatedAt'
+          ])
+          && request.resource.data.targetId is string
+          && request.resource.data.targetId.size() > 0
+          && request.resource.data.targetId.size() <= 128
+          && request.resource.data.targetType in ['store', 'association']
+          && request.resource.data.notificationsEnabled is bool
+          && request.resource.data.createdAt is timestamp
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if request.auth.uid == uid && isGoogleBuyer();
+      }
+
+      match /devices/{deviceId} {
+        allow read: if request.auth.uid == uid || isAdmin();
+        allow create, update: if request.auth.uid == uid && isGoogleBuyer()
+          && request.resource.data.keys().hasOnly(['token', 'updatedAt'])
+          && request.resource.data.keys().hasAll(['token', 'updatedAt'])
+          && request.resource.data.token is string
+          && request.resource.data.token.size() > 0
+          && request.resource.data.token.size() <= 4096
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if request.auth.uid == uid;
+      }
+    }
+
+    match /products/{productId} {
+      // Public catalogue documents contain only fields intended for display.
+      allow read: if true;
+      allow create: if isEntrepreneur()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && validProduct(request.resource.data);
+      allow update: if isEntrepreneur()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.storeId == resource.data.storeId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && validProduct(request.resource.data);
+      allow delete: if isEntrepreneur() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    match /sales/{saleId} {
+      allow read: if isEntrepreneur() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isEntrepreneur() && validSale(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    match /fairs/{fairId} {
+      allow read: if resource.data.published == true || isAdmin()
+        || (isEntrepreneur()
+          && exists(/databases/$(database)/documents/fairs/$(fairId)/participants/$(request.auth.uid)));
+      allow create: if isAdmin()
+        && request.resource.data.createdAt == request.time
+        && validFair(request.resource.data);
+      allow update: if isAdmin()
+        && request.resource.data.createdAt == resource.data.createdAt
+        && validFair(request.resource.data);
+      allow delete: if isAdmin();
+
+      match /participants/{participantUid} {
+        allow read: if isAdmin()
+          || (signedIn() && request.auth.uid == participantUid)
+          || (isEntrepreneur() && resource.data.entrepreneurUid == request.auth.uid);
+        allow create: if isAdmin()
+          && exists(/databases/$(database)/documents/fairs/$(fairId))
+          && validParticipant(request.resource.data, participantUid);
+        allow update: if (isAdmin()
+            && request.resource.data.entrepreneurUid == resource.data.entrepreneurUid
+            && validParticipant(request.resource.data, participantUid))
+          || (isEntrepreneur()
+            && resource.data.entrepreneurUid == request.auth.uid
+            && resource.data.status == 'invitada'
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['status', 'updatedAt'])
+            && request.resource.data.status in ['confirmada', 'rechazada']
+            && request.resource.data.updatedAt == request.time);
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /associations/{associationId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly([
+          'name', 'logoUrl', 'description', 'sector', 'contact', 'active', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.description is string
+        && request.resource.data.keys().hasAll([
+          'name', 'logoUrl', 'description', 'sector', 'contact', 'active', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.description.size() <= 1000
+        && request.resource.data.logoUrl is string
+        && request.resource.data.logoUrl.size() <= 2048
+        && request.resource.data.sector is string
+        && request.resource.data.sector.size() <= 100
+        && request.resource.data.contact is string
+        && request.resource.data.contact.size() <= 200
+        && request.resource.data.active is bool
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
+    match /adminAudit/{entryId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid', 'action', 'targetType', 'targetId', 'createdAt'])
+        && request.resource.data.keys().hasAll(['actorUid', 'action', 'targetType', 'targetId', 'createdAt'])
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.action is string
+        && request.resource.data.action.size() <= 80
+        && request.resource.data.targetType is string
+        && request.resource.data.targetType.size() <= 40
+        && request.resource.data.targetId is string
+        && request.resource.data.targetId.size() <= 128
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "follows",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "targetType", "order": "ASCENDING" },
+        { "fieldPath": "targetId", "order": "ASCENDING" },
+        { "fieldPath": "notificationsEnabled", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
