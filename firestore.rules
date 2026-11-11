@@ -115,6 +115,24 @@ service cloud.firestore {
         && request.resource.data.email is string
         && request.resource.data.email.size() > 0
         && request.resource.data.email.size() <= 254
+        && request.resource.data.rol == 'administrador'
+        && request.resource.data.activo == true
+      ) || (
+        esAdministrador()
+        && usuarioId != request.auth.uid
+        && request.resource.data.keys().hasAll([
+          'ID', 'nombre', 'email', 'rol', 'activo'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'ID', 'nombre', 'email', 'rol', 'activo'
+        ])
+        && request.resource.data.ID == usuarioId
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 150
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 0
+        && request.resource.data.email.size() <= 254
         && request.resource.data.rol == 'emprendedor'
         && request.resource.data.activo == true
         && altaCompleta(usuarioId)
