@@ -223,6 +223,16 @@ export default function Navbar() {
                     Mi perfil
                   </Link>
 
+                  {rol === 'comprador' && (
+                  <Link
+                    to="/mis-favoritos"
+                    className="navbar-user-option"
+                  >
+                    <span aria-hidden="true">♥</span>
+                    Mis favoritos
+                  </Link>
+                )}
+
                   {panel && (
                     <Link to={panel} className="navbar-user-option">
                       <span aria-hidden="true">▦</span>

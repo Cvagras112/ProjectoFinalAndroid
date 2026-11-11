@@ -421,10 +421,6 @@ export default function Productos() {
 
                         <h2>{producto.nombre}</h2>
 
-                        <p className="bora-catalogo-tienda">
-                          {producto.tienda}
-                        </p>
-
                         <p className="bora-catalogo-descripcion">
                           {producto.descripcion}
                         </p>

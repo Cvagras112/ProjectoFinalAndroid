@@ -734,7 +734,7 @@ export default function TiendaDetalle() {
                           />
 
                           <span className="bora-tienda-producto-sello">
-                            Producto BORA
+                            {tienda.nombre || 'Emprendimiento BORA'}
                           </span>
                         </div>
 

@@ -39,11 +39,11 @@ function adaptarProducto(documento, tiendas = {}) {
     tienda: tienda?.nombre || 'Emprendimiento BORA',
     whatsapp: tienda?.whatsapp || tienda?.telefono || '',
     emailContacto:
-      tienda?.emailContacto ||
-      tienda?.correo ||
-      tienda?.email ||
+     tienda?.emailContacto ||
+     tienda?.correo ||
+     tienda?.email ||
       '',
-    etiqueta: 'Producto BORA',
+    etiqueta: tienda?.nombre || 'Emprendimiento BORA',
   }
 }
 
