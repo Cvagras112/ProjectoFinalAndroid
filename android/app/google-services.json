@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "17026152565",
+    "project_id": "bora-database",
+    "storage_bucket": "bora-database.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17026152565:android:071ffce5d7ac586562603c",
+        "android_client_info": {
+          "package_name": "com.esp.bora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "17026152565-ffkbqr5npda0pdjcvbpie562p3mgvbl4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrhmLrwgLY4r1gSP7AjeAwTp0bUsgdn_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "17026152565-ffkbqr5npda0pdjcvbpie562p3mgvbl4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
