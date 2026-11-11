@@ -45,6 +45,28 @@ export async function obtenerTiendaEmprendedor(uid) {
   }
 }
 
+function validarUrlImagen(valor, nombreCampo) {
+  const urlTexto = String(valor || '').trim()
+
+  if (urlTexto.length > 2000) {
+    throw new Error(`La URL de ${nombreCampo} es demasiado larga.`)
+  }
+
+  if (!urlTexto) return ''
+
+  try {
+    const url = new URL(urlTexto)
+
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      throw new Error('Protocolo no permitido.')
+    }
+  } catch {
+    throw new Error(`Ingresa una URL válida para ${nombreCampo}.`)
+  }
+
+  return urlTexto
+}
+
 export async function actualizarTiendaEmprendedor(uid, datos) {
   const tienda = await obtenerTiendaEmprendedor(uid)
 
@@ -55,9 +77,16 @@ export async function actualizarTiendaEmprendedor(uid, datos) {
   const telefono = String(datos.telefono || '').trim()
   const whatsapp = String(datos.whatsapp || '').trim()
   const emailContacto = String(datos.emailContacto || '').trim()
-  const imagen = String(datos.imagen || '').trim()
 
-  // Validaciones generales
+  const imagen = validarUrlImagen(datos.imagen, 'el logo')
+
+  // Conservar la portada existente cuando un formulario
+  // anterior todavía no envía este campo.
+  const portada = validarUrlImagen(
+    datos.portada ?? tienda.portada ?? '',
+    'la portada'
+  )
+
   if (!nombre || nombre.length > 150) {
     throw new Error('El nombre debe tener entre 1 y 150 caracteres.')
   }
@@ -67,22 +96,19 @@ export async function actualizarTiendaEmprendedor(uid, datos) {
   }
 
   if (descripcion.length > 2000) {
-    throw new Error('La descripción no puede superar los 2000 caracteres.')
+    throw new Error('La descripción no puede superar 2000 caracteres.')
   }
 
   if (sector.length > 100) {
     throw new Error('La comuna seleccionada no es válida.')
   }
 
-  // Validación de teléfono y WhatsApp
   function validarTelefono(numero, campo) {
     if (!numero) return
 
     const digitos = numero.replace(/\D/g, '')
 
-    if (
-      !/^(?:9\d{8}|56\d{9})$/.test(digitos)
-    ) {
+    if (!/^(?:9\d{8}|56\d{9})$/.test(digitos)) {
       throw new Error(
         `Ingresa un número válido para ${campo}. Ejemplo: +56 9 1234 5678.`
       )
@@ -92,7 +118,6 @@ export async function actualizarTiendaEmprendedor(uid, datos) {
   validarTelefono(telefono, 'teléfono')
   validarTelefono(whatsapp, 'WhatsApp')
 
-  // Validación del correo
   if (
     emailContacto &&
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailContacto)
@@ -104,24 +129,6 @@ export async function actualizarTiendaEmprendedor(uid, datos) {
     throw new Error('El correo electrónico es demasiado largo.')
   }
 
-  // Validación de imagen
-  if (imagen.length > 2000) {
-    throw new Error('La URL de la imagen es demasiado larga.')
-  }
-
-  if (imagen) {
-    try {
-      const url = new URL(imagen)
-
-      if (!['http:', 'https:'].includes(url.protocol)) {
-        throw new Error('Protocolo no permitido.')
-      }
-    } catch {
-      throw new Error('Ingresa una URL de imagen válida.')
-    }
-  }
-
-  // Guardar todos los datos en Firestore
   const datosActualizados = {
     nombre,
     descripcion,
@@ -131,6 +138,7 @@ export async function actualizarTiendaEmprendedor(uid, datos) {
     whatsapp,
     emailContacto,
     imagen,
+    portada,
   }
 
   const tiendaRef = doc(db, 'tiendas', tienda.id)

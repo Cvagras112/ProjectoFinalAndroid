@@ -37,11 +37,17 @@ function adaptarProducto(documento, tiendas = {}) {
       '',
     tiendaId,
     tienda: tienda?.nombre || 'Emprendimiento BORA',
+    whatsapp: tienda?.whatsapp || tienda?.telefono || '',
+    emailContacto:
+      tienda?.emailContacto ||
+      tienda?.correo ||
+      tienda?.email ||
+      '',
     etiqueta: 'Producto BORA',
   }
 }
 
-// Obtener nombres de tiendas.
+// Obtener nombres y datos de contacto de tiendas.
 async function obtenerTiendas() {
   const resultado = await getDocs(collection(db, 'tiendas'))
   const tiendas = {}
@@ -190,10 +196,8 @@ export async function crearProducto(tiendaId, datos) {
 
   const producto = validarProducto(datos)
 
-  // Generar primero el ID del documento.
   const referencia = doc(collection(db, 'productos'))
 
-  // Guardar el producto con su ID correspondiente.
   await setDoc(referencia, {
     ...producto,
     ID_Producto: referencia.id,

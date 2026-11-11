@@ -19,9 +19,7 @@ const categorias = [
   'Otros',
 ]
 
-
 const sectores = [
-  // Provincia de Llanquihue
   'Calbuco',
   'Cochamó',
   'Fresia',
@@ -31,8 +29,6 @@ const sectores = [
   'Maullín',
   'Puerto Montt',
   'Puerto Varas',
-
-  // Provincia de Osorno
   'Osorno',
   'Puerto Octay',
   'Purranque',
@@ -40,8 +36,6 @@ const sectores = [
   'Río Negro',
   'San Juan de la Costa',
   'San Pablo',
-
-  // Provincia de Chiloé
   'Ancud',
   'Castro',
   'Chonchi',
@@ -52,14 +46,11 @@ const sectores = [
   'Quellón',
   'Quemchi',
   'Quinchao',
-
-  // Provincia de Palena
   'Chaitén',
   'Futaleufú',
   'Hualaihué',
   'Palena',
 ]
-
 
 const formularioInicial = {
   nombre: '',
@@ -70,6 +61,36 @@ const formularioInicial = {
   whatsapp: '',
   emailContacto: '',
   imagen: '',
+  portada: '',
+}
+
+function VistaPreviaImagen({ url, alt, tipo }) {
+  const [fallo, setFallo] = useState(false)
+
+  useEffect(() => {
+    setFallo(false)
+  }, [url])
+
+  if (!url || fallo) return null
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <img
+        src={url}
+        alt={alt}
+        onError={() => setFallo(true)}
+        style={{
+          display: 'block',
+          width: tipo === 'portada' ? '100%' : 140,
+          maxWidth: tipo === 'portada' ? 560 : 140,
+          height: tipo === 'portada' ? 180 : 140,
+          objectFit: 'cover',
+          borderRadius: 14,
+          border: '1px solid #e1e8e1',
+        }}
+      />
+    </div>
+  )
 }
 
 function EditarTienda() {
@@ -82,9 +103,14 @@ function EditarTienda() {
   const [mensaje, setMensaje] = useState('')
 
   useEffect(() => {
+    let activo = true
+
     const cancelar = onAuthStateChanged(auth, async (usuarioActual) => {
+      if (!activo) return
+
       setCargando(true)
       setError('')
+      setMensaje('')
 
       if (!usuarioActual) {
         setUsuario(null)
@@ -99,7 +125,10 @@ function EditarTienda() {
       try {
         const datos = await obtenerTiendaEmprendedor(usuarioActual.uid)
 
+        if (!activo) return
+
         setTienda(datos)
+
         setFormulario({
           nombre: datos.nombre || '',
           descripcion: datos.descripcion || '',
@@ -109,15 +138,22 @@ function EditarTienda() {
           whatsapp: datos.whatsapp || '',
           emailContacto: datos.emailContacto || '',
           imagen: datos.imagen || '',
+          portada: datos.portada || '',
         })
       } catch (err) {
-        setError(err.message || 'No pudimos cargar tu tienda.')
+        if (activo) {
+          setTienda(null)
+          setError(err.message || 'No pudimos cargar tu tienda.')
+        }
       } finally {
-        setCargando(false)
+        if (activo) setCargando(false)
       }
     })
 
-    return () => cancelar()
+    return () => {
+      activo = false
+      cancelar()
+    }
   }, [])
 
   function cambiarCampo(evento) {
@@ -127,6 +163,8 @@ function EditarTienda() {
       ...anterior,
       [name]: value,
     }))
+
+    setMensaje('')
   }
 
   async function guardarCambios(evento) {
@@ -179,13 +217,17 @@ function EditarTienda() {
         </Link>
 
         <h1>Editar mi tienda</h1>
+
         <p>
           Actualiza la información que las personas verán
           cuando visiten tu emprendimiento en BORA.
         </p>
       </div>
 
-      <form onSubmit={guardarCambios} className="editar-tienda__formulario">
+      <form
+        onSubmit={guardarCambios}
+        className="editar-tienda__formulario"
+      >
         <h2>Información de tu emprendimiento</h2>
 
         <label htmlFor="nombre">Nombre de la tienda</label>
@@ -217,6 +259,7 @@ function EditarTienda() {
           required
         >
           <option value="">Selecciona una categoría</option>
+
           {categorias.map((categoria) => (
             <option key={categoria} value={categoria}>
               {categoria}
@@ -224,7 +267,10 @@ function EditarTienda() {
           ))}
         </select>
 
-        <label htmlFor="sector">Comuna de la Región de Los Lagos</label>
+        <label htmlFor="sector">
+          Comuna de la Región de Los Lagos
+        </label>
+
         <select
           id="sector"
           name="sector"
@@ -232,6 +278,7 @@ function EditarTienda() {
           onChange={cambiarCampo}
         >
           <option value="">Selecciona tu comuna</option>
+
           {sectores.map((sector) => (
             <option key={sector} value={sector}>
               {sector}
@@ -261,7 +308,10 @@ function EditarTienda() {
           placeholder="+56 9 1234 5678"
         />
 
-        <label htmlFor="emailContacto">Correo de contacto</label>
+        <label htmlFor="emailContacto">
+          Correo de contacto
+        </label>
+
         <input
           id="emailContacto"
           name="emailContacto"
@@ -271,9 +321,17 @@ function EditarTienda() {
           placeholder="contacto@ejemplo.cl"
         />
 
-        <h2>Imagen de la tienda</h2>
+        <h2>Identidad visual de la tienda</h2>
 
-        <label htmlFor="imagen">URL de la foto o logo</label>
+        <p>
+          Personaliza el logo y la imagen de portada que
+          aparecerán en el perfil público de tu emprendimiento.
+        </p>
+
+        <label htmlFor="imagen">
+          URL del logo de la tienda (opcional)
+        </label>
+
         <input
           id="imagen"
           name="imagen"
@@ -283,18 +341,36 @@ function EditarTienda() {
           placeholder="https://ejemplo.cl/logo.jpg"
         />
 
-        {formulario.imagen && (
-          <img
-            src={formulario.imagen}
-            alt="Vista previa de la tienda"
-            style={{
-              width: 140,
-              height: 140,
-              objectFit: 'cover',
-              borderRadius: 16,
-            }}
-          />
-        )}
+        <VistaPreviaImagen
+          url={formulario.imagen}
+          alt="Vista previa del logo de la tienda"
+          tipo="logo"
+        />
+
+        <label htmlFor="portada">
+          URL de la imagen de portada (opcional)
+        </label>
+
+        <input
+          id="portada"
+          name="portada"
+          type="url"
+          value={formulario.portada}
+          onChange={cambiarCampo}
+          placeholder="https://ejemplo.cl/portada.jpg"
+        />
+
+        <VistaPreviaImagen
+          url={formulario.portada}
+          alt="Vista previa de la portada de la tienda"
+          tipo="portada"
+        />
+
+        <p style={{ fontSize: 13, color: '#6b776e' }}>
+          La portada es una imagen horizontal que se mostrará
+          detrás de la información de tu tienda. Si todavía
+          no tienes fotografías, puedes dejar ambos campos vacíos.
+        </p>
 
         {error && <p role="alert">{error}</p>}
         {mensaje && <p role="status">{mensaje}</p>}

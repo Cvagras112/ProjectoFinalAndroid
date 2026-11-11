@@ -246,21 +246,50 @@
 
 /* CONTACTO */
 
+
+/* CONTACTO */
+
 .bora-producto-acciones {
   width: 100%;
   margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .bora-producto-contactar {
   width: 100%;
   min-height: 50px;
   padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: #236b4b;
   color: #ffffff;
   border: none;
   border-radius: 11px;
   font-size: 15px;
   font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bora-producto-contactar:hover:not(:disabled) {
+  background: #185437;
+  transform: translateY(-2px);
+}
+
+.bora-producto-contactar-correo {
+  background: #fff8eb;
+  color: #236b4b;
+  border: 1px solid #e8d7b7;
+}
+
+.bora-producto-contactar-correo:hover {
+  background: #f8edda;
 }
 
 .bora-producto-contactar:disabled {
@@ -269,12 +298,13 @@
 }
 
 .bora-producto-acciones p {
-  margin: 12px 0 0;
+  margin: 0;
   color: #89928a;
   font-size: 12px;
   line-height: 1.6;
   text-align: center;
 }
+
 
 /* PRODUCTOS RELACIONADOS */
 
