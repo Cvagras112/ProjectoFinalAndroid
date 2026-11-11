@@ -1,0 +1,12 @@
+.npm-cache/
+.gradle-home/
+node_modules/
+**/node_modules/
+android/.gradle/
+android/**/build/
+android/local.properties
+backend/.firebase/
+backend/.firebase-emulators/
+backend/*.log
+**/service-account*.json
+**/*-adminsdk-*.json
