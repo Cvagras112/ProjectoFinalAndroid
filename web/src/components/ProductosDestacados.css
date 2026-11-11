@@ -1,0 +1,555 @@
+
+/* =========================================
+   BORA - PRODUCTOS DESTACADOS
+   Diseño verde y naranja
+========================================= */
+
+.bora-productos-nuevos {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    #fffaf3 0%,
+    #f8faf6 52%,
+    #fff0e1 100%
+  );
+  border-radius: 28px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Decoraciones de fondo */
+
+.bora-productos-nuevos::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  right: -140px;
+  top: -160px;
+  border-radius: 50%;
+  background: rgba(255, 147, 39, 0.1);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bora-productos-nuevos::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  left: -140px;
+  bottom: -100px;
+  border-radius: 50%;
+  background: rgba(0, 113, 65, 0.07);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Encabezado */
+
+.bora-productos-nuevos .bora-subtitulo {
+  color: #d76516;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.bora-productos-nuevos .bora-titulo-fila h2 {
+  color: #06462f;
+}
+
+.bora-productos-nuevos .bora-titulo-fila p {
+  color: #66756c;
+}
+
+/* Flechas de navegación */
+
+.bora-productos-navegacion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bora-productos-navegacion button {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e4d7c8;
+  border-radius: 50%;
+  background: white;
+  color: #075b38;
+  font-size: 23px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.bora-productos-navegacion button:hover {
+  background: #08723f;
+  color: white;
+  border-color: #08723f;
+  transform: translateY(-3px);
+}
+
+/* Filtros interactivos */
+
+.bora-productos-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 26px;
+}
+
+.bora-productos-filtros button {
+  padding: 10px 18px;
+  border: 1px solid #e5ddcf;
+  border-radius: 30px;
+  background: #ffffff;
+  color: #596c60;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.bora-productos-filtros button:hover {
+  background: #fff0df;
+  border-color: #f0aa72;
+  color: #c45c12;
+  transform: translateY(-2px);
+}
+
+.bora-productos-filtros button.activo {
+  background: #08723f;
+  border-color: #08723f;
+  color: white;
+  box-shadow: 0 6px 16px rgba(0, 98, 54, 0.16);
+}
+
+/* Carrusel */
+
+.bora-productos-nuevos .bora-productos-carrusel {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 8px 4px 24px;
+  scrollbar-width: none;
+}
+
+.bora-productos-nuevos .bora-productos-carrusel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Tarjetas */
+
+.bora-productos-nuevos .bora-producto {
+  flex: 0 0 calc((100% - 66px) / 4);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #eee1d3;
+  border-radius: 22px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.bora-productos-nuevos .bora-producto:hover {
+  transform: translateY(-8px);
+  border-color: #f2b37c;
+  box-shadow: 0 22px 40px rgba(111, 74, 35, 0.13);
+}
+
+/* Fotografías */
+
+.bora-productos-nuevos .bora-producto-foto {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+}
+
+.bora-productos-nuevos .bora-producto-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.55s ease;
+}
+
+.bora-productos-nuevos .bora-producto:hover
+.bora-producto-foto img {
+  transform: scale(1.07);
+}
+
+/* Etiqueta destacado */
+
+.bora-productos-nuevos .bora-producto-destacado {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #fff0dc;
+  color: #bd5a10;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+}
+
+/* Favoritos */
+
+.bora-productos-nuevos .bora-producto-favorito {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: white;
+  color: #075b38;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.bora-productos-nuevos .bora-producto-favorito:hover {
+  transform: scale(1.12);
+  background: #fff0e2;
+  color: #e16a12;
+}
+
+.bora-productos-nuevos .bora-producto-favorito.activo {
+  background: #fff0e2;
+  color: #e16a12;
+}
+
+/* Información de producto */
+
+.bora-productos-nuevos .bora-producto-detalles {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.bora-productos-nuevos .bora-producto-detalles > span {
+  color: #d76516;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.bora-productos-nuevos .bora-producto-detalles h3 {
+  margin: 12px 0 8px;
+  color: #06462f;
+  font-size: 19px;
+  line-height: 1.4;
+  transition: color 0.25s ease;
+}
+
+.bora-productos-nuevos .bora-producto:hover
+.bora-producto-detalles h3 {
+  color: #c45c12;
+}
+
+.bora-productos-nuevos .bora-producto-detalles p {
+  color: #7a857d;
+  font-size: 13px;
+}
+
+.bora-productos-nuevos .bora-producto-inferior {
+  margin-top: auto;
+  padding: 18px 0 14px;
+  border-top: 1px solid #f1e9df;
+}
+
+.bora-productos-nuevos .bora-producto-inferior strong {
+  color: #075b38;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* Botón Ver producto */
+
+.bora-producto-ver {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #08723f;
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.bora-producto-ver:hover {
+  background: #d76516;
+  transform: translateY(-2px);
+}
+
+.bora-producto-ver span {
+  font-size: 19px;
+}
+
+/* Aviso de demostración */
+
+.bora-productos-nota {
+  margin: 10px 0 26px;
+  color: #9b7956;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Modal de vista rápida */
+
+.bora-modal-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(5, 38, 25, 0.65);
+  backdrop-filter: blur(6px);
+  animation: boraModalFondo 0.25s ease;
+}
+
+.bora-modal-producto {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(820px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fffdf8;
+  border-radius: 24px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.22);
+  animation: boraModalEntrada 0.3s ease;
+}
+
+.bora-modal-producto > img {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+}
+
+.bora-modal-cerrar {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  color: #06462f;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.bora-modal-contenido {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 30px;
+}
+
+.bora-modal-contenido > span {
+  color: #d76516;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.bora-modal-contenido h2 {
+  margin: 0;
+  color: #06462f;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.bora-modal-contenido p {
+  margin: 0;
+  color: #68766b;
+  line-height: 1.6;
+}
+
+.bora-modal-contenido strong {
+  color: #08723f;
+  font-size: 28px;
+}
+
+.bora-modal-contenido .bora-modal-aviso {
+  color: #b36b25;
+  font-size: 12px;
+}
+
+.bora-modal-contenido > button {
+  padding: 13px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #08723f;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.bora-modal-contenido > button:hover {
+  background: #d76516;
+}
+
+/* Animaciones */
+
+@keyframes boraModalFondo {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes boraModalEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .bora-productos-nuevos .bora-producto {
+    flex-basis: calc((100% - 44px) / 3);
+  }
+}
+
+@media (max-width: 800px) {
+  .bora-productos-nuevos .bora-producto {
+    flex-basis: calc((100% - 22px) / 2);
+  }
+
+  .bora-modal-producto {
+    grid-template-columns: 1fr;
+  }
+
+  .bora-modal-producto > img {
+    height: 260px;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 550px) {
+  .bora-productos-nuevos {
+    border-radius: 18px;
+  }
+
+  .bora-productos-nuevos .bora-producto {
+    flex-basis: 85%;
+  }
+
+  .bora-productos-nuevos .bora-producto-foto {
+    height: 220px;
+  }
+
+  .bora-productos-filtros {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .bora-productos-filtros button {
+    white-space: nowrap;
+  }
+
+  .bora-productos-navegacion button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .bora-modal-contenido {
+    padding: 25px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bora-productos-nuevos *,
+  .bora-modal-fondo,
+  .bora-modal-producto {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* BOTONES DE LA VISTA RÁPIDA */
+
+.bora-modal-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.bora-modal-acciones .bora-modal-comprar {
+  padding: 14px 12px;
+  border: none;
+  border-radius: 12px;
+  background: #08723f;
+  color: #ffffff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.bora-modal-acciones .bora-modal-comprar:hover {
+  background: #05572f;
+  transform: translateY(-2px);
+}
+
+.bora-modal-acciones .bora-modal-seguir {
+  padding: 14px 12px;
+  border: 1px solid #efb783;
+  border-radius: 12px;
+  background: #fff0df;
+  color: #b9560c;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.bora-modal-acciones .bora-modal-seguir:hover {
+  background: #ffe1c3;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+  .bora-modal-acciones {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,967 @@
+
+/* =========================================
+   BORA - PANEL DE EMPRENDEDOR/A
+========================================= */
+
+.panel-emprendedor {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 42px 24px 80px;
+  color: #263a32;
+}
+
+.panel-emprendedor * {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   ENCABEZADO
+========================================= */
+
+.panel-emprendedor__hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 44px;
+  border-radius: 26px;
+  background: linear-gradient(125deg, #07583c, #08734d);
+  color: #fff;
+}
+
+.panel-emprendedor__hero::after {
+  content: '';
+  position: absolute;
+  width: 310px;
+  height: 310px;
+  right: -90px;
+  top: -160px;
+  border-radius: 50%;
+  background: rgba(255, 173, 57, 0.18);
+  pointer-events: none;
+}
+
+.panel-emprendedor__hero::before {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: 130px;
+  bottom: -160px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.panel-emprendedor__hero-contenido {
+  position: relative;
+  z-index: 1;
+  max-width: 670px;
+}
+
+.panel-emprendedor__etiqueta {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  margin-bottom: 18px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.panel-emprendedor__hero h1 {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 3.2vw, 43px);
+  line-height: 1.2;
+  color: #fff;
+}
+
+.panel-emprendedor__hero p {
+  max-width: 550px;
+  margin: 0;
+  color: #e2f2e9;
+  line-height: 1.8;
+}
+
+.panel-emprendedor__hero-accion {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  background: #ffad39;
+  color: #17442f;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.panel-emprendedor__hero-accion:hover {
+  transform: translateY(-2px);
+  background: #ffc16a;
+}
+
+/* =========================================
+   ESTADÍSTICAS
+========================================= */
+
+.panel-emprendedor__estadisticas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 26px;
+}
+
+.panel-emprendedor__estadistica {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 135px;
+  padding: 25px;
+  border: 1px solid #e7eae5;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 26px rgba(20, 70, 45, 0.035);
+}
+
+.panel-emprendedor__estadistica-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 55px;
+  height: 55px;
+  border-radius: 16px;
+  background: #e6f4eb;
+  font-size: 25px;
+}
+
+.panel-emprendedor__estadistica-icono--naranja {
+  background: #fff0dc;
+}
+
+.panel-emprendedor__estadistica-icono--gris {
+  background: #f0f1ef;
+}
+
+.panel-emprendedor__estadistica-info span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #697a70;
+}
+
+.panel-emprendedor__estadistica-info strong {
+  display: block;
+  font-size: 32px;
+  line-height: 1.1;
+  color: #07583c;
+}
+
+/* =========================================
+   SECCIONES
+========================================= */
+
+.panel-emprendedor__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+  align-items: start;
+}
+
+.panel-emprendedor__tarjeta {
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid #e7eae5;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 8px 26px rgba(20, 70, 45, 0.03);
+}
+
+.panel-emprendedor__titulo-seccion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.panel-emprendedor__titulo-seccion h2 {
+  margin: 0;
+  font-size: 21px;
+  color: #174c37;
+}
+
+.panel-emprendedor__subtitulo {
+  margin: -12px 0 24px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #7a8980;
+}
+
+/* =========================================
+   PRODUCTOS
+========================================= */
+
+.panel-emprendedor__productos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.panel-emprendedor__producto {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e9ede7;
+  border-radius: 17px;
+  background: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.panel-emprendedor__producto:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(13, 75, 49, 0.1);
+}
+
+.panel-emprendedor__producto-imagen {
+  width: 100%;
+  height: 175px;
+  object-fit: cover;
+  display: block;
+  background: #f5f2eb;
+}
+
+.panel-emprendedor__producto-info {
+  padding: 18px;
+}
+
+.panel-emprendedor__producto-info h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #283b32;
+}
+
+.panel-emprendedor__producto-precio {
+  margin: 0 0 12px;
+  font-size: 19px;
+  font-weight: 800;
+  color: #08734d;
+}
+
+.panel-emprendedor__producto-detalles {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.panel-emprendedor__estado {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 100px;
+  background: #e3f5e9;
+  color: #08734d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.panel-emprendedor__estado--inactivo {
+  background: #fff0df;
+  color: #b66a17;
+}
+
+.panel-emprendedor__stock {
+  font-size: 12px;
+  color: #6f7e75;
+}
+
+.panel-emprendedor__enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #08734d;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.panel-emprendedor__enlace:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   INFORMACIÓN DE TIENDA
+========================================= */
+
+.panel-emprendedor__tienda-nombre {
+  margin: 0 0 12px;
+  font-size: 24px;
+  color: #07583c;
+}
+
+.panel-emprendedor__descripcion {
+  margin: 0 0 22px;
+  color: #66786c;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+.panel-emprendedor__dato {
+  padding: 15px 0;
+  border-top: 1px solid #edf0ea;
+}
+
+.panel-emprendedor__dato span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #89958b;
+}
+
+.panel-emprendedor__dato strong {
+  font-size: 14px;
+  color: #34483c;
+}
+
+.panel-emprendedor__tienda-link {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+  padding: 13px;
+  border-radius: 12px;
+  background: #e8f5ed;
+  color: #07583c;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.panel-emprendedor__tienda-link:hover {
+  background: #d6ecde;
+}
+
+/* =========================================
+   ESTADOS VACÍOS Y ERRORES
+========================================= */
+
+.panel-emprendedor__vacio {
+  grid-column: 1 / -1;
+  padding: 42px 20px;
+  border: 1px dashed #d8e3da;
+  border-radius: 16px;
+  background: #f9fcf9;
+  text-align: center;
+}
+
+.panel-emprendedor__vacio-icono {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 36px;
+}
+
+.panel-emprendedor__vacio h3 {
+  margin: 0 0 10px;
+  color: #174c37;
+}
+
+.panel-emprendedor__vacio p {
+  margin: 0;
+  color: #7a8980;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.panel-emprendedor__mensaje {
+  max-width: 700px;
+  margin: 60px auto;
+  padding: 40px 24px;
+  border: 1px solid #e7eae5;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+}
+
+.panel-emprendedor__mensaje h1 {
+  color: #07583c;
+}
+
+.panel-emprendedor__mensaje p {
+  color: #66786c;
+}
+
+/* =========================================
+   GESTIÓN DE PRODUCTOS
+========================================= */
+
+.panel-emprendedor__gestion {
+  margin-top: 28px;
+  padding: 30px;
+  border: 1px solid #e7eae5;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 8px 26px rgba(20, 70, 45, 0.04);
+}
+
+.panel-emprendedor__gestion h2 {
+  margin: 0 0 10px;
+  color: #07583c;
+  font-size: 23px;
+}
+
+.panel-emprendedor__gestion p {
+  color: #718177;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* FORMULARIO */
+
+.panel-emprendedor__formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.panel-emprendedor__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.panel-emprendedor__campo label {
+  color: #34483c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.panel-emprendedor__campo input,
+.panel-emprendedor__campo select,
+.panel-emprendedor__campo textarea {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid #dce5dd;
+  border-radius: 12px;
+  background: #fbfcfa;
+  color: #263a32;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.panel-emprendedor__campo input:focus,
+.panel-emprendedor__campo select:focus,
+.panel-emprendedor__campo textarea:focus {
+  border-color: #08734d;
+  box-shadow: 0 0 0 3px rgba(8, 115, 77, 0.1);
+}
+
+.panel-emprendedor__campo textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.panel-emprendedor__campo--completo {
+  grid-column: 1 / -1;
+}
+
+/* DISPONIBILIDAD */
+
+.panel-emprendedor__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #34483c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.panel-emprendedor__checkbox input {
+  width: 19px;
+  height: 19px;
+  accent-color: #08734d;
+}
+
+/* BOTONES */
+
+.panel-emprendedor__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.panel-emprendedor__boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border: 0;
+  border-radius: 12px;
+  background: #08734d;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.panel-emprendedor__boton:hover:not(:disabled) {
+  background: #07583c;
+  transform: translateY(-2px);
+}
+
+.panel-emprendedor__boton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.panel-emprendedor__boton--secundario {
+  background: #e8f5ed;
+  color: #07583c;
+}
+
+.panel-emprendedor__boton--secundario:hover:not(:disabled) {
+  background: #d6ecde;
+}
+
+.panel-emprendedor__boton--eliminar {
+  background: #fff0ed;
+  color: #b53c32;
+}
+
+.panel-emprendedor__boton--eliminar:hover:not(:disabled) {
+  background: #ffe0da;
+}
+
+/* ALERTAS */
+
+.panel-emprendedor__alerta {
+  margin-top: 20px;
+  padding: 15px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.panel-emprendedor__alerta--exito {
+  border: 1px solid #b9e4c9;
+  background: #e9f8ee;
+  color: #12683c;
+}
+
+.panel-emprendedor__alerta--error {
+  border: 1px solid #f3c9c4;
+  background: #fff0ee;
+  color: #a63830;
+}
+
+/* ACCIONES DE PRODUCTOS */
+
+.panel-emprendedor__producto-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.panel-emprendedor__producto-acciones button {
+  padding: 9px 13px;
+  border: 1px solid #dce5dd;
+  border-radius: 9px;
+  background: #f5faf6;
+  color: #07583c;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.panel-emprendedor__producto-acciones button:hover {
+  background: #e4f3e9;
+}
+
+.panel-emprendedor__producto-acciones button:last-child {
+  border-color: #f4d4d0;
+  background: #fff3f1;
+  color: #b53c32;
+}
+
+.panel-emprendedor__producto-acciones button:last-child:hover {
+  background: #ffe3df;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+  .panel-emprendedor__hero {
+    padding: 34px;
+  }
+
+  .panel-emprendedor__contenido {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-emprendedor__estadistica {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 650px) {
+  .panel-emprendedor {
+    padding: 24px 15px 60px;
+  }
+
+  .panel-emprendedor__hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 24px;
+  }
+
+  .panel-emprendedor__hero-accion {
+    width: 100%;
+  }
+
+  .panel-emprendedor__estadisticas {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .panel-emprendedor__estadistica {
+    min-height: 100px;
+  }
+
+  .panel-emprendedor__tarjeta {
+    padding: 20px;
+  }
+
+  .panel-emprendedor__productos {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-emprendedor__producto-imagen {
+    height: 210px;
+  }
+
+  .panel-emprendedor__gestion {
+    padding: 22px 18px;
+  }
+
+  .panel-emprendedor__formulario {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .panel-emprendedor__campo--completo {
+    grid-column: auto;
+  }
+
+  .panel-emprendedor__acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panel-emprendedor__acciones .panel-emprendedor__boton {
+    width: 100%;
+  }
+}
+
+/* =========================================
+   BORA - FORMULARIO DE PRODUCTOS
+========================================= */
+
+.panel-emprendedor__formulario {
+  margin: 24px 0;
+  padding: 28px;
+  background: #fbf9f4;
+  border: 1px solid #e5e9e1;
+  border-radius: 20px;
+}
+
+.panel-emprendedor__formulario h3 {
+  margin: 0 0 24px;
+  color: #07583c;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.panel-emprendedor__campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.panel-emprendedor__campos label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  color: #34483c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.panel-emprendedor__campos input,
+.panel-emprendedor__campos textarea,
+.panel-emprendedor__campos select {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid #d9e3d9;
+  border-radius: 11px;
+  background: #fff;
+  color: #263a32;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.panel-emprendedor__campos input:focus,
+.panel-emprendedor__campos textarea:focus,
+.panel-emprendedor__campos select:focus {
+  border-color: #08734d;
+  box-shadow: 0 0 0 3px rgba(8, 115, 77, 0.1);
+}
+
+.panel-emprendedor__campos textarea {
+  resize: vertical;
+  min-height: 115px;
+}
+
+.panel-emprendedor__campo-ancho {
+  grid-column: 1 / -1;
+}
+
+.panel-emprendedor__campo-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0;
+  color: #34483c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.panel-emprendedor__campo-check input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #08734d;
+}
+
+.panel-emprendedor__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.panel-emprendedor__boton-crear,
+.panel-emprendedor__boton-secundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.panel-emprendedor__boton-crear {
+  border: 1px solid #08734d;
+  background: #08734d;
+  color: #fff;
+}
+
+.panel-emprendedor__boton-crear:hover:not(:disabled) {
+  background: #07583c;
+  transform: translateY(-1px);
+}
+
+.panel-emprendedor__boton-secundario {
+  border: 1px solid #dce6dc;
+  background: #fff;
+  color: #34483c;
+}
+
+.panel-emprendedor__boton-secundario:hover:not(:disabled) {
+  background: #eef4ee;
+}
+
+.panel-emprendedor__boton-crear:disabled,
+.panel-emprendedor__boton-secundario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panel-emprendedor__acciones-producto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.panel-emprendedor__acciones-producto button {
+  padding: 9px 15px;
+  border: 1px solid #dce6dc;
+  border-radius: 9px;
+  background: #e8f5ed;
+  color: #07583c;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.panel-emprendedor__acciones-producto .panel-emprendedor__eliminar {
+  background: #fff1ed;
+  border-color: #f3d5cd;
+  color: #b44332;
+}
+
+/* Adaptación para celulares */
+
+@media (max-width: 650px) {
+  .panel-emprendedor__formulario {
+    padding: 20px 16px;
+  }
+
+  .panel-emprendedor__campos {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .panel-emprendedor__campo-ancho {
+    grid-column: auto;
+  }
+
+  .panel-emprendedor__acciones button {
+    flex: 1;
+  }
+}
+
+/* =========================================
+   AJUSTE FINAL DEL FORMULARIO BORA
+========================================= */
+
+/* Formulario completo, sin columnas laterales */
+.panel-emprendedor__formulario {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
+  margin: 24px 0;
+  padding: 28px;
+}
+
+/* Título arriba, ocupando todo el ancho */
+.panel-emprendedor__formulario h3 {
+  display: block;
+  width: 100%;
+  margin: 0 0 24px;
+  font-size: 21px;
+}
+
+/* Campos distribuidos en dos columnas iguales */
+.panel-emprendedor__formulario .panel-emprendedor__campos {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* Cada etiqueta encima de su campo */
+.panel-emprendedor__formulario .panel-emprendedor__campos label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  gap: 8px;
+}
+
+/* Entradas de texto */
+.panel-emprendedor__formulario .panel-emprendedor__campos input,
+.panel-emprendedor__formulario .panel-emprendedor__campos textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Descripción e imagen a lo ancho */
+.panel-emprendedor__formulario
+.panel-emprendedor__campos
+.panel-emprendedor__campo-ancho {
+  grid-column: 1 / -1;
+}
+
+/* Checkbox separado y alineado */
+.panel-emprendedor__formulario .panel-emprendedor__campo-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin: 22px 0 8px;
+}
+
+/* Botones debajo del formulario */
+.panel-emprendedor__formulario > .panel-emprendedor__acciones {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Diseño adaptable a celulares */
+@media (max-width: 650px) {
+  .panel-emprendedor__formulario {
+    padding: 20px 16px;
+  }
+
+  .panel-emprendedor__formulario .panel-emprendedor__campos {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .panel-emprendedor__formulario
+  .panel-emprendedor__campos
+  .panel-emprendedor__campo-ancho {
+    grid-column: 1;
+  }
+
+  .panel-emprendedor__formulario > .panel-emprendedor__acciones {
+    flex-direction: column;
+  }
+
+  .panel-emprendedor__formulario > .panel-emprendedor__acciones button {
+    width: 100%;
+  }
+}

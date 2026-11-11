@@ -1,0 +1,366 @@
+
+/* ==========================================
+   BORA - SOLICITUDES DE EMPRENDEDORES
+   ========================================== */
+
+.bora-solicitudes {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e8e9e3;
+  border-top: 4px solid #236b4b;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 8px 25px rgba(25, 76, 54, 0.06);
+}
+
+.bora-solicitudes * {
+  box-sizing: border-box;
+}
+
+/* Encabezado */
+
+.bora-solicitudes-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.bora-solicitudes-encabezado h2 {
+  color: #194c36;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.bora-solicitudes-encabezado p {
+  color: #68766d;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.bora-solicitudes-actualizar {
+  background: #236b4b;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bora-solicitudes-actualizar:hover {
+  background: #194c36;
+}
+
+.bora-solicitudes-actualizar:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* Resumen */
+
+.bora-solicitudes-resumen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.bora-solicitudes-resumen > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f0f7f1;
+  border: 1px solid #dcebdd;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.bora-solicitudes-resumen span {
+  color: #52665b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.bora-solicitudes-resumen strong {
+  color: #236b4b;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+/* Buscador */
+
+.bora-solicitudes-label {
+  display: block;
+  color: #194c36;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.bora-solicitudes-buscar {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d6e0d8;
+  border-radius: 12px;
+  background: white;
+  color: #263a30;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 20px;
+}
+
+.bora-solicitudes-buscar:focus {
+  border-color: #236b4b;
+  box-shadow: 0 0 0 3px rgba(35, 107, 75, 0.1);
+}
+
+/* Tabla */
+
+.bora-solicitudes-tabla-contenedor {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e8e9e3;
+  border-radius: 13px;
+}
+
+.bora-solicitudes-tabla {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.bora-solicitudes-tabla thead {
+  background: #f5efe4;
+}
+
+.bora-solicitudes-tabla th {
+  color: #194c36;
+  font-weight: 700;
+  padding: 16px;
+}
+
+.bora-solicitudes-tabla td {
+  color: #52665b;
+  padding: 16px;
+  border-top: 1px solid #e8e9e3;
+  vertical-align: middle;
+}
+
+.bora-solicitudes-tabla td strong {
+  display: block;
+  color: #344b3d;
+  font-weight: 600;
+}
+
+.bora-solicitudes-tabla td small {
+  display: block;
+  color: #77877c;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+}
+
+.bora-solicitudes-tabla tbody tr:hover {
+  background: #fbf9f4;
+}
+
+/* Estado */
+
+.bora-solicitudes-estado {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: #fff1d9;
+  color: #986013;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Botones */
+
+.bora-solicitudes-ver {
+  background: #236b4b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bora-solicitudes-ver:hover {
+  background: #194c36;
+}
+
+.bora-solicitudes-error {
+  background: #fff0e8;
+  color: #a43d25;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.bora-solicitudes-vacio {
+  padding: 36px 16px;
+  text-align: center;
+  color: #68766d;
+  font-size: 14px;
+}
+
+/* ==========================================
+   VENTANA EMERGENTE DE DETALLES
+   ========================================== */
+
+.bora-solicitudes-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 44, 32, 0.58);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.bora-solicitudes-modal {
+  position: relative;
+  width: 100%;
+  max-width: 510px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.2);
+  transform: none;
+}
+
+.bora-solicitudes-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.bora-solicitudes-modal-header span {
+  display: block;
+  color: #d47727;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.bora-solicitudes-modal-header h2 {
+  color: #236b4b;
+  font-size: 25px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.bora-solicitudes-modal-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  background: #eff5f0;
+  color: #236b4b;
+  border: none;
+  border-radius: 50%;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.bora-solicitudes-modal-header button:hover {
+  background: #dcebdd;
+}
+
+/* Datos del solicitante */
+
+.bora-solicitudes-detalles > div {
+  padding: 13px 0;
+  border-bottom: 1px solid #e8eee9;
+}
+
+.bora-solicitudes-detalles span {
+  display: block;
+  color: #839087;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.bora-solicitudes-detalles strong {
+  display: block;
+  color: #344b3d;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.bora-solicitudes-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+
+.bora-solicitudes-modal-footer button {
+  background: #236b4b;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  padding: 12px 24px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bora-solicitudes-modal-footer button:hover {
+  background: #194c36;
+}
+
+/* Adaptación a teléfonos */
+
+@media (max-width: 700px) {
+  .bora-solicitudes {
+    padding: 18px;
+  }
+
+  .bora-solicitudes-encabezado {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bora-solicitudes-actualizar {
+    align-self: flex-start;
+  }
+
+  .bora-solicitudes-resumen {
+    grid-template-columns: 1fr;
+  }
+
+  .bora-solicitudes-modal {
+    padding: 22px;
+  }
+
+  .bora-solicitudes-modal-header h2 {
+    font-size: 21px;
+  }
+}

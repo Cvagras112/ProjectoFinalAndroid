@@ -1,0 +1,217 @@
+
+.editar-tienda {
+  min-height: calc(100vh - 80px);
+  padding: 55px 24px 90px;
+  background: #fbf9f4;
+  font-family: 'Poppins', sans-serif;
+  color: #183e30;
+}
+
+.editar-tienda__encabezado,
+.editar-tienda__formulario {
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.editar-tienda__encabezado {
+  margin-bottom: 30px;
+}
+
+.editar-tienda__encabezado > a {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 18px;
+  color: #236b4b;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.editar-tienda__encabezado > a:hover {
+  color: #ff9100;
+}
+
+.editar-tienda__encabezado h1 {
+  margin: 0 0 12px;
+  color: #075b3b;
+  font-size: clamp(30px, 4vw, 43px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.editar-tienda__encabezado p {
+  max-width: 650px;
+  margin: 0;
+  color: #697c72;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.editar-tienda__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 38px 42px;
+  background: #fff;
+  border: 1px solid #e5ebe5;
+  border-radius: 24px;
+  box-shadow: 0 15px 45px rgba(20, 75, 48, 0.07);
+}
+
+.editar-tienda__formulario h2 {
+  margin: 16px 0 12px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e7eee8;
+  color: #075b3b;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.editar-tienda__formulario h2:first-child {
+  margin-top: 0;
+}
+
+.editar-tienda__formulario label {
+  display: block;
+  margin-top: 8px;
+  color: #264c3b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editar-tienda__formulario input,
+.editar-tienda__formulario textarea,
+.editar-tienda__formulario select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 13px 15px;
+  border: 1px solid #dbe5dd;
+  border-radius: 12px;
+  outline: none;
+  background: #fbfcfa;
+  color: #233d30;
+  font: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.editar-tienda__formulario textarea {
+  min-height: 115px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.editar-tienda__formulario input:focus,
+.editar-tienda__formulario textarea:focus,
+.editar-tienda__formulario select:focus {
+  border-color: #23875c;
+  box-shadow: 0 0 0 4px rgba(35, 135, 92, 0.1);
+}
+
+.editar-tienda__formulario input::placeholder,
+.editar-tienda__formulario textarea::placeholder {
+  color: #a1afa5;
+}
+
+.editar-tienda__formulario img {
+  display: block;
+  margin: 12px 0;
+  border: 3px solid #e6f0e8;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+}
+
+.editar-tienda__acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px solid #e7eee8;
+}
+
+.editar-tienda__acciones a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 47px;
+  padding: 0 24px;
+  border: 1px solid #ffad39;
+  border-radius: 12px;
+  color: #b76a00;
+  background: #fff8ed;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.editar-tienda__acciones a:hover {
+  background: #ffedcf;
+}
+
+.editar-tienda__acciones button {
+  min-height: 47px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 12px;
+  background: #087b4a;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(8, 123, 74, 0.18);
+  transition: 0.2s;
+}
+
+.editar-tienda__acciones button:hover:not(:disabled) {
+  background: #05663d;
+  transform: translateY(-2px);
+}
+
+.editar-tienda__acciones button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.editar-tienda__formulario [role="alert"] {
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: #fff0ef;
+  color: #ad3434;
+  font-size: 13px;
+}
+
+.editar-tienda__formulario [role="status"] {
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: #e9f7ee;
+  color: #17663e;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .editar-tienda {
+    padding: 30px 15px 60px;
+  }
+
+  .editar-tienda__formulario {
+    padding: 25px 20px;
+    border-radius: 18px;
+  }
+
+  .editar-tienda__acciones {
+    flex-direction: column-reverse;
+  }
+
+  .editar-tienda__acciones a,
+  .editar-tienda__acciones button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

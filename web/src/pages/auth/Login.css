@@ -1,0 +1,458 @@
+
+.bora-login {
+  min-height: calc(100vh - 92px);
+  padding: 65px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #faf7f1;
+}
+
+.bora-login-card {
+  width: 100%;
+  max-width: 1050px;
+  min-height: 570px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: white;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 18px 55px rgba(0, 55, 32, 0.09);
+}
+
+.bora-login-presentacion {
+  padding: 65px 48px;
+  background: linear-gradient(145deg, #00643d, #00874c);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bora-login-etiqueta {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 10px 16px;
+  border-radius: 30px;
+  background: rgba(255,255,255,.15);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.bora-login-presentacion h1 {
+  color: white;
+  font-size: clamp(30px, 3vw, 43px);
+  line-height: 1.18;
+  margin: 25px 0;
+}
+
+.bora-login-presentacion p {
+  color: #e6f5eb;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.bora-login-decoracion {
+  display: flex;
+  gap: 20px;
+  font-size: 55px;
+  color: #ffac38;
+  margin-top: 35px;
+}
+
+.bora-login-formulario {
+  padding: 55px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bora-login-icono {
+  font-size: 34px;
+  margin-bottom: 12px;
+}
+
+.bora-login-formulario h2 {
+  color: #075638;
+  font-size: 32px;
+  margin: 0 0 10px;
+}
+
+.bora-login-formulario > p {
+  color: #77837c;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.bora-login-formulario form {
+  display: flex;
+  flex-direction: column;
+}
+
+.bora-login-formulario label {
+  color: #263e32;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 9px;
+}
+
+.bora-login-formulario input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #dce6dd;
+  border-radius: 12px;
+  background: #fafcf9;
+  color: #233b2d;
+  font-size: 14px;
+  outline: none;
+}
+
+.bora-login-formulario input:focus {
+  border-color: #07834c;
+  box-shadow: 0 0 0 3px rgba(0,131,76,.1);
+}
+
+.bora-login-password {
+  position: relative;
+}
+
+.bora-login-password input {
+  padding-right: 95px;
+}
+
+.bora-login-password button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #08723f;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.bora-login-recuperar {
+  align-self: flex-end;
+  color: #08723f;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  margin: -6px 0 25px;
+}
+
+.bora-login-submit {
+  background: linear-gradient(90deg, #07864a, #006b40);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.bora-login-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 100, 60, .2);
+}
+
+.bora-login-registro {
+  text-align: center;
+  margin-top: 25px;
+  color: #69796d;
+  font-size: 13px;
+}
+
+.bora-login-registro a {
+  color: #d76516;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.bora-login-error {
+  color: #a42d21;
+  background: #fff0ee;
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+
+@media (max-width: 800px) {
+  .bora-login-card {
+    grid-template-columns: 1fr;
+  }
+
+  .bora-login-presentacion {
+    padding: 35px;
+  }
+
+  .bora-login-presentacion h1 {
+    font-size: 28px;
+  }
+
+  .bora-login-decoracion {
+    display: none;
+  }
+
+  .bora-login-formulario {
+    padding: 40px 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bora-login {
+    padding: 25px 12px;
+  }
+
+  .bora-login-formulario {
+    padding: 30px 22px;
+  }
+}
+
+/* Botón para registrarse */
+
+.bora-login-registro {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.bora-login-registro p {
+  color: #69796d;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.bora-login-registro .bora-login-btn-registro {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  background: #fff5e9;
+  border: 2px solid #f28a19;
+  border-radius: 12px;
+  color: #c75d0c;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.bora-login-registro .bora-login-btn-registro:hover {
+  background: #f28a19;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ==========================================
+   BORA - PANEL DE BIENVENIDA MEJORADO
+========================================== */
+
+.bora-login-presentacion {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    #005c39 0%,
+    #007747 55%,
+    #008c51 100%
+  );
+}
+
+/* Círculos decorativos superiores */
+
+.bora-login-presentacion::before {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  top: -105px;
+  right: -95px;
+  border: 2px solid rgba(255, 176, 58, 0.65);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 28px rgba(255, 255, 255, 0.05),
+    0 0 0 65px rgba(255, 176, 58, 0.06);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Decoración inferior */
+
+.bora-login-presentacion::after {
+  content: "";
+  position: absolute;
+  width: 310px;
+  height: 170px;
+  bottom: -105px;
+  left: -85px;
+  border: 2px solid rgba(255, 176, 58, 0.45);
+  border-radius: 50%;
+  transform: rotate(-20deg);
+  box-shadow: 0 0 0 25px rgba(255, 255, 255, 0.045);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Etiqueta BIENVENIDO A BORA */
+
+.bora-login-presentacion .bora-login-etiqueta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 10px;
+  padding: 14px 22px;
+  background: linear-gradient(
+    110deg,
+    #ffdfab,
+    #ffad39
+  );
+  color: #075638;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50px;
+  box-shadow:
+    0 8px 24px rgba(0, 35, 20, 0.2),
+    0 0 22px rgba(255, 173, 57, 0.16);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 1.3px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+/* Pequeño destello */
+
+.bora-login-etiqueta::before {
+  content: "✦";
+  color: #d76516;
+  font-size: 21px;
+}
+
+/* Título principal */
+
+.bora-login-presentacion h1 {
+  position: relative;
+  margin-top: 32px;
+  margin-bottom: 24px;
+  color: #ffffff;
+  font-size: clamp(32px, 3vw, 43px);
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -1px;
+  z-index: 1;
+}
+
+/* Descripción */
+
+.bora-login-presentacion p {
+  position: relative;
+  max-width: 430px;
+  color: #e8f6ed;
+  font-size: 16px;
+  line-height: 1.85;
+  z-index: 1;
+}
+
+/* Línea decorativa debajo de la descripción */
+
+.bora-login-presentacion p::after {
+  content: "";
+  display: block;
+  width: 85px;
+  height: 5px;
+  margin-top: 28px;
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    #ffad39 0%,
+    #ffad39 65%,
+    rgba(255, 255, 255, 0.65) 65%
+  );
+}
+
+@media (max-width: 480px) {
+  .bora-login-presentacion .bora-login-etiqueta {
+    padding: 12px 16px;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+  }
+
+  .bora-login-presentacion h1 {
+    font-size: 29px;
+    letter-spacing: -0.5px;
+  }
+
+  .bora-login-presentacion::before {
+    width: 170px;
+    height: 170px;
+    top: -90px;
+    right: -85px;
+  }
+}
+
+/* BORA - Inicio de sesión con Google */
+
+.bora-login-separador {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 23px 0;
+  color: #87948a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bora-login-separador::before,
+.bora-login-separador::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e2e9e2;
+}
+
+.bora-login-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #dce6dd;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #263e32;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.bora-login-google:hover {
+  background: #f5faf6;
+  border-color: #07864a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 100, 60, 0.09);
+}
+
+.bora-login-google:disabled,
+.bora-login-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bora-login-google svg {
+  flex-shrink: 0;
+}
+

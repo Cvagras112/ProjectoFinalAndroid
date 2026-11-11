@@ -1,0 +1,705 @@
+
+/* ==========================================
+   BORA - CENTRO DE CUENTA Y PERFIL
+========================================== */
+
+.bora-perfil {
+  min-height: calc(100vh - 86px);
+  padding: 48px 20px 75px;
+  background: #faf7f1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.bora-perfil-card {
+  width: 100%;
+  max-width: 1000px;
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 18px 55px rgba(0, 55, 32, 0.09);
+}
+
+/* ENCABEZADO */
+
+.bora-perfil-encabezado {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 54px 30px 48px;
+  background: linear-gradient(
+    145deg,
+    #005c39 0%,
+    #007747 55%,
+    #008c51 100%
+  );
+  color: white;
+  text-align: center;
+}
+
+.bora-perfil-encabezado::before {
+  content: "";
+  position: absolute;
+  width: 270px;
+  height: 270px;
+  top: -145px;
+  right: -75px;
+  border: 2px solid rgba(255, 173, 57, 0.7);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 40px rgba(255, 255, 255, 0.05),
+    0 0 0 85px rgba(255, 173, 57, 0.06);
+  z-index: -1;
+}
+
+.bora-perfil-encabezado::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 180px;
+  bottom: -115px;
+  left: -85px;
+  border: 2px solid rgba(255, 173, 57, 0.4);
+  border-radius: 50%;
+  transform: rotate(-20deg);
+  z-index: -1;
+}
+
+.bora-perfil-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 22px;
+  border: 5px solid #fff5e6;
+  border-radius: 50%;
+  background: #ffad39;
+  color: #075638;
+  font-size: 53px;
+  font-weight: 800;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 35, 20, 0.2);
+}
+
+.bora-perfil-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bora-perfil-encabezado h1 {
+  color: #ffffff;
+  margin: 0 0 10px;
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 800;
+}
+
+.bora-perfil-encabezado p {
+  margin: 0 0 22px;
+  color: #e5f5eb;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.bora-perfil-rol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 40px;
+  background: #fff2d9;
+  color: #075638;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+/* CONTENIDO */
+
+.bora-perfil-contenido {
+  padding: 45px 55px 50px;
+}
+
+.bora-perfil-titulo-menu {
+  margin-bottom: 28px;
+}
+
+.bora-perfil-titulo-menu > span {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #d87717;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+}
+
+.bora-perfil-titulo-menu h2 {
+  margin: 0 0 10px;
+  color: #075638;
+  font-size: 29px;
+  font-weight: 800;
+}
+
+.bora-perfil-titulo-menu p {
+  margin: 0;
+  color: #738278;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* MENÚ DE OPCIONES */
+
+.bora-perfil-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bora-perfil-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  min-height: 88px;
+  padding: 18px 20px;
+  background: #fbfcfa;
+  border: 1px solid #e4ebe4;
+  border-radius: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.bora-perfil-menu-item:hover {
+  background: #f0f8f2;
+  border-color: #a9d8bc;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 80, 45, 0.07);
+}
+
+.bora-perfil-menu-item:focus-visible {
+  outline: 3px solid #ffad39;
+  outline-offset: 3px;
+}
+
+.bora-perfil-menu-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  background: #e7f4eb;
+  border-radius: 15px;
+  font-size: 25px;
+}
+
+.bora-perfil-menu-texto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
+}
+
+.bora-perfil-menu-texto strong {
+  color: #174c34;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.bora-perfil-menu-texto small {
+  color: #78877c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.bora-perfil-menu-flecha {
+  flex-shrink: 0;
+  color: #9aa99d;
+  font-size: 32px;
+  font-weight: 300;
+  transition: transform 0.2s ease;
+}
+
+.bora-perfil-menu-item:hover .bora-perfil-menu-flecha {
+  color: #087c48;
+  transform: translateX(4px);
+}
+
+/* SECCIONES INTERNAS */
+
+.bora-perfil-regresar {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 0;
+  margin-bottom: 28px;
+  border: none;
+  background: transparent;
+  color: #087548;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bora-perfil-regresar:hover {
+  color: #d87717;
+}
+
+.bora-perfil-seccion-titulo {
+  margin-bottom: 30px;
+}
+
+.bora-perfil-seccion-titulo > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 18px;
+  background: #e7f4eb;
+  border-radius: 18px;
+  font-size: 30px;
+}
+
+.bora-perfil-seccion-titulo h2 {
+  margin: 0 0 10px;
+  color: #075638;
+  font-size: 28px;
+}
+
+.bora-perfil-seccion-titulo p {
+  margin: 0;
+  color: #77857b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* INFORMACIÓN PERSONAL */
+
+.bora-perfil-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.bora-perfil-datos > div {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 23px;
+  background: #f7faf7;
+  border: 1px solid #e0eae1;
+  border-radius: 17px;
+}
+
+.bora-perfil-datos span {
+  color: #7c8c80;
+  font-size: 13px;
+}
+
+.bora-perfil-datos strong {
+  color: #174c34;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+/* SECCIONES PENDIENTES */
+
+.bora-perfil-proximamente {
+  padding: 55px 25px;
+  background: #f7faf7;
+  border: 1px dashed #b7d8c2;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.bora-perfil-proximamente > span {
+  display: block;
+  margin-bottom: 15px;
+  color: #e58c21;
+  font-size: 42px;
+}
+
+.bora-perfil-proximamente h3 {
+  margin: 0 0 12px;
+  color: #075638;
+  font-size: 20px;
+}
+
+.bora-perfil-proximamente p {
+  max-width: 430px;
+  margin: 0 auto;
+  color: #738278;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ALERTAS Y NAVEGACIÓN */
+
+.bora-perfil-alerta {
+  margin-bottom: 22px;
+  padding: 15px;
+  background: #fff0ee;
+  color: #a42d21;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.bora-perfil-volver {
+  display: inline-flex;
+  margin-top: 35px;
+  color: #087548;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.bora-perfil-volver:hover {
+  color: #d87717;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+  .bora-perfil {
+    padding: 22px 12px 45px;
+  }
+
+  .bora-perfil-card {
+    border-radius: 20px;
+  }
+
+  .bora-perfil-encabezado {
+    padding: 40px 20px;
+  }
+
+  .bora-perfil-avatar {
+    width: 100px;
+    height: 100px;
+    font-size: 43px;
+  }
+
+  .bora-perfil-contenido {
+    padding: 30px 20px 35px;
+  }
+
+  .bora-perfil-titulo-menu h2 {
+    font-size: 25px;
+  }
+
+  .bora-perfil-datos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .bora-perfil-menu-item {
+    gap: 12px;
+    padding: 15px 12px;
+  }
+
+  .bora-perfil-menu-icono {
+    width: 45px;
+    height: 45px;
+    font-size: 21px;
+  }
+
+  .bora-perfil-menu-texto strong {
+    font-size: 14px;
+  }
+
+  .bora-perfil-menu-texto small {
+    font-size: 12px;
+  }
+
+  .bora-perfil-menu-flecha {
+    font-size: 25px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bora-perfil-menu-item,
+  .bora-perfil-menu-flecha {
+    transition: none;
+  }
+}
+
+/* AJUSTE DE CENTRADO DEL PERFIL */
+
+.bora-perfil {
+  padding-top: 55px;
+}
+
+.bora-perfil-encabezado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 350px;
+  box-sizing: border-box;
+  padding: 48px 30px;
+}
+
+.bora-perfil-avatar {
+  flex-shrink: 0;
+  margin: 0 0 20px;
+}
+
+.bora-perfil-encabezado h1,
+.bora-perfil-encabezado p {
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .bora-perfil {
+    padding-top: 25px;
+  }
+
+  .bora-perfil-encabezado {
+    min-height: 310px;
+    padding: 38px 20px;
+  }
+}
+
+/* ==========================================
+   SEGURIDAD Y CAMBIO DE CONTRASEÑA
+========================================== */
+
+.bora-perfil-seguridad {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #f7faf7;
+  border: 1px solid #e0eae1;
+  border-radius: 20px;
+}
+
+.bora-perfil-seguridad-intro {
+  margin-bottom: 28px;
+}
+
+.bora-perfil-seguridad-intro h3 {
+  margin: 0 0 10px;
+  color: #075638;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.bora-perfil-seguridad-intro p {
+  margin: 0;
+  color: #738278;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.bora-perfil-seguridad-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bora-perfil-seguridad-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.bora-perfil-seguridad-campo label {
+  color: #174c34;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bora-perfil-seguridad-campo input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px 17px;
+  background: #ffffff;
+  border: 1px solid #d5e4d8;
+  border-radius: 12px;
+  color: #174c34;
+  font: inherit;
+  font-size: 14px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.bora-perfil-seguridad-campo input:focus {
+  outline: none;
+  border-color: #087548;
+  box-shadow: 0 0 0 3px rgba(8, 117, 72, 0.12);
+}
+
+.bora-perfil-seguridad-campo input::placeholder {
+  color: #9aa99d;
+}
+
+.bora-perfil-seguridad-campo input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.bora-perfil-seguridad-guardar {
+  width: 100%;
+  padding: 16px 20px;
+  background: #087548;
+  color: #ffffff;
+  border: none;
+  border-radius: 13px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.bora-perfil-seguridad-guardar:hover:not(:disabled) {
+  background: #075638;
+  transform: translateY(-2px);
+}
+
+.bora-perfil-seguridad-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bora-perfil-seguridad-error,
+.bora-perfil-seguridad-exito,
+.bora-perfil-seguridad-aviso {
+  padding: 15px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.bora-perfil-seguridad-error {
+  background: #fff0ee;
+  border: 1px solid #f1c7c1;
+  color: #a42d21;
+}
+
+.bora-perfil-seguridad-exito {
+  background: #e8f7ec;
+  border: 1px solid #b9dfc3;
+  color: #17643a;
+}
+
+.bora-perfil-seguridad-aviso {
+  background: #fff5e4;
+  border: 1px solid #f0d7a6;
+  color: #825411;
+}
+
+.bora-perfil-seguridad-ayuda {
+  margin: 0;
+  color: #738278;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.bora-perfil-seguridad-ayuda a {
+  color: #087548;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.bora-perfil-seguridad-ayuda a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================
+   OJOS INDIVIDUALES PARA CONTRASEÑAS
+========================================== */
+
+.bora-perfil-contrasena-control {
+  position: relative;
+  width: 100%;
+}
+
+.bora-perfil-seguridad-campo
+.bora-perfil-contrasena-control input {
+  padding-right: 58px;
+}
+
+.bora-perfil-contrasena-ojo {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #667f70;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.bora-perfil-contrasena-ojo:hover {
+  background: #e7f4eb;
+  color: #087548;
+}
+
+.bora-perfil-contrasena-ojo:focus-visible {
+  outline: 2px solid #087548;
+  outline-offset: 2px;
+}
+
+.bora-perfil-contrasena-ojo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bora-perfil-contrasena-ojo svg {
+  display: block;
+  width: 21px;
+  height: 21px;
+}
+
+/* RESPONSIVE DEL FORMULARIO */
+
+@media (max-width: 700px) {
+  .bora-perfil-seguridad {
+    padding: 22px 18px;
+    border-radius: 16px;
+  }
+
+  .bora-perfil-seguridad-intro h3 {
+    font-size: 20px;
+  }
+
+  .bora-perfil-seguridad-campo input {
+    padding: 14px;
+  }
+
+  .bora-perfil-seguridad-campo
+  .bora-perfil-contrasena-control input {
+    padding-right: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bora-perfil-seguridad-campo input,
+  .bora-perfil-seguridad-guardar,
+  .bora-perfil-contrasena-ojo {
+    transition: none;
+  }
+}

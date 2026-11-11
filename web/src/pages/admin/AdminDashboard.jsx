@@ -1,250 +1,562 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../../firebase/config'
+
 import './AdminDashboard.css'
 
 import EmprendedorasAdmin from './EmprendedorasAdmin'
+import SolicitudesAdmin from './SolicitudesAdmin'
 import AsociacionesAdmin from './AsociacionesAdmin'
 import AsignacionesAdmin from './AsignacionesAdmin'
 import CategoriasAdmin from './CategoriasAdmin'
 import TiposProductosAdmin from './TiposProductosAdmin'
+import TiposEmprendimientoAdmin from './TiposEmprendimientoAdmin'
 
 function AdminDashboard() {
+  const [seccion, setSeccion] = useState('dashboard')
 
-    // SECCIÓN ACTUAL
-    const [seccion, setSeccion] = useState('dashboard')
+  const [emprendedoras, setEmprendedoras] = useState([])
+  const [asociaciones, setAsociaciones] = useState([])
+  const [asignaciones, setAsignaciones] = useState([])
+  const [categorias, setCategorias] = useState([])
 
-    // ESTADOS COMPARTIDOS
-    const [emprendedoras, setEmprendedoras] = useState([])
-    const [asociaciones, setAsociaciones] = useState([])
-    const [asignaciones, setAsignaciones] = useState([])
-    const [categorias, setCategorias] = useState([])
-    const [tiposProductos, setTiposProductos] = useState([])
+  // CARGA FIREBASE CATEGORIAS
+  useEffect(() => {
+    let activo = true
 
-    // ESTADÍSTICAS DEL DASHBOARD
-    const totalEmprendedoras = emprendedoras.length
-    const totalAsociaciones = asociaciones.length
-    const totalCategorias = categorias.length
-    const totalTiposProductos = tiposProductos.length
+    async function cargarCategorias() {
+      try {
+        const resultado = await getDocs(collection(db, 'categorias'))
 
-    // OPCIONES DEL MENÚ
-    const opciones = [
-        { id: 'dashboard', nombre: 'Panel principal' },
-        { id: 'emprendedoras', nombre: 'Emprendedoras' },
-        { id: 'asociaciones', nombre: 'Asociaciones' },
-        { id: 'asignaciones', nombre: 'Asignaciones' },
-        { id: 'categorias', nombre: 'Categorías' },
-        { id: 'tipos', nombre: 'Tipos de productos' }
-    ]
-
-    const obtenerNombreSeccion = () => {
-        return opciones.find(
-            (opcion) => opcion.id === seccion
-        )?.nombre
+        if (activo) {
+          setCategorias(
+            resultado.docs.map((documento) => ({
+              id: documento.id,
+              ...documento.data()
+            }))
+          )
+        }
+      } catch (error) {
+        console.error('Error cargando categorías:', error)
+      }
     }
 
-    return (
-        <div className="bora-admin">
+    cargarCategorias()
 
-            {/* MENÚ LATERAL */}
-            <aside className="bora-sidebar">
+    return () => {
+      activo = false
+    }
+  }, [])
+  const [tiposProductos, setTiposProductos] = useState([])
+  const [tiposEmprendimiento, setTiposEmprendimiento] = useState([])
 
-                <div className="bora-logo">
-                    BORA
-                </div>
+  useEffect(() => {
+    let activo = true
 
-                <p className="bora-subtitle">
-                    Panel de administración
-                </p>
+    async function cargarTiposEmprendimiento() {
+      try {
+        const resultado = await getDocs(
+          collection(db, 'tipos_emprendimiento')
+        )
 
-                <nav className="bora-menu">
-                    {opciones.map((opcion) => (
-                        <button
-                            key={opcion.id}
-                            type="button"
-                            className={
-                                seccion === opcion.id ? 'active' : ''
-                            }
-                            onClick={() => setSeccion(opcion.id)}
-                        >
-                            {opcion.nombre}
-                        </button>
-                    ))}
-                </nav>
+        if (activo) {
+          setTiposEmprendimiento(
+            resultado.docs.map((documento) => ({
+              id: documento.id,
+              ...documento.data()
+            }))
+          )
+        }
+      } catch (error) {
+        console.error('Error cargando tipos de emprendimiento:', error)
+      }
+    }
 
-            </aside>
+    cargarTiposEmprendimiento()
 
-            {/* CONTENIDO PRINCIPAL */}
-            <main className="bora-content">
+    return () => {
+      activo = false
+    }
+  }, [])
 
-                {/* ENCABEZADO */}
-                <header className="bora-header">
+  // CARGA FIREBASE TIPOS PRODUCTOS
+  useEffect(() => {
+    let activo = true
 
-                    {seccion === 'dashboard' ? (
-                        <>
-                            <h1>
-                                ¡Bienvenido al panel BORA!
-                            </h1>
+    async function cargarTiposProductos() {
+      try {
+        const resultado = await getDocs(
+          collection(db, 'tipos_productos')
+        )
 
-                            <p>
-                                Gestiona las emprendedoras, asociaciones
-                                y categorías de la plataforma desde
-                                un solo lugar.
-                            </p>
-                        </>
-                    ) : (
-                        <>
-                            <h1>
-                                {obtenerNombreSeccion()}
-                            </h1>
+        if (activo) {
+          setTiposProductos(
+            resultado.docs.map((documento) => ({
+              id: documento.id,
+              ...documento.data()
+            }))
+          )
+        }
+      } catch (error) {
+        console.error('Error cargando tipos de productos:', error)
+      }
+    }
 
-                            <p>
-                                Administración de la plataforma BORA
-                            </p>
-                        </>
-                    )}
+    cargarTiposProductos()
 
-                </header>
+    return () => {
+      activo = false
+    }
+  }, [])
 
-                {/* CONTENIDO SEGÚN LA SECCIÓN */}
-                {seccion === 'dashboard' ? (
+  useEffect(() => {
+    let activo = true
 
-                    <>
-                        {/* ACCESOS RÁPIDOS */}
-                        <section className="bora-acciones">
+    async function cargarDatosAdministrativos() {
+      try {
+        const [resultadoAsociaciones, resultadoAsignaciones] =
+          await Promise.all([
+            getDocs(collection(db, 'asociaciones')),
+            getDocs(collection(db, 'asignaciones'))
+          ])
 
-                            <h2>
-                                Accesos rápidos
-                            </h2>
+        if (!activo) return
 
-                            <div className="bora-acciones-botones">
+        setAsociaciones(resultadoAsociaciones.docs.map(item => ({
+          id: item.id,
+          ...item.data()
+        })))
 
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setSeccion('emprendedoras')
-                                    }
-                                >
-                                    Gestionar emprendedoras
-                                </button>
+        setAsignaciones(resultadoAsignaciones.docs.map(item => ({
+          id: item.id,
+          ...item.data()
+        })))
+      } catch (error) {
+        console.error('Error cargando asociaciones y asignaciones:', error)
+      }
+    }
 
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setSeccion('asociaciones')
-                                    }
-                                >
-                                    Gestionar asociaciones
-                                </button>
+    cargarDatosAdministrativos()
 
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setSeccion('categorias')
-                                    }
-                                >
-                                    Gestionar categorías
-                                </button>
+    return () => {
+      activo = false
+    }
+  }, [])
 
-                            </div>
+  const [cargandoEmprendedoras, setCargandoEmprendedoras] =
+    useState(true)
+  const [errorEmprendedoras, setErrorEmprendedoras] = useState('')
 
-                        </section>
+  useEffect(() => {
+    let activo = true
 
-                        {/* TARJETAS DE ESTADÍSTICAS */}
-                        <section className="bora-cards">
+    async function cargarEmprendedoras() {
+      try {
+        setCargandoEmprendedoras(true)
+        setErrorEmprendedoras('')
 
-                            <article className="bora-card">
-                                <h3>Emprendedoras</h3>
-                                <div className="value">
-                                    {totalEmprendedoras}
-                                </div>
-                            </article>
+        const [
+          resultadoEmprendedores,
+          resultadoTiendas,
+          resultadoUsuarios,
+        ] = await Promise.all([
+          getDocs(collection(db, 'emprendedores')),
+          getDocs(collection(db, 'tiendas')),
+          getDocs(collection(db, 'usuarios')),
+        ])
 
-                            <article className="bora-card">
-                                <h3>Asociaciones</h3>
-                                <div className="value">
-                                    {totalAsociaciones}
-                                </div>
-                            </article>
+        const tiendas = {}
 
-                            <article className="bora-card">
-                                <h3>Categorías</h3>
-                                <div className="value">
-                                    {totalCategorias}
-                                </div>
-                            </article>
+        resultadoTiendas.docs.forEach((documento) => {
+          tiendas[documento.id] = documento.data()
+        })
 
-                            <article className="bora-card">
-                                <h3>Tipos de productos</h3>
-                                <div className="value">
-                                    {totalTiposProductos}
-                                </div>
-                            </article>
+        const usuarios = {}
 
-                        </section>
-                    </>
+        resultadoUsuarios.docs.forEach((documento) => {
+          usuarios[documento.id] = documento.data()
+        })
 
-                ) : seccion === 'emprendedoras' ? (
+        const datos = resultadoEmprendedores.docs.map((documento) => {
+          const emprendedora = documento.data()
+          const usuario = usuarios[documento.id]
 
-                    /* MÓDULO EMPRENDEDORAS */
-                    <EmprendedorasAdmin
-                        emprendedoras={emprendedoras}
-                        setEmprendedoras={setEmprendedoras}
-                        asociaciones={asociaciones}
-                        asignaciones={asignaciones}
-                    />
+          const tiendaId =
+            emprendedora.ID_Tienda ||
+            emprendedora.idTienda ||
+            ''
 
-                ) : seccion === 'asociaciones' ? (
+          const tienda = tiendas[tiendaId]
 
-                    /* MÓDULO ASOCIACIONES */
-                    <AsociacionesAdmin
-                        asociaciones={asociaciones}
-                        setAsociaciones={setAsociaciones}
-                    />
+          return {
+            id: documento.id,
+            nombre: emprendedora.nombre || 'Sin nombre',
 
-                ) : seccion === 'asignaciones' ? (
+            correo:
+              usuario?.email ||
+              emprendedora.email ||
+              '',
 
-                    /* MÓDULO ASIGNACIONES */
-                    <AsignacionesAdmin
-                        emprendedoras={emprendedoras}
-                        setEmprendedoras={setEmprendedoras}
-                        asociaciones={asociaciones}
-                        asignaciones={asignaciones}
-                        setAsignaciones={setAsignaciones}
-                    />
+            telefono: emprendedora.telefono || '',
 
-                ) : seccion === 'categorias' ? (
+            emprendimiento:
+              tienda?.nombre || 'Sin tienda asociada',
 
-                    /* MÓDULO CATEGORÍAS */
-                    <CategoriasAdmin
-                        categorias={categorias}
-                        setCategorias={setCategorias}
-                    />
+            tiendaId,
 
-                ) : seccion === 'tipos' ? (
+            estado:
+              emprendedora.activo === false
+                ? 'Inactiva'
+                : 'Activa',
+          }
+        })
 
-                    /* MÓDULO TIPOS DE PRODUCTOS */
-                    <TiposProductosAdmin
-                        tipos={tiposProductos}
-                        setTipos={setTiposProductos}
-                    />
+        if (activo) {
+          setEmprendedoras(datos)
+        }
+      } catch (error) {
+        console.error('Error al cargar emprendedoras:', error)
 
-                ) : (
+        if (activo) {
+          setErrorEmprendedoras(
+            'No fue posible cargar los emprendedores o usuarios desde Firebase.'
+          )
+        }
+      } finally {
+        if (activo) {
+          setCargandoEmprendedoras(false)
+        }
+      }
+    }
 
-                    <section className="bora-card">
-                        <h3>
-                            Gestión de {obtenerNombreSeccion()}
-                        </h3>
+    cargarEmprendedoras()
 
-                        <p>
-                            Módulo pendiente de implementación.
-                        </p>
-                    </section>
+    return () => {
+      activo = false
+    }
+  }, [])
 
-                )}
+  const opciones = [
+    {
+      id: 'dashboard',
+      nombre: 'Panel principal',
+      icono: '🏠',
+    },
+    {
+      id: 'emprendedoras',
+      nombre: 'Emprendedores/as',
+      icono: '👩‍💼',
+    },
+    {
+      id: 'solicitudes',
+      nombre: 'Solicitudes de emprendedores',
+      icono: '📩',
+    },
+    {
+      id: 'asociaciones',
+      nombre: 'Asociaciones',
+      icono: '🤝',
+    },
+    {
+      id: 'categorias',
+      nombre: 'Categorías',
+      icono: '🏷️',
+    },
+    {
+      id: 'asignaciones',
+      nombre: 'Asignaciones',
+      icono: '🔗',
+    },
+    {
+      id: 'tipos-emprendimiento',
+      nombre: 'Tipos de emprendimiento',
+      icono: '🏪',
+    },
+    {
+      id: 'tipos',
+      nombre: 'Tipos de productos',
+      icono: '📦',
+    },
+  ]
 
-            </main>
-        </div>
-    )
+  const obtenerNombreSeccion = () =>
+    opciones.find((opcion) => opcion.id === seccion)?.nombre ||
+    'Administración'
+
+  const estadisticas = [
+    {
+      titulo: 'Emprendedores/as',
+      valor: cargandoEmprendedoras
+        ? '...'
+        : emprendedoras.length,
+      icono: '🧑‍🎨',
+      descripcion: 'Perfiles registrados',
+    },
+    {
+      titulo: 'Asociaciones',
+      valor: asociaciones.length,
+      icono: '🤝',
+      descripcion: 'Organizaciones registradas',
+    },
+    {
+      titulo: 'Categorías',
+      valor: categorias.length,
+      icono: '🏷️',
+      descripcion: 'Categorías disponibles',
+    },
+    {
+      titulo: 'Tipos de productos',
+      valor: tiposProductos.length,
+      icono: '📦',
+      descripcion: 'Tipos registrados',
+    },
+  ]
+
+  return (
+    <div className="bora-admin">
+      {/* MENÚ LATERAL */}
+      <aside className="bora-sidebar">
+        <div className="bora-logo">🛍️ BORA</div>
+
+        <p className="bora-subtitle">
+          ✨ Panel de administración
+        </p>
+
+        <nav
+          className="bora-menu"
+          aria-label="Menú administrativo"
+        >
+          {opciones.map((opcion) => (
+            <button
+              key={opcion.id}
+              type="button"
+              className={
+                seccion === opcion.id ? 'active' : ''
+              }
+              onClick={() => setSeccion(opcion.id)}
+            >
+              <span aria-hidden="true">
+                {opcion.icono}{' '}
+              </span>
+              {opcion.nombre}
+            </button>
+          ))}
+        </nav>
+
+        <Link to="/" className="bora-volver-inicio">
+          <span aria-hidden="true">🏠</span>
+          Volver al inicio
+        </Link>
+      </aside>
+
+      {/* CONTENIDO PRINCIPAL */}
+      <main className="bora-content">
+        <header className="bora-header">
+          {seccion === 'dashboard' ? (
+            <>
+              <h1>✨ ¡Bienvenido al panel BORA!</h1>
+              <p>
+                Administra tu comunidad de emprendedores,
+                asociaciones y productos desde un solo lugar. 💚
+              </p>
+            </>
+          ) : (
+            <>
+              <h1>
+                {
+                  opciones.find(
+                    (opcion) => opcion.id === seccion
+                  )?.icono
+                }{' '}
+                {obtenerNombreSeccion()}
+              </h1>
+              <p>🛠️ Gestión y administración de BORA</p>
+            </>
+          )}
+        </header>
+
+        {errorEmprendedoras && (
+          <p
+            role="alert"
+            style={{
+              padding: '14px',
+              background: '#fff1e9',
+              borderRadius: '10px',
+              color: '#a43d25',
+              marginBottom: '20px',
+            }}
+          >
+            ⚠️ {errorEmprendedoras}
+          </p>
+        )}
+
+        {seccion === 'dashboard' ? (
+          <>
+            {/* ACCESOS RÁPIDOS */}
+            <section className="bora-acciones">
+              <h2>🚀 Accesos rápidos</h2>
+
+              <div className="bora-acciones-botones">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSeccion('emprendedoras')
+                  }
+                >
+                  🧑‍🎨 Gestionar emprendedores/as
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSeccion('solicitudes')
+                  }
+                >
+                  📩 Revisar solicitudes
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSeccion('asociaciones')
+                  }
+                >
+                  🤝 Gestionar asociaciones
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSeccion('categorias')
+                  }
+                >
+                  🏷️ Gestionar categorías
+                </button>
+              </div>
+            </section>
+
+            {/* ESTADÍSTICAS */}
+            <section
+              className="bora-cards"
+              aria-label="Resumen de la plataforma"
+            >
+              {estadisticas.map((estadistica) => (
+                <article
+                  key={estadistica.titulo}
+                  className="bora-card"
+                >
+                  <div
+                    style={{
+                      fontSize: '30px',
+                      marginBottom: '12px',
+                    }}
+                    aria-hidden="true"
+                  >
+                    {estadistica.icono}
+                  </div>
+
+                  <h3>{estadistica.titulo}</h3>
+
+                  <div className="value">
+                    {estadistica.valor}
+                  </div>
+
+                  <p
+                    style={{
+                      fontSize: '12px',
+                      color: '#69736D',
+                      marginTop: '8px',
+                    }}
+                  >
+                    {estadistica.descripcion}
+                  </p>
+                </article>
+              ))}
+            </section>
+
+            {/* MENSAJE DE BIENVENIDA */}
+            <section
+              style={{
+                marginTop: '30px',
+                padding: '24px',
+                background: '#F0F7F1',
+                borderRadius: '18px',
+                border: '1px solid #DCEBDD',
+              }}
+            >
+              <h2
+                style={{
+                  color: '#194C36',
+                  fontSize: '18px',
+                  marginBottom: '10px',
+                }}
+              >
+                🌿 Una comunidad que crece
+              </h2>
+
+              <p
+                style={{
+                  color: '#52665B',
+                  lineHeight: '1.7',
+                  fontSize: '14px',
+                }}
+              >
+                BORA conecta a emprendedores y
+                emprendedoras con nuevas oportunidades.
+                Desde este espacio podrás organizar la
+                información de la plataforma y apoyar el
+                crecimiento de la comunidad. 💚🧡
+              </p>
+            </section>
+          </>
+        ) : seccion === 'emprendedoras' ? (
+          <EmprendedorasAdmin
+            emprendedoras={emprendedoras}
+            setEmprendedoras={setEmprendedoras}
+            asociaciones={asociaciones}
+            asignaciones={asignaciones}
+          />
+        ) : seccion === 'solicitudes' ? (
+          <SolicitudesAdmin />
+        ) : seccion === 'asociaciones' ? (
+          <AsociacionesAdmin
+            asociaciones={asociaciones}
+            setAsociaciones={setAsociaciones}
+          />
+        ) : seccion === 'asignaciones' ? (
+          <AsignacionesAdmin
+            emprendedoras={emprendedoras}
+            setEmprendedoras={setEmprendedoras}
+            asociaciones={asociaciones}
+            asignaciones={asignaciones}
+            setAsignaciones={setAsignaciones}
+          />
+        ) : seccion === 'categorias' ? (
+          <CategoriasAdmin
+            categorias={categorias}
+            setCategorias={setCategorias}
+          />
+        ) : seccion === 'tipos-emprendimiento' ? (
+          <TiposEmprendimientoAdmin
+            categorias={tiposEmprendimiento}
+            setCategorias={setTiposEmprendimiento}
+          />
+        ) : seccion === 'tipos' ? (
+          <TiposProductosAdmin
+            categorias={tiposProductos}
+            setCategorias={setTiposProductos}
+          />
+        ) : (
+          <section className="bora-card">
+            <h3>Gestión de {obtenerNombreSeccion()}</h3>
+            <p>Módulo pendiente de implementación.</p>
+          </section>
+        )}
+      </main>
+    </div>
+  )
 }
 
 export default AdminDashboard

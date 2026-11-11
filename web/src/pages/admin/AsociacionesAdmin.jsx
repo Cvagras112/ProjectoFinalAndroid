@@ -1,319 +1,290 @@
-
 import { useState } from 'react'
+import { collection, doc, setDoc, updateDoc } from 'firebase/firestore'
+import { db } from '../../firebase/config'
+
+const inicial = {
+  nombre: '',
+  descripcion: '',
+  sector: '',
+  contacto: '',
+  logo: ''
+}
 
 export default function AsociacionesAdmin({ asociaciones, setAsociaciones }) {
-    const [mostrarFormulario, setMostrarFormulario] = useState(false)
-    const [asociacionEditando, setAsociacionEditando] = useState(null)
-    const [busqueda, setBusqueda] = useState('')
+  const [formulario, setFormulario] = useState(inicial)
+  const [editando, setEditando] = useState(null)
+  const [mostrar, setMostrar] = useState(false)
+  const [busqueda, setBusqueda] = useState('')
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
 
-    const [formulario, setFormulario] = useState({
-        nombre: '',
-        descripcion: ''
+  const limpiar = () => {
+    setFormulario(inicial)
+    setEditando(null)
+    setMostrar(false)
+    setError('')
+  }
+
+  const editar = (item) => {
+    setFormulario({
+      nombre: item.nombre || '',
+      descripcion: item.descripcion || '',
+      sector: item.sector || '',
+      contacto: item.contacto || '',
+      logo: item.logo || ''
     })
+    setEditando(item.id)
+    setMostrar(true)
+    setError('')
+  }
 
-    const limpiarFormulario = () => {
-        setFormulario({
-            nombre: '',
-            descripcion: ''
-        })
-        setAsociacionEditando(null)
-        setMostrarFormulario(false)
+  const guardar = async (e) => {
+    e.preventDefault()
+    if (guardando) return
+
+    const datos = Object.fromEntries(
+      Object.entries(formulario).map(([clave, valor]) => [
+        clave, valor.trim()
+      ])
+    )
+
+    if (datos.nombre.length < 3 || datos.nombre.length > 100) {
+      setError('El nombre debe tener entre 3 y 100 caracteres.')
+      return
     }
 
-    const abrirFormulario = () => {
-        setFormulario({
-            nombre: '',
-            descripcion: ''
-        })
-        setAsociacionEditando(null)
-        setMostrarFormulario(true)
+    const repetida = asociaciones.some(
+      item =>
+        item.id !== editando &&
+        (item.nombre || '').toLocaleLowerCase('es').trim() ===
+          datos.nombre.toLocaleLowerCase('es')
+    )
+
+    if (repetida) {
+      setError('Ya existe una asociación con ese nombre.')
+      return
     }
 
-    const editarAsociacion = (asociacion) => {
-        setAsociacionEditando(asociacion)
-        setFormulario({
-            nombre: asociacion.nombre,
-            descripcion: asociacion.descripcion || ''
-        })
-        setMostrarFormulario(true)
+    if (datos.logo) {
+      try {
+        const url = new URL(datos.logo)
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          throw new Error('URL inválida')
+        }
+      } catch {
+        setError('El logo debe ser una URL http o https válida.')
+        return
+      }
     }
 
+    setGuardando(true)
+    setError('')
 
-    const normalizarTexto = (texto) => {
-        return String(texto || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLocaleLowerCase('es')
-            .trim()
-    }
-
-    const asociacionesFiltradas = asociaciones.filter((asociacion) => {
-        const textoBuscado = normalizarTexto(busqueda)
-
-        const nombre = normalizarTexto(asociacion.nombre)
-        const descripcion = normalizarTexto(asociacion.descripcion)
-
-        return (
-            nombre.includes(textoBuscado) ||
-            descripcion.includes(textoBuscado)
+    try {
+      if (editando) {
+        await updateDoc(doc(db, 'asociaciones', editando), datos)
+        setAsociaciones(anteriores =>
+          anteriores.map(item =>
+            item.id === editando ? { ...item, ...datos } : item
+          )
         )
-    })
-
-
-    const registrarAsociacion = (e) => {
-        e.preventDefault()
-
-        const nombre = formulario.nombre.trim()
-        const descripcion = formulario.descripcion.trim()
-
-        if (nombre.length < 3) {
-            window.alert('El nombre debe tener al menos 3 caracteres.')
-            return
+      } else {
+        const referencia = doc(collection(db, 'asociaciones'))
+        const nueva = {
+          ...datos,
+          estado: 'Activa'
         }
 
-        const existe = asociaciones.some(
-            (asociacion) =>
-                asociacion.nombre.toLocaleLowerCase('es') ===
-                nombre.toLocaleLowerCase('es') &&
-                asociacion.id !== asociacionEditando?.id
-        )
+        await setDoc(referencia, nueva)
 
-        if (existe) {
-            window.alert('Ya existe una asociación con ese nombre.')
-            return
-        }
+        setAsociaciones(anteriores => [
+          ...anteriores,
+          { id: referencia.id, ...nueva }
+        ])
+      }
 
-        if (asociacionEditando) {
-            setAsociaciones((anteriores) =>
-                anteriores.map((asociacion) =>
-                    asociacion.id === asociacionEditando.id
-                        ? {
-                            ...asociacion,
-                            nombre,
-                            descripcion
-                        }
-                        : asociacion
-                )
-            )
-        } else {
-            const nuevaAsociacion = {
-                id: crypto.randomUUID(),
-                nombre,
-                descripcion,
-                estado: 'Activa'
-            }
-
-            setAsociaciones((anteriores) => [
-                ...anteriores,
-                nuevaAsociacion
-            ])
-        }
-
-        limpiarFormulario()
+      limpiar()
+    } catch (err) {
+      console.error('Error guardando asociación:', err)
+      setError('No se pudo guardar en Firebase: ' + err.message)
+    } finally {
+      setGuardando(false)
     }
+  }
 
-    const cambiarEstadoAsociacion = (id) => {
-        const asociacion = asociaciones.find(
-            (item) => item.id === id
+  const cambiarEstado = async (item) => {
+    const estado = item.estado === 'Activa' ? 'Inactiva' : 'Activa'
+
+    if (!window.confirm(
+      `¿Cambiar "${item.nombre}" a ${estado}?`
+    )) return
+
+    try {
+      await updateDoc(doc(db, 'asociaciones', item.id), { estado })
+      setAsociaciones(anteriores =>
+        anteriores.map(actual =>
+          actual.id === item.id ? { ...actual, estado } : actual
         )
-
-        if (!asociacion) return
-
-        const nuevoEstado =
-            asociacion.estado === 'Activa'
-                ? 'Inactiva'
-                : 'Activa'
-
-        const confirmar = window.confirm(
-            `¿Deseas cambiar el estado de "${asociacion.nombre}" a ${nuevoEstado}?`
-        )
-
-        if (!confirmar) return
-
-        setAsociaciones((anteriores) =>
-            anteriores.map((item) =>
-                item.id === id
-                    ? { ...item, estado: nuevoEstado }
-                    : item
-            )
-        )
+      )
+    } catch (err) {
+      console.error(err)
+      window.alert('No se pudo cambiar el estado: ' + err.message)
     }
+  }
 
-    return (
-        <div className="bora-seccion-admin">
+  const normalizar = valor =>
+    String(valor || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('es')
 
-            <div className="bora-emprendedoras-header">
-                <div>
-                    <h2>Gestión de asociaciones</h2>
-                    <p>
-                        Registra, administra y consulta las asociaciones
-                        de emprendedoras de BORA.
-                    </p>
-                </div>
+  const filtradas = asociaciones.filter(item =>
+    [item.nombre, item.descripcion, item.sector, item.contacto]
+      .some(valor => normalizar(valor).includes(normalizar(busqueda)))
+  )
 
-                <button
-                    type="button"
-                    onClick={
-                        mostrarFormulario
-                            ? limpiarFormulario
-                            : abrirFormulario
-                    }
-                >
-                    {mostrarFormulario
-                        ? 'Cancelar'
-                        : '+ Nueva asociación'}
-                </button>
-            </div>
+  return (
+    <div className="bora-seccion-admin">
+      <div className="bora-emprendedoras-header">
+        <div>
+          <h2>Gestión de asociaciones</h2>
+          <p>Registra y administra las asociaciones de BORA.</p>
+        </div>
+        <button type="button" onClick={() => {
+          if (mostrar) limpiar()
+          else {
+            setFormulario(inicial)
+            setEditando(null)
+            setMostrar(true)
+          }
+        }}>
+          {mostrar ? 'Cancelar' : '+ Nueva asociación'}
+        </button>
+      </div>
 
-            {mostrarFormulario && (
-                <div className="bora-formulario">
-                    <h3>
-                        {asociacionEditando
-                            ? 'Editar asociación'
-                            : 'Registrar nueva asociación'}
-                    </h3>
+      {mostrar && (
+        <div className="bora-formulario">
+          <h3>{editando ? 'Editar asociación' : 'Nueva asociación'}</h3>
 
-                    <p>
-                        Completa los datos de la asociación.
-                    </p>
+          <form className="bora-formulario-campos" onSubmit={guardar}>
+            {[
+              ['nombre', 'Nombre de la asociación', 100],
+              ['descripcion', 'Descripción', 500],
+              ['sector', 'Sector', 150],
+              ['contacto', 'Contacto', 200],
+              ['logo', 'URL del logo', 2000]
+            ].map(([campo, etiqueta, maximo]) => (
+              <div className="bora-campo" key={campo}>
+                <label htmlFor={'asociacion-' + campo}>{etiqueta}</label>
+                <input
+                  id={'asociacion-' + campo}
+                  type={campo === 'logo' ? 'url' : 'text'}
+                  value={formulario[campo]}
+                  maxLength={maximo}
+                  required={campo === 'nombre'}
+                  minLength={campo === 'nombre' ? 3 : undefined}
+                  onChange={e =>
+                    setFormulario(anterior => ({
+                      ...anterior,
+                      [campo]: e.target.value
+                    }))
+                  }
+                />
+              </div>
+            ))}
 
-                    <form
-                        className="bora-formulario-campos"
-                        onSubmit={registrarAsociacion}
-                    >
-                        <div className="bora-campo">
-                            <label htmlFor="nombre-asociacion">
-                                Nombre de la asociación
-                            </label>
-
-                            <input
-                                id="nombre-asociacion"
-                                name="nombre"
-                                type="text"
-                                placeholder="Ej: Artesanas de Chiloé"
-                                value={formulario.nombre}
-                                onChange={(e) =>
-                                    setFormulario((anterior) => ({
-                                        ...anterior,
-                                        nombre: e.target.value
-                                    }))
-                                }
-                                required
-                                minLength={3}
-                                maxLength={100}
-                            />
-                        </div>
-
-                        <div className="bora-campo">
-                            <label htmlFor="descripcion-asociacion">
-                                Descripción
-                            </label>
-
-                            <input
-                                id="descripcion-asociacion"
-                                name="descripcion"
-                                type="text"
-                                placeholder="Describe brevemente la asociación"
-                                value={formulario.descripcion}
-                                onChange={(e) =>
-                                    setFormulario((anterior) => ({
-                                        ...anterior,
-                                        descripcion: e.target.value
-                                    }))
-                                }
-                                maxLength={500}
-                            />
-                        </div>
-
-                        <button type="submit">
-                            {asociacionEditando
-                                ? 'Guardar cambios'
-                                : 'Registrar asociación'}
-                        </button>
-                    </form>
-                </div>
+            {formulario.logo && (
+              <img
+                src={formulario.logo}
+                alt="Vista previa del logo"
+                style={{ maxWidth: 110, maxHeight: 110, objectFit: 'contain' }}
+              />
             )}
 
-            <div className="bora-buscador">
-                <label htmlFor="buscar-asociacion">
-                    Buscar asociación
-                </label>
+            {error && <p role="alert" style={{ color: '#b42318' }}>{error}</p>}
 
-                <input
-                    id="buscar-asociacion"
-                    type="search"
-                    placeholder="Buscar por nombre o descripción..."
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
-                />
-            </div>
-
-            <div className="bora-tabla-contenedor">
-                <table className="bora-tabla">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {asociacionesFiltradas.length === 0 ? (
-                            <tr>
-                                <td colSpan={4}>
-                                    {busqueda.trim()
-                                        ? 'No se encontraron asociaciones con esa búsqueda.'
-                                        : 'Todavía no hay asociaciones registradas.'}
-                                </td>
-                            </tr>
-                        ) : (
-                            asociacionesFiltradas.map((asociacion) => (
-                                <tr key={asociacion.id}>
-                                    <td>{asociacion.nombre}</td>
-
-                                    <td>
-                                        {asociacion.descripcion || 'Sin descripción'}
-                                    </td>
-
-                                    <td>{asociacion.estado}</td>
-
-                                    <td>
-                                        <div className="bora-acciones-tabla">
-                                            <button
-                                                type="button"
-                                                className="bora-boton-editar"
-                                                onClick={() =>
-                                                    editarAsociacion(asociacion)
-                                                }
-                                            >
-                                                Editar
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className={
-                                                    asociacion.estado === 'Activa'
-                                                        ? 'bora-boton-eliminar'
-                                                        : 'bora-boton-editar'
-                                                }
-                                                onClick={() =>
-                                                    cambiarEstadoAsociacion(asociacion.id)
-                                                }
-                                            >
-                                                {asociacion.estado === 'Activa'
-                                                    ? 'Desactivar'
-                                                    : 'Activar'}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            <button type="submit" disabled={guardando}>
+              {guardando
+                ? 'Guardando...'
+                : editando ? 'Guardar cambios' : 'Registrar asociación'}
+            </button>
+          </form>
         </div>
-    )
+      )}
+
+      <div className="bora-buscador">
+        <label htmlFor="buscar-asociacion">Buscar asociación</label>
+        <input
+          id="buscar-asociacion"
+          type="search"
+          value={busqueda}
+          placeholder="Nombre, descripción, sector o contacto"
+          onChange={e => setBusqueda(e.target.value)}
+        />
+      </div>
+
+      <div className="bora-tabla-contenedor">
+        <table className="bora-tabla">
+          <thead>
+            <tr>
+              <th>Logo</th>
+              <th>Nombre</th>
+              <th>Sector</th>
+              <th>Contacto</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtradas.length === 0 ? (
+              <tr>
+                <td colSpan={6}>No hay asociaciones para mostrar.</td>
+              </tr>
+            ) : filtradas.map(item => (
+              <tr key={item.id}>
+                <td>
+                  {item.logo ? (
+                    <img
+                      src={item.logo}
+                      alt={'Logo de ' + item.nombre}
+                      style={{ width: 48, height: 48, objectFit: 'contain' }}
+                    />
+                  ) : 'Sin logo'}
+                </td>
+                <td>
+                  <strong>{item.nombre}</strong>
+                  <div>{item.descripcion}</div>
+                </td>
+                <td>{item.sector || 'Sin sector'}</td>
+                <td>{item.contacto || 'Sin contacto'}</td>
+                <td>{item.estado}</td>
+                <td>
+                  <div className="bora-acciones-tabla">
+                    <button
+                      type="button"
+                      className="bora-boton-editar"
+                      onClick={() => editar(item)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      className={
+                        item.estado === 'Activa'
+                          ? 'bora-boton-eliminar'
+                          : 'bora-boton-editar'
+                      }
+                      onClick={() => cambiarEstado(item)}
+                    >
+                      {item.estado === 'Activa' ? 'Desactivar' : 'Activar'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
 }

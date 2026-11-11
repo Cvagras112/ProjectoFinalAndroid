@@ -1,3 +1,5 @@
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore'
+import { db } from '../../firebase/config'
 
 import { useState } from 'react'
 
@@ -12,6 +14,7 @@ export default function CategoriasAdmin({
   const [categoriaEditando, setCategoriaEditando] = useState(null)
   const [nombre, setNombre] = useState('')
   const [busqueda, setBusqueda] = useState('')
+  const [guardando, setGuardando] = useState(false)
 
   const normalizarTexto = (texto) =>
     String(texto || '')
@@ -42,13 +45,14 @@ export default function CategoriasAdmin({
     setMostrarFormulario(true)
   }
 
-  const guardarCategoria = (e) => {
+  const guardarCategoria = async (e) => {
     e.preventDefault()
+    if (guardando) return
 
     const nombreLimpio = nombre.trim()
 
-    if (nombreLimpio.length < 3) {
-      window.alert('El nombre debe tener al menos 3 caracteres.')
+    if (nombreLimpio.length < 3 || nombreLimpio.length > 100) {
+      window.alert('El nombre debe tener entre 3 y 100 caracteres.')
       return
     }
 
@@ -59,33 +63,55 @@ export default function CategoriasAdmin({
     )
 
     if (duplicada) {
-      window.alert(`Ya existe un registro de ${nombreElemento} con ese nombre.`)
+      window.alert('Ya existe una categoría con ese nombre.')
       return
     }
 
-    if (categoriaEditando) {
-      setCategorias((anteriores) =>
-        anteriores.map((categoria) =>
-          categoria.id === categoriaEditando.id
-            ? { ...categoria, nombre: nombreLimpio }
-            : categoria
+    setGuardando(true)
+
+    try {
+      if (categoriaEditando) {
+        const referencia = doc(db, 'categorias', categoriaEditando.id)
+
+        await updateDoc(referencia, {
+          nombre: nombreLimpio
+        })
+
+        setCategorias((anteriores) =>
+          anteriores.map((categoria) =>
+            categoria.id === categoriaEditando.id
+              ? { ...categoria, nombre: nombreLimpio }
+              : categoria
+          )
         )
-      )
-    } else {
-      setCategorias((anteriores) => [
-        ...anteriores,
-        {
-          id: crypto.randomUUID(),
+      } else {
+        const nueva = {
           nombre: nombreLimpio,
           estado: 'Activa'
         }
-      ])
+
+        const referencia = await addDoc(
+          collection(db, 'categorias'),
+          nueva
+        )
+
+        setCategorias((anteriores) => [
+          ...anteriores,
+          { id: referencia.id, ...nueva }
+        ])
+      }
+
+      cerrarFormulario()
+    } catch (error) {
+      console.error('Error guardando categoría:', error)
+      window.alert('No se pudo guardar en Firebase: ' + error.message)
+    } finally {
+      setGuardando(false)
     }
-
-    cerrarFormulario()
   }
+  const cambiarEstado = async (categoria) => {
+    if (guardando) return
 
-  const cambiarEstado = (categoria) => {
     const nuevoEstado =
       categoria.estado === 'Activa' ? 'Inactiva' : 'Activa'
 
@@ -95,15 +121,27 @@ export default function CategoriasAdmin({
 
     if (!confirmar) return
 
-    setCategorias((anteriores) =>
-      anteriores.map((item) =>
-        item.id === categoria.id
-          ? { ...item, estado: nuevoEstado }
-          : item
-      )
-    )
-  }
+    setGuardando(true)
 
+    try {
+      await updateDoc(doc(db, 'categorias', categoria.id), {
+        estado: nuevoEstado
+      })
+
+      setCategorias((anteriores) =>
+        anteriores.map((item) =>
+          item.id === categoria.id
+            ? { ...item, estado: nuevoEstado }
+            : item
+        )
+      )
+    } catch (error) {
+      console.error('Error cambiando estado:', error)
+      window.alert('No se pudo actualizar en Firebase: ' + error.message)
+    } finally {
+      setGuardando(false)
+    }
+  }
   return (
     <div className="bora-seccion-admin">
 
