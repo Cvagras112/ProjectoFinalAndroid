@@ -13,6 +13,7 @@ import AsignacionesAdmin from './AsignacionesAdmin'
 import CategoriasAdmin from './CategoriasAdmin'
 import TiposProductosAdmin from './TiposProductosAdmin'
 import TiposEmprendimientoAdmin from './TiposEmprendimientoAdmin'
+import AdministradoresAdmin from './AdministradoresAdmin'
 
 function AdminDashboard() {
   const [seccion, setSeccion] = useState('dashboard')
@@ -275,6 +276,10 @@ function AdminDashboard() {
       icono: '🏪',
     },
     {
+      id: 'administradores',
+      nombre: 'Administradores',
+      icono: '🛡️',
+    },    {
       id: 'tipos',
       nombre: 'Tipos de productos',
       icono: '📦',
@@ -548,6 +553,8 @@ function AdminDashboard() {
             categorias={tiposProductos}
             setCategorias={setTiposProductos}
           />
+        ) : seccion === 'administradores' ? (
+          <AdministradoresAdmin />
         ) : (
           <section className="bora-card">
             <h3>Gestión de {obtenerNombreSeccion()}</h3>
