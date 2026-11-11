@@ -76,9 +76,6 @@ export default function Navbar() {
     }
   }, [])
 
-  useEffect(() => {
-    setMenuAbierto(false)
-  }, [location.pathname])
 
   useEffect(() => {
     if (!menuAbierto) return

@@ -38,8 +38,6 @@ function SolicitudesAdmin() {
   const [procesando, setProcesando] = useState(null)
 
   async function cargarSolicitudes() {
-    setCargando(true)
-    setError('')
 
     try {
       const resultado = await getDocs(
@@ -69,7 +67,11 @@ function SolicitudesAdmin() {
   }
 
   useEffect(() => {
-    cargarSolicitudes()
+    const temporizador = setTimeout(() => {
+      cargarSolicitudes()
+    }, 0)
+
+    return () => clearTimeout(temporizador)
   }, [])
 
   async function aprobarSolicitud(solicitud) {

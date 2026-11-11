@@ -1,4 +1,4 @@
-
+﻿
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
@@ -93,7 +93,7 @@ export default function TiendaDetalle() {
   const [ordenamiento, setOrdenamiento] = useState('predeterminado')
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
-  const [seguida, setSeguida] = useState(false)
+  const [seguida, setSeguida] = useState(() => obtenerSeguidas().includes(tiendaId))
   const [mensajeCompartir, setMensajeCompartir] = useState('')
 
   useEffect(() => {
@@ -835,3 +835,4 @@ export default function TiendaDetalle() {
     </main>
   )
 }
+

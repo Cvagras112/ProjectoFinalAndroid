@@ -1,0 +1,40 @@
+
+.bora-btn-credenciales-copiar,
+.bora-btn-credenciales-ocultar {
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.bora-btn-credenciales-copiar {
+  background: #08764f;
+  color: #fff;
+  border: 1px solid #08764f;
+  margin-top: 14px;
+}
+
+.bora-btn-credenciales-copiar:hover {
+  background: #065d3e;
+  transform: translateY(-1px);
+}
+
+.bora-btn-credenciales-ocultar {
+  background: #f5f0e7;
+  color: #07563d;
+  border: 1px solid #d8d1c5;
+  margin-left: 10px;
+  margin-top: 14px;
+}
+
+.bora-btn-credenciales-ocultar:hover {
+  background: #e9e0d1;
+}
+
+@media (max-width: 600px) {
+  .bora-btn-credenciales-ocultar {
+    margin-left: 0;
+  }
+}

@@ -12,6 +12,7 @@ import AsociacionesAdmin from './AsociacionesAdmin'
 import AsignacionesAdmin from './AsignacionesAdmin'
 import CategoriasAdmin from './CategoriasAdmin'
 import TiposProductosAdmin from './TiposProductosAdmin'
+import TiposEmprendimientoAdmin from './TiposEmprendimientoAdmin'
 
 function AdminDashboard() {
   const [seccion, setSeccion] = useState('dashboard')
@@ -20,7 +21,129 @@ function AdminDashboard() {
   const [asociaciones, setAsociaciones] = useState([])
   const [asignaciones, setAsignaciones] = useState([])
   const [categorias, setCategorias] = useState([])
+
+  // CARGA FIREBASE CATEGORIAS
+  useEffect(() => {
+    let activo = true
+
+    async function cargarCategorias() {
+      try {
+        const resultado = await getDocs(collection(db, 'categorias'))
+
+        if (activo) {
+          setCategorias(
+            resultado.docs.map((documento) => ({
+              id: documento.id,
+              ...documento.data()
+            }))
+          )
+        }
+      } catch (error) {
+        console.error('Error cargando categorías:', error)
+      }
+    }
+
+    cargarCategorias()
+
+    return () => {
+      activo = false
+    }
+  }, [])
   const [tiposProductos, setTiposProductos] = useState([])
+  const [tiposEmprendimiento, setTiposEmprendimiento] = useState([])
+
+  useEffect(() => {
+    let activo = true
+
+    async function cargarTiposEmprendimiento() {
+      try {
+        const resultado = await getDocs(
+          collection(db, 'tipos_emprendimiento')
+        )
+
+        if (activo) {
+          setTiposEmprendimiento(
+            resultado.docs.map((documento) => ({
+              id: documento.id,
+              ...documento.data()
+            }))
+          )
+        }
+      } catch (error) {
+        console.error('Error cargando tipos de emprendimiento:', error)
+      }
+    }
+
+    cargarTiposEmprendimiento()
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  // CARGA FIREBASE TIPOS PRODUCTOS
+  useEffect(() => {
+    let activo = true
+
+    async function cargarTiposProductos() {
+      try {
+        const resultado = await getDocs(
+          collection(db, 'tipos_productos')
+        )
+
+        if (activo) {
+          setTiposProductos(
+            resultado.docs.map((documento) => ({
+              id: documento.id,
+              ...documento.data()
+            }))
+          )
+        }
+      } catch (error) {
+        console.error('Error cargando tipos de productos:', error)
+      }
+    }
+
+    cargarTiposProductos()
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let activo = true
+
+    async function cargarDatosAdministrativos() {
+      try {
+        const [resultadoAsociaciones, resultadoAsignaciones] =
+          await Promise.all([
+            getDocs(collection(db, 'asociaciones')),
+            getDocs(collection(db, 'asignaciones'))
+          ])
+
+        if (!activo) return
+
+        setAsociaciones(resultadoAsociaciones.docs.map(item => ({
+          id: item.id,
+          ...item.data()
+        })))
+
+        setAsignaciones(resultadoAsignaciones.docs.map(item => ({
+          id: item.id,
+          ...item.data()
+        })))
+      } catch (error) {
+        console.error('Error cargando asociaciones y asignaciones:', error)
+      }
+    }
+
+    cargarDatosAdministrativos()
+
+    return () => {
+      activo = false
+    }
+  }, [])
 
   const [cargandoEmprendedoras, setCargandoEmprendedoras] =
     useState(true)
@@ -137,14 +260,19 @@ function AdminDashboard() {
       icono: '🤝',
     },
     {
-      id: 'asignaciones',
-      nombre: 'Asignaciones',
-      icono: '📋',
-    },
-    {
       id: 'categorias',
       nombre: 'Categorías',
       icono: '🏷️',
+    },
+    {
+      id: 'asignaciones',
+      nombre: 'Asignaciones',
+      icono: '🔗',
+    },
+    {
+      id: 'tipos-emprendimiento',
+      nombre: 'Tipos de emprendimiento',
+      icono: '🏪',
     },
     {
       id: 'tipos',
@@ -410,10 +538,15 @@ function AdminDashboard() {
             categorias={categorias}
             setCategorias={setCategorias}
           />
+        ) : seccion === 'tipos-emprendimiento' ? (
+          <TiposEmprendimientoAdmin
+            categorias={tiposEmprendimiento}
+            setCategorias={setTiposEmprendimiento}
+          />
         ) : seccion === 'tipos' ? (
           <TiposProductosAdmin
-            tipos={tiposProductos}
-            setTipos={setTiposProductos}
+            categorias={tiposProductos}
+            setCategorias={setTiposProductos}
           />
         ) : (
           <section className="bora-card">
