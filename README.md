@@ -32,3 +32,11 @@ Aunque existen áreas principales de responsabilidad, el desarrollo
 de BORA se realizará de manera colaborativa. Los integrantes podrán
 participar y apoyar otras áreas del proyecto cuando sea necesario,
 manteniendo coordinación entre aplicación móvil, web, backend y diseño.
+
+## Avance Android
+
+La app Android está en `android/` y usa Kotlin, Jetpack Compose y Firebase. Incluye gestión de productos con categorías, variantes, stock y disponibilidad; acceso de compradora y emprendedora; ventas e historial; calendario de ferias, respuesta a invitaciones, seguimiento de tiendas y avisos FCM preparados.
+
+El modelo Firebase, reglas, datos ficticios y pruebas de Emulator Suite están en `backend/`. Para instrucciones de ejecución, accesibilidad y validación, revisa `android/README.md` y `backend/datos-desarrollo.md`.
+
+La compilación y las pruebas del emulador aún deben ejecutarse. Las reglas y Cloud Function no se han desplegado; el modo administrador Android y el mapa integrado siguen pendientes.
