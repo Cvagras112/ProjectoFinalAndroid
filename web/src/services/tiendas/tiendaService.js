@@ -150,3 +150,8 @@ export async function actualizarTiendaEmprendedor(uid, datos) {
     ...datosActualizados,
   }
 }
+
+export async function obtenerTiendaPublica(id) {
+  const resultado = await getDoc(doc(db, 'tiendas', id))
+  return resultado.exists() && resultado.data().activo === true ? { ...resultado.data(), id: resultado.id } : null
+}

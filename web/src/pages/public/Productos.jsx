@@ -1,3 +1,4 @@
+import { disponibilidadProducto } from '../../services/productos/productoModelo'
 
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -495,9 +496,7 @@ export default function Productos() {
                               fontWeight: '700',
                             }}
                           >
-                            {producto.disponible && Number(producto.stock) > 0
-                              ? 'Disponible'
-                              : 'Agotado'}
+                            {disponibilidadProducto(producto)}
                           </span>
 
                           {/* A pedido */}

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:inventario": "node --test tests/inventario.test.mjs",
+    "test:inventario:firebase": "firebase emulators:exec --project demo-bora-inventario --config ../firebase.inventario.test.json --only firestore \"node --test tests/inventario.firebase.test.mjs\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",

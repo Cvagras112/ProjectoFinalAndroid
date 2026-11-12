@@ -16,10 +16,13 @@ import {
     eliminarProducto,
 } from '../../services/productos/productoService'
 
+import VentasPanel from '../../components/emprendedor/VentasPanel'
 import './PanelEmprendedor.css'
 
 
 const FORMULARIO_VACIO = {
+    revision: 0,
+    variantes: [],
     nombre: '',
     categoria: '',
     descripcion: '',
@@ -45,6 +48,7 @@ function formatoPrecio(precio) {
 }
 
 export default function PanelEmprendedor() {
+    const [seccion, setSeccion] = useState('productos')
     const [tienda, setTienda] = useState(null)
 
     const [productos, setProductos] = useState([])
@@ -74,7 +78,7 @@ export default function PanelEmprendedor() {
             setProductos([])
 
             if (!usuario) {
-                setError('Debes iniciar sesi?n para acceder a tu tienda.')
+                setError('Debes iniciar sesión para acceder a tu tienda.')
                 setCargando(false)
                 return
             }
@@ -114,7 +118,7 @@ export default function PanelEmprendedor() {
 
     function abrirCrear() {
         setProductoEditando(null)
-        setFormulario({ ...FORMULARIO_VACIO })
+        setFormulario({ ...FORMULARIO_VACIO, variantes: [], idCreacion: crypto.randomUUID() })
         setErrorOperacion('')
         setMensaje('')
         setFormularioAbierto(true)
@@ -125,10 +129,12 @@ export default function PanelEmprendedor() {
         setProductoEditando(producto.id)
 
         setFormulario({
+            revision: producto.revision,
+            variantes: producto.variantes.map(v => ({ ...v, price: String(v.price), stock: String(v.stock) })),
             nombre: producto.nombre,
             categoria: producto.categoria,
             descripcion: producto.descripcion || '',
-            precio: String(producto.precio),
+            precio: String(producto.precioBase ?? producto.precio),
             stock: String(producto.stock),
             imagen: producto.imagen?.includes('unsplash.com/photo-1493106641515')
                 ? ''
@@ -136,7 +142,7 @@ export default function PanelEmprendedor() {
             disponible: producto.disponible,
 
             // Características del producto
-            ofrecerPedido: producto.ofrecerPedido === true,
+            ofrecerPedido: producto.ofrecerPedidoBase === true,
             piezaUnica: producto.piezaUnica === true,
 
             // Comportamiento cuando se agote
@@ -162,6 +168,15 @@ export default function PanelEmprendedor() {
             ...anterior,
             [name]: type === 'checkbox' ? checked : value,
         }))
+    }
+
+    function agregarVariante() {
+        setFormulario(anterior => ({...anterior, variantes: [...anterior.variantes, {
+            id: crypto.randomUUID(), name: '', price: anterior.precio || '', stock: '0', imageUrl: '', active: true,
+        }]}))
+    }
+    function cambiarVariante(id, campo, valor) {
+        setFormulario(anterior => ({...anterior, variantes: anterior.variantes.map(v => v.id === id ? {...v, [campo]: valor} : v)}))
     }
 
     async function actualizarProductos() {
@@ -201,7 +216,7 @@ export default function PanelEmprendedor() {
             console.error('Error al guardar producto:', err)
             setErrorOperacion(
                 err.code === 'permission-denied'
-                    ? 'Firestore rechaz? la operaci?n. Debemos revisar las reglas de seguridad.'
+                    ? 'Firestore rechazó la operación. Debemos revisar las reglas de seguridad.'
                     : err.message || 'No pudimos guardar el producto.'
             )
         } finally {
@@ -213,7 +228,7 @@ export default function PanelEmprendedor() {
         if (eliminandoId || guardando) return
 
         const confirmar = window.confirm(
-            `?Quieres eliminar "${producto.nombre}"? Esta acci?n no se puede deshacer.`
+            `¿Quieres eliminar "${producto.nombre}"? Esta acción no se puede deshacer.`
         )
 
         if (!confirmar) return
@@ -230,7 +245,7 @@ export default function PanelEmprendedor() {
             console.error('Error al eliminar producto:', err)
             setErrorOperacion(
                 err.code === 'permission-denied'
-                    ? 'Firestore rechaz? la eliminaci?n. Debemos revisar las reglas.'
+                    ? 'Firestore rechazó la eliminación. Debemos revisar las reglas.'
                     : err.message || 'No pudimos eliminar el producto.'
             )
         } finally {
@@ -243,7 +258,7 @@ export default function PanelEmprendedor() {
             <main className="panel-emprendedor">
                 <div className="panel-emprendedor__mensaje">
                     <h1>Cargando tu emprendimiento...</h1>
-                    <p>Estamos preparando la informaci?n de tu tienda.</p>
+                    <p>Estamos preparando la información de tu tienda.</p>
                 </div>
             </main>
         )
@@ -281,7 +296,7 @@ export default function PanelEmprendedor() {
                     <h1>¡Bienvenida a tu emprendimiento!</h1>
 
                     <p>
-                        Desde aqu?­ puedes conocer el estado de tu tienda,
+                        Desde aquí puedes conocer el estado de tu tienda,
                         administrar tus productos y seguir haciendo crecer
                         tu emprendimiento en BORA.
                     </p>
@@ -330,7 +345,12 @@ export default function PanelEmprendedor() {
                 </article>
             </section>
 
-            <div className="panel-emprendedor__contenido">
+            <nav className="panel-emprendedor__pestanas" aria-label="Administración de tu emprendimiento">
+                <button type="button" aria-pressed={seccion === 'productos'} onClick={() => setSeccion('productos')}>Mis productos</button>
+                <button type="button" aria-pressed={seccion === 'ventas'} onClick={() => setSeccion('ventas')}>Ventas e historial</button>
+            </nav>
+            {seccion === 'ventas' && <VentasPanel key={tienda.id} tiendaId={tienda.id} productos={productos} actualizarProductos={actualizarProductos} />}
+            <div className="panel-emprendedor__contenido" hidden={seccion !== 'productos'}>
                 <section className="panel-emprendedor__tarjeta">
                     <div className="panel-emprendedor__titulo-seccion">
                         <h2>📦 Mis productos</h2>
@@ -411,8 +431,8 @@ export default function PanelEmprendedor() {
                                         <option value="Belleza y bienestar">
                                             Belleza y bienestar
                                         </option>
-                                        <option value="Decoraci?n">
-                                            Decoraci?n
+                                        <option value="Decoración">
+                                            Decoración
                                         </option>
                                         <option value="Otros">
                                             Otros
@@ -435,20 +455,21 @@ export default function PanelEmprendedor() {
                                 </label>
 
                                 <label>
-                                    Stock
+                                    {formulario.variantes.length ? 'Stock total de variantes activas' : 'Stock'}
                                     <input
                                         name="stock"
                                         type="number"
                                         min="0"
                                         step="1"
-                                        value={formulario.stock}
+                                        value={formulario.variantes.length ? formulario.variantes.filter(v => v.active).reduce((n,v) => n + Number(v.stock || 0), 0) : formulario.stock}
+                                        readOnly={formulario.variantes.length > 0}
                                         onChange={cambiarCampo}
                                         required
                                     />
                                 </label>
 
                                 <label className="panel-emprendedor__campo-ancho">
-                                    Descripci?n
+                                    Descripción
                                     <textarea
                                         name="descripcion"
                                         value={formulario.descripcion}
@@ -469,6 +490,36 @@ export default function PanelEmprendedor() {
                                     />
                                 </label>
                             </div>
+
+                            <fieldset className="panel-emprendedor__variantes" disabled={guardando}>
+                                <legend>Variantes del producto</legend>
+                                <p>Agrega tallas, colores o presentaciones. Cada opción tiene precio y existencias propios.</p>
+                                {formulario.variantes.map((v, indice) => (
+                                    <div className="panel-emprendedor__variante" key={v.id}>
+                                        <h4>Variante {indice + 1}</h4>
+                                        <div className="panel-emprendedor__campos">
+                                            <label>Nombre o descripción
+                                                <input value={v.name} maxLength={150} required onChange={e => cambiarVariante(v.id, 'name', e.target.value)} />
+                                            </label>
+                                            <label>Precio (CLP)
+                                                <input type="number" min="1" max="999999999" step="1" value={v.price} required onChange={e => cambiarVariante(v.id, 'price', e.target.value)} />
+                                            </label>
+                                            <label>Stock
+                                                <input type="number" min="0" max="100000" step="1" value={v.stock} required onChange={e => cambiarVariante(v.id, 'stock', e.target.value)} />
+                                            </label>
+                                            <label>URL de imagen (opcional)
+                                                <input type="url" maxLength={2000} value={v.imageUrl} onChange={e => cambiarVariante(v.id, 'imageUrl', e.target.value)} />
+                                            </label>
+                                        </div>
+                                        <label className="panel-emprendedor__campo-check">
+                                            <input type="checkbox" checked={v.active} onChange={e => cambiarVariante(v.id, 'active', e.target.checked)} /> Variante activa
+                                        </label>
+                                        {!v.active && <small>Se conserva para mantener las referencias del historial.</small>}
+                                    </div>
+                                ))}
+                                <button type="button" onClick={agregarVariante} disabled={formulario.variantes.length >= 10}>+ Agregar variante</button>
+                                <small>Máximo 10 variantes; puedes editar o desactivar las existentes.</small>
+                            </fieldset>
 
                             <label className="panel-emprendedor__campo-check">
                                 <input

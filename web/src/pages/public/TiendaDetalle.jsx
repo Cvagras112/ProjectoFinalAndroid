@@ -1,8 +1,9 @@
 ﻿
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import { obtenerTiendaPublica } from '../../services/tiendas/tiendaService'
+import { obtenerProductosPorTienda } from '../../services/productos/productoService'
+import { disponibilidadProducto } from '../../services/productos/productoModelo'
 import './TiendaDetalle.css'
 
 const IMAGEN_PREDETERMINADA =
@@ -122,33 +123,9 @@ export default function TiendaDetalle() {
         setTienda(null)
         setProductos([])
 
-        const resultado = await getDoc(
-          doc(db, 'tiendas', tiendaId)
-        )
-
-        if (!resultado.exists() || resultado.data().activo !== true) {
-          return
-        }
-
-        const datosTienda = {
-          id: resultado.id,
-          ...resultado.data(),
-        }
-
-        const resultadoProductos = await getDocs(
-          collection(db, 'productos')
-        )
-
-        const productosTienda = resultadoProductos.docs
-          .map((documento) => ({
-            ...documento.data(),
-            id: documento.id,
-          }))
-          .filter(
-            (producto) =>
-              producto.ID_Tienda === tiendaId &&
-              producto.Disponible !== false
-          )
+        const datosTienda = await obtenerTiendaPublica(tiendaId)
+        if (!datosTienda) return
+        const productosTienda = (await obtenerProductosPorTienda(tiendaId)).filter(p => p.visible)
 
         if (activo) {
           setTienda(datosTienda)
@@ -740,6 +717,7 @@ export default function TiendaDetalle() {
                           </span>
 
                           <h3>{nombre}</h3>
+                          {producto.variantes?.length > 0 && <small>{producto.variantes.filter(v => v.active).length} variantes · Ver opciones</small>}
 
                           <p className="bora-tienda-producto-tienda">
                             {tienda.nombre}
@@ -773,8 +751,8 @@ export default function TiendaDetalle() {
                                   producto.disponible === false
                                   ? 'No disponible'
                                   : stock !== null && stock <= 0
-                                    ? 'Agotado'
-                                    : 'Disponible'}
+                                    ? disponibilidadProducto(producto)
+                                    : disponibilidadProducto(producto)}
                               </span>
 
                               {/* Modalidad a pedido */}

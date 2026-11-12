@@ -481,3 +481,6 @@ exports.crearEmprendedora = onCall(
       }
     },
 );
+
+// Inventario compartido; sin modificar los flujos de solicitudes existentes.
+Object.assign(exports, require("./operacionesInventario"));

@@ -311,118 +311,319 @@ match /tiendas/{tiendaId} {
     // ========================================
 
     
+    // Inventario Spark: validación autoritativa de documentos y operaciones atómicas.
+    function propietariaInventario(tiendaId) {
+      let perfil = get(/databases/$(database)/documents/emprendedores/$(request.auth.uid)).data;
+      let tienda = get(/databases/$(database)/documents/tiendas/$(tiendaId)).data;
+      let usuario = get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+      // Un documento ausente o un campo ausente produce denegación.
+      return request.auth != null && tiendaId is string
+        && perfil.activo == true && perfil.ID_Tienda == tiendaId
+        && tienda.activo == true && tienda.ID_Dueno == request.auth.uid
+        && usuario.rol == 'emprendedor' && usuario.activo == true;
+    }
+    function varianteNuevaValida0() {
+      let v = request.resource.data.Variantes[0];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida1() {
+      let v = request.resource.data.Variantes[1];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida2() {
+      let v = request.resource.data.Variantes[2];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida3() {
+      let v = request.resource.data.Variantes[3];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida4() {
+      let v = request.resource.data.Variantes[4];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida5() {
+      let v = request.resource.data.Variantes[5];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida6() {
+      let v = request.resource.data.Variantes[6];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida7() {
+      let v = request.resource.data.Variantes[7];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida8() {
+      let v = request.resource.data.Variantes[8];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function varianteNuevaValida9() {
+      let v = request.resource.data.Variantes[9];
+      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
+      // keys solo existe en mapas. Las siete propiedades se validan abajo.
+      return v.keys().size() == 7
+        && v.id.matches('^[^/]{1,64}$')
+        && v.name.matches('(?s)^.{1,150}$')
+        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
+        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
+        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && v.imagePath.matches('(?s)^.{0,512}$')
+        && v.active is bool;
+    }
+    function stockNuevasVariantes() {
+      let v = request.resource.data.Variantes;
+      // Con tamaño diez, todos los índices existen: no se repite esa comprobación.
+      return v.size() == 10
+        ? (v[0].active ? v[0].stock : 0)
+          + (v[1].active ? v[1].stock : 0)
+          + (v[2].active ? v[2].stock : 0)
+          + (v[3].active ? v[3].stock : 0)
+          + (v[4].active ? v[4].stock : 0)
+          + (v[5].active ? v[5].stock : 0)
+          + (v[6].active ? v[6].stock : 0)
+          + (v[7].active ? v[7].stock : 0)
+          + (v[8].active ? v[8].stock : 0)
+          + (v[9].active ? v[9].stock : 0)
+        : (v.size() > 0 && v[0].active ? v[0].stock : 0)
+          + (v.size() > 1 && v[1].active ? v[1].stock : 0)
+          + (v.size() > 2 && v[2].active ? v[2].stock : 0)
+          + (v.size() > 3 && v[3].active ? v[3].stock : 0)
+          + (v.size() > 4 && v[4].active ? v[4].stock : 0)
+          + (v.size() > 5 && v[5].active ? v[5].stock : 0)
+          + (v.size() > 6 && v[6].active ? v[6].stock : 0)
+          + (v.size() > 7 && v[7].active ? v[7].stock : 0)
+          + (v.size() > 8 && v[8].active ? v[8].stock : 0)
+          + (v.size() > 9 && v[9].active ? v[9].stock : 0);
+    }
+    function variantesNuevasValidas() {
+      let v = request.resource.data.get('Variantes', []);
+      return v is list && v.size() <= 10
+        && (v.size() == 0 ? true : v.size() == 10
+          ? (varianteNuevaValida0()
+            && varianteNuevaValida1()
+            && varianteNuevaValida2()
+            && varianteNuevaValida3()
+            && varianteNuevaValida4()
+            && varianteNuevaValida5()
+            && varianteNuevaValida6()
+            && varianteNuevaValida7()
+            && varianteNuevaValida8()
+            && varianteNuevaValida9()
+            && [v[0].id, v[1].id, v[2].id, v[3].id, v[4].id, v[5].id, v[6].id, v[7].id, v[8].id, v[9].id].toSet().size() == 10)
+          : ((v.size() > 0 ? varianteNuevaValida0() : true)
+            && (v.size() > 1 ? varianteNuevaValida1() : true)
+            && (v.size() > 2 ? varianteNuevaValida2() : true)
+            && (v.size() > 3 ? varianteNuevaValida3() : true)
+            && (v.size() > 4 ? varianteNuevaValida4() : true)
+            && (v.size() > 5 ? varianteNuevaValida5() : true)
+            && (v.size() > 6 ? varianteNuevaValida6() : true)
+            && (v.size() > 7 ? varianteNuevaValida7() : true)
+            && (v.size() > 8 ? varianteNuevaValida8() : true)
+            && (v.size() > 9 ? varianteNuevaValida9() : true)
+            && [(v.size() > 0 ? v[0].id : 0), (v.size() > 1 ? v[1].id : 1), (v.size() > 2 ? v[2].id : 2), (v.size() > 3 ? v[3].id : 3), (v.size() > 4 ? v[4].id : 4), (v.size() > 5 ? v[5].id : 5), (v.size() > 6 ? v[6].id : 6), (v.size() > 7 ? v[7].id : 7), (v.size() > 8 ? v[8].id : 8), (v.size() > 9 ? v[9].id : 9)].toSet().size() == 10));
+    }
+    function productoInventarioValido(p, productoId) {
+      let v = p.get('Variantes', []);
+      // Cada campo obligatorio se accede y se valida abajo; ausencias se deniegan.
+      return p.keys().hasOnly(['ID_Producto','ID_Tienda','Nombre','Categoria','Precio','Stock','Disponible','imagen',
+          'Descripcion','OfrecerPedido','PiezaUnica','AccionAgotado','ManejaStock','Variantes','Vendido','Revision','UltimaVenta','ActualizadoEn'])
+        && p.ID_Producto == productoId
+        && p.ID_Tienda is string && p.ID_Tienda.size() > 0
+        && p.Nombre.matches('(?s)^.{1,150}$')
+        && p.Categoria.matches('(?s)^.{1,100}$')
+        && p.Precio is int && string(p.Precio).matches('^[1-9][0-9]{0,8}$')
+        && p.Stock is int && string(p.Stock).matches('^([0-9]{1,6}|1000000)$')
+        && p.Disponible is bool
+        && p.imagen.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
+        && p.get('Descripcion','').matches('(?s)^.{0,1000}.{0,1000}$')
+        && p.get('OfrecerPedido',false) is bool && p.get('PiezaUnica',false) is bool
+        && p.get('AccionAgotado','mostrar') in ['mostrar','ocultar','pedido']
+        && p.get('ManejaStock',true) is bool && p.get('Vendido',false) is bool
+        && p.Revision is int && p.Revision > 0
+        && p.UltimaVenta.matches('(?s)^.{0,260}$')
+        && p.ActualizadoEn == request.time
+        && variantesNuevasValidas()
+        && (v.size() == 0 || (p.ManejaStock == true && p.Stock == stockNuevasVariantes()));
+    }
+
+    function conservaIdentidades(a, b) {
+      return b.size() >= a.size() && (a.size() <= 0 ? true : a[0].id == b[0].id && (a.size() <= 1 ? true : a[1].id == b[1].id && (a.size() <= 2 ? true : a[2].id == b[2].id && (a.size() <= 3 ? true : a[3].id == b[3].id && (a.size() <= 4 ? true : a[4].id == b[4].id && (a.size() <= 5 ? true : a[5].id == b[5].id && (a.size() <= 6 ? true : a[6].id == b[6].id && (a.size() <= 7 ? true : a[7].id == b[7].id && (a.size() <= 8 ? true : a[8].id == b[8].id && (a.size() <= 9 ? true : a[9].id == b[9].id && true))))))))));
+    }
+    function ventaEstructuraValida(v, ventaId) {
+      return v.keys().hasAll(['productoId','tiendaId','usuarioId','operacionId','indiceVariante','productoNombre',
+          'varianteId','varianteNombre','cantidad','precioUnitario','total','fecha'])
+        && v.keys().hasOnly(['productoId','tiendaId','usuarioId','operacionId','indiceVariante','productoNombre',
+          'varianteId','varianteNombre','cantidad','precioUnitario','total','fecha'])
+        && v.usuarioId == request.auth.uid
+        && v.productoId is string && v.productoId.size() > 0 && !v.productoId.matches('.*[/].*')
+        && v.tiendaId is string && v.tiendaId.size() > 0
+        && v.operacionId is string && v.operacionId.matches('^[a-zA-Z0-9_-]{1,128}$')
+        && ventaId == request.auth.uid + '_' + v.operacionId
+        && v.indiceVariante is int && v.indiceVariante >= -1 && v.indiceVariante < 10
+        && v.productoNombre is string && v.productoNombre.size() <= 150
+        && v.varianteId is string && v.varianteId.size() <= 64
+        && v.varianteNombre is string && v.varianteNombre.size() <= 150
+        && v.cantidad is int && v.cantidad > 0 && v.cantidad <= 100000
+        && v.precioUnitario is int && v.precioUnitario > 0 && v.precioUnitario <= 999999999
+        && v.total == v.precioUnitario * v.cantidad
+        && v.fecha == request.time;
+    }
+
+    function cambiosVariantesValidos(a, b, v) {
+      let i = v.indiceVariante;
+      // IDs únicos: al retirar el elemento vendido, el resto debe ser idéntico.
+      return a.size() == b.size() && (a.size() == 0 ? true
+        : i >= 0 && i < a.size() && a[i].active == true
+          && a[i].stock >= v.cantidad && b[i].stock == a[i].stock - v.cantidad
+          && b[i].diff(a[i]).affectedKeys().hasOnly(['stock'])
+          && a.removeAll([a[i]]) == b.removeAll([b[i]]));
+    }
+    function lineaVentaValida(v, p) {
+      let variantes = p.get('Variantes', []);
+      return variantes.size() == 0
+        ? v.indiceVariante == -1 && v.varianteId == '' && v.varianteNombre == ''
+          && v.precioUnitario == p.Precio
+        : v.indiceVariante >= 0 && v.indiceVariante < variantes.size()
+          && v.varianteId == variantes[v.indiceVariante].id
+          && v.varianteNombre == variantes[v.indiceVariante].name
+          && v.precioUnitario == variantes[v.indiceVariante].price;
+    }
+    function movimientoValido(v, p, despues, productoId, ventaId) {
+      let a = p.get('Variantes', []);
+      let b = despues.get('Variantes', []);
+      return v.productoId == productoId && v.tiendaId == p.ID_Tienda
+        && p.Disponible == true && p.get('Vendido',false) == false
+        && despues.ID_Producto == p.ID_Producto && despues.ID_Tienda == p.ID_Tienda
+        && despues.Revision == p.get('Revision',0) + 1
+        && despues.UltimaVenta == ventaId && despues.UltimaVenta != p.get('UltimaVenta','')
+        && despues.ActualizadoEn == request.time
+        && despues.diff(p).affectedKeys().hasOnly(['Stock','Variantes','Revision','UltimaVenta','ActualizadoEn','Vendido','Disponible'])
+        && cambiosVariantesValidos(a, b, v)
+        && (a.size() > 0 ? p.Stock >= v.cantidad && despues.Stock == p.Stock - v.cantidad
+          : p.get('ManejaStock',true) ? p.Stock >= v.cantidad && despues.Stock == p.Stock - v.cantidad
+          : despues.Stock == p.Stock)
+        && (p.get('PiezaUnica',false)
+          ? v.cantidad == 1 && despues.Vendido == true && despues.Disponible == false
+          : despues.get('Vendido',false) == false && despues.Disponible == p.Disponible);
+    }
+    function reciboCoincide(r, v, ventaId) {
+      return r.keys().hasAll(['productoId','tiendaId','varianteId','cantidad','ventaId','fecha'])
+        && r.keys().hasOnly(['productoId','tiendaId','varianteId','cantidad','ventaId','fecha'])
+        && r.ventaId == ventaId && r.productoId == v.productoId
+        && r.tiendaId == v.tiendaId && r.varianteId == v.varianteId
+        && r.cantidad == v.cantidad && r.fecha == request.time;
+    }
+    function productoConVentaValido(productoId) {
+      let ventaId = request.resource.data.get('UltimaVenta','');
+      let v = getAfter(/databases/$(database)/documents/ventas/$(ventaId)).data;
+      return ventaId != ''
+        && !exists(/databases/$(database)/documents/ventas/$(ventaId))
+        && movimientoValido(v, resource.data, request.resource.data, productoId, ventaId);
+    }
+
     match /productos/{productoId} {
 
       // Lectura pública para el catálogo BORA.
       allow read: if true;
 
-      // Validar estructura y datos del producto.
-      function productoValido() {
-        return request.resource.data.keys().hasAll([
-          'ID_Producto',
-          'ID_Tienda',
-          'Nombre',
-          'Categoria',
-          'Precio',
-          'Stock',
-          'Disponible',
-          'imagen'
-        ])
+      allow create: if propietariaInventario(request.resource.data.ID_Tienda)
+        && productoInventarioValido(request.resource.data, productoId)
+        && request.resource.data.Revision == 1
+        && request.resource.data.UltimaVenta == ''
+        && request.resource.data.Vendido == false;
 
-        && request.resource.data.keys().hasOnly([
-          'ID_Producto',
-          'ID_Tienda',
-          'Nombre',
-          'Categoria',
-          'Precio',
-          'Stock',
-          'Disponible',
-          'imagen',
-          'Descripcion',
-          'OfrecerPedido',
-          'PiezaUnica',
-          'AccionAgotado'
-        ])
-
-        // Identificadores.
-        && request.resource.data.ID_Producto == productoId
-        && request.resource.data.ID_Tienda is string
-        && request.resource.data.ID_Tienda.size() > 0
-
-        // Nombre.
-        && request.resource.data.Nombre is string
-        && request.resource.data.Nombre.size() > 0
-        && request.resource.data.Nombre.size() <= 150
-
-        // Categoría.
-        && request.resource.data.Categoria is string
-        && request.resource.data.Categoria.size() > 0
-        && request.resource.data.Categoria.size() <= 100
-
-        // Precio.
-        && request.resource.data.Precio is number
-        && request.resource.data.Precio >= 0
-
-        // Stock.
-        && request.resource.data.Stock is int
-        && request.resource.data.Stock >= 0
-
-        // Disponibilidad.
-        && request.resource.data.Disponible is bool
-
-        // Imagen.
-        && request.resource.data.imagen is string
-        && request.resource.data.imagen.size() <= 2000
-
-        // Descripción opcional.
-        && request.resource.data.get('Descripcion', '') is string
-        && request.resource.data.get('Descripcion', '').size() <= 2000
-
-        // Modalidades nuevas.
-        && request.resource.data.get('OfrecerPedido', false) is bool
-        && request.resource.data.get('PiezaUnica', false) is bool
-
-        // Comportamiento al agotarse.
-        && request.resource.data.get('AccionAgotado', 'mostrar') in [
-          'mostrar',
-          'ocultar'
-        ];
-      }
-
-      // CREAR PRODUCTOS.
-      // Solo el propietario de la tienda activa.
-      allow create: if productoValido()
-        && esDuenoTienda(
-          request.resource.data.ID_Tienda
-        );
-
-      // EDITAR PRODUCTOS.
-      // No se permite cambiar identificadores
-      // ni transferir productos entre tiendas.
-      allow update: if productoValido()
-
-        && esDuenoTienda(resource.data.ID_Tienda)
-
-        && request.resource.data.diff(resource.data)
-          .affectedKeys()
-          .hasOnly([
-            'Nombre',
-            'Categoria',
-            'Precio',
-            'Stock',
-            'Disponible',
-            'imagen',
-            'Descripcion',
-            'OfrecerPedido',
-            'PiezaUnica',
-            'AccionAgotado'
-          ])
-
-        && request.resource.data.ID_Tienda ==
-          resource.data.ID_Tienda
-
-        && request.resource.data.ID_Producto ==
-          resource.data.ID_Producto;
+      allow update: if propietariaInventario(resource.data.ID_Tienda)
+        && (request.resource.data.get('UltimaVenta','') != resource.data.get('UltimaVenta','')
+          ? productoConVentaValido(productoId)
+          : productoInventarioValido(request.resource.data, productoId)
+            && request.resource.data.ID_Tienda == resource.data.ID_Tienda
+            && request.resource.data.ID_Producto == resource.data.ID_Producto
+            && request.resource.data.Revision == resource.data.get('Revision',0) + 1
+            && request.resource.data.get('Vendido',false) == resource.data.get('Vendido',false)
+            && (resource.data.get('Vendido',false) == false || request.resource.data.Disponible == false)
+            && conservaIdentidades(resource.data.get('Variantes',[]), request.resource.data.get('Variantes',[])));
 
       // ELIMINAR PRODUCTOS.
       // Solo el propietario de la tienda.
@@ -635,6 +836,37 @@ match /tiendas/{tiendaId} {
 
       allow delete: if esAdministrador();
     }
+    match /ventas/{ventaId} {
+      function ventaConProducto() {
+        let v = request.resource.data;
+        let antes = get(/databases/$(database)/documents/productos/$(v.productoId)).data;
+        let despues = getAfter(/databases/$(database)/documents/productos/$(v.productoId)).data;
+        return ventaEstructuraValida(v, ventaId)
+          && propietariaInventario(v.tiendaId)
+          && v.tiendaId == antes.ID_Tienda && v.productoNombre == antes.Nombre
+          && lineaVentaValida(v, antes)
+          && despues.UltimaVenta == ventaId
+          && despues.UltimaVenta != antes.get('UltimaVenta','')
+          && despues.Revision == antes.get('Revision',0) + 1
+          && reciboCoincide(getAfter(/databases/$(database)/documents/movimientosInventario/$(request.auth.uid)/operaciones/$(v.operacionId)).data, v, ventaId);
+      }
+      allow read: if request.auth != null
+        && resource.data.usuarioId == request.auth.uid
+        && propietariaInventario(resource.data.tiendaId);
+      allow create: if request.auth != null && ventaConProducto();
+      allow update, delete: if false;
+    }
+    match /movimientosInventario/{uid}/operaciones/{operacionId} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && operacionId.matches('^[a-zA-Z0-9_-]{1,128}$')
+        && request.resource.data.ventaId == uid + '_' + operacionId
+        && !exists(/databases/$(database)/documents/ventas/$(request.resource.data.ventaId))
+        && getAfter(/databases/$(database)/documents/ventas/$(request.resource.data.ventaId)).data.usuarioId == uid
+        && getAfter(/databases/$(database)/documents/ventas/$(request.resource.data.ventaId)).data.operacionId == operacionId;
+      allow list, update, delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

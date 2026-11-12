@@ -1,3 +1,4 @@
+import { disponibilidadProducto } from '../../services/productos/productoModelo'
 
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -36,6 +37,7 @@ function normalizarWhatsApp(numero) {
 export default function ProductoDetalle() {
   const { id } = useParams()
 
+  const [varianteId, setVarianteId] = useState('')
   const [producto, setProducto] = useState(null)
   const [relacionados, setRelacionados] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -48,6 +50,7 @@ export default function ProductoDetalle() {
       setCargando(true)
       setError('')
       setProducto(null)
+      setVarianteId('')
       setRelacionados([])
 
       try {
@@ -131,13 +134,16 @@ export default function ProductoDetalle() {
     )
   }
 
+  const variante = producto.variantes.find(v => v.id === varianteId && v.active) || producto.variantes.find(v => v.active)
+  const precioSeleccionado = variante?.price ?? producto.precio
+  const imagenSeleccionada = variante?.imageUrl || producto.imagen
   const numeroWhatsApp = normalizarWhatsApp(producto.whatsapp)
   const correo = String(producto.emailContacto || '').trim()
 
   const mensaje =
     `¡Hola! Vi el producto "${producto.nombre}" ` +
     `en BORA, publicado por "${producto.tienda}", ` +
-    `con un precio de ${formatoPrecio(producto.precio)}. ` +
+    `con un precio de ${formatoPrecio(precioSeleccionado)}. ` +
     'Me gustaría obtener más información.'
 
   const asunto = `Consulta por ${producto.nombre} - BORA`
@@ -174,7 +180,7 @@ export default function ProductoDetalle() {
         <div className="bora-producto-galeria">
           <div className="bora-producto-foto">
             <img
-              src={producto.imagen}
+              src={imagenSeleccionada}
               alt={producto.nombre}
               onError={(evento) => {
                 evento.currentTarget.onerror = null
@@ -206,9 +212,18 @@ export default function ProductoDetalle() {
           </span>
 
           <strong className="bora-producto-precio">
-            {formatoPrecio(producto.precio)}
+            {formatoPrecio(precioSeleccionado)}
           </strong>
 
+          {producto.variantes.length > 0 && (
+            <label className="bora-producto-variantes">Elige una variante
+              <select value={variante?.id || ''} onChange={e => setVarianteId(e.target.value)}>
+                {producto.variantes.filter(v => v.active).map(v => (
+                  <option key={v.id} value={v.id}>{v.name} · {formatoPrecio(v.price)} · {disponibilidadProducto(producto, v)}</option>
+                ))}
+              </select>
+            </label>
+          )}
           {/* TIENDA */}
           <div className="bora-producto-vendedor">
             <span className="bora-producto-vendedor-icono">
@@ -251,9 +266,7 @@ export default function ProductoDetalle() {
             <h2>📦 Disponibilidad</h2>
 
             <p>
-              {producto.stock > 0
-                ? `Disponible · ${producto.stock} unidades en stock`
-                : 'Sin existencias por el momento'}
+              {disponibilidadProducto(producto, variante)}
             </p>
           </div>
 

@@ -1,3 +1,5 @@
+import { guardarProductoTransaccion } from './inventarioTransacciones'
+import { normalizarProducto } from './productoModelo'
 
 import {
   collection,
@@ -5,8 +7,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  setDoc,
-  updateDoc,
 } from 'firebase/firestore'
 
 import { auth, db } from '../../firebase/config'
@@ -21,31 +21,11 @@ function adaptarProducto(documento, tiendas = {}) {
   const tienda = tiendas[tiendaId]
 
   return {
-    id: documento.id,
-    nombre: datos.Nombre || datos.nombre || 'Producto sin nombre',
-    categoria: datos.Categoria || datos.categoria || 'Sin categoría',
-    precio: Number(datos.Precio ?? datos.precio ?? 0),
-    stock: Number(datos.Stock ?? datos.stock ?? 0),
-    disponible: datos.Disponible !== false,
-    ofrecerPedido: datos.OfrecerPedido === true,
-    piezaUnica: datos.PiezaUnica === true,
-    accionAgotado: datos.AccionAgotado || 'mostrar',
-    imagen:
-      datos.imagen?.trim() ||
-      datos.Imagen?.trim() ||
-      IMAGEN_PRODUCTO_PREDETERMINADA,
-    descripcion:
-      datos.Descripcion ||
-      datos.descripcion ||
-      '',
-    tiendaId,
+    ...normalizarProducto(datos, documento.id),
+    imagen: datos.imagen?.trim() || datos.Imagen?.trim() || IMAGEN_PRODUCTO_PREDETERMINADA,
     tienda: tienda?.nombre || 'Emprendimiento BORA',
     whatsapp: tienda?.whatsapp || tienda?.telefono || '',
-    emailContacto:
-      tienda?.emailContacto ||
-      tienda?.correo ||
-      tienda?.email ||
-      '',
+    emailContacto: tienda?.emailContacto || tienda?.correo || tienda?.email || '',
     etiqueta: tienda?.nombre || 'Emprendimiento BORA',
   }
 }
@@ -71,7 +51,7 @@ export async function obtenerProductos() {
 
   return resultadoProductos.docs
     .map((documento) => adaptarProducto(documento, tiendas))
-    .filter((producto) => producto.disponible)
+    .filter((producto) => producto.visible)
 }
 
 // Obtener un producto por su ID.
@@ -85,7 +65,8 @@ export async function obtenerProductoPorId(id) {
 
   const tiendas = await obtenerTiendas()
 
-  return adaptarProducto(resultado, tiendas)
+  const producto = adaptarProducto(resultado, tiendas)
+  return producto.visible ? producto : null
 }
 
 // Obtener todos los productos de una tienda,
@@ -148,7 +129,7 @@ function validarProducto(datos) {
     throw new Error('La imagen debe tener una URL válida.')
   }
 
-  if (!['mostrar', 'ocultar'].includes(accionAgotado)) {
+  if (!['mostrar', 'ocultar', 'pedido'].includes(accionAgotado)) {
     throw new Error('Selecciona una opción válida para cuando se agote.')
   }
 
@@ -165,6 +146,10 @@ function validarProducto(datos) {
     OfrecerPedido: ofrecerPedido,
     PiezaUnica: piezaUnica,
     AccionAgotado: accionAgotado,
+    ...(datos.variantes ? { Variantes: datos.variantes.map(v => ({
+      id: v.id, name: String(v.name || '').trim(), price: Number(v.price), stock: Number(v.stock),
+      imageUrl: String(v.imageUrl || '').trim(), imagePath: v.imagePath || '', active: v.active !== false,
+    })) } : {}),
   }
 }
 
@@ -214,13 +199,12 @@ export async function crearProducto(tiendaId, datos) {
 
   const referencia = doc(collection(db, 'productos'))
 
-  await setDoc(referencia, {
-    ...producto,
-    ID_Producto: referencia.id,
-    ID_Tienda: tiendaId,
+  const resultado = await guardarProductoTransaccion(db, auth.currentUser?.uid, {
+    productoId: datos.idCreacion || referencia.id, tiendaId, datos: producto, revision: null,
   })
 
-  return referencia.id
+  return resultado.productoId
+
 }
 
 // Editar un producto existente.
@@ -244,7 +228,9 @@ export async function editarProducto(productoId, tiendaId, datos) {
 
   const producto = validarProducto(datos)
 
-  await updateDoc(referencia, producto)
+  await guardarProductoTransaccion(db, auth.currentUser?.uid, {
+    productoId, tiendaId, datos: producto, revision: datos.revision ?? 0,
+  })
 }
 
 // Eliminar un producto de la tienda.
