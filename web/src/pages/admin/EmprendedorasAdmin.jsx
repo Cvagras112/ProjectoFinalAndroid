@@ -1,10 +1,10 @@
 import './credenciales-bora.css'
 
 import { useEffect, useState } from 'react'
-import { doc, updateDoc, writeBatch } from 'firebase/firestore'
+import { crearDocumentosEmprendedora, cambiarEstadoEmprendedora, editarPerfilEmprendedora } from '../../repositories/admin/emprendedorasRepository'
 
 
-import { db, secondaryAuth } from '../../firebase/config'
+import { secondaryAuth } from '../../firebase/config'
 import { createUserWithEmailAndPassword, updateProfile, deleteUser, signOut } from 'firebase/auth'
 
 function generarPasswordTemporal() {
@@ -81,12 +81,7 @@ function EmprendedorasAdmin({
     setMensajeValidacion('')
 
     try {
-      await updateDoc(
-        doc(db, 'emprendedores', emprendedora.id),
-        {
-          activo: nuevoEstado === 'Activa',
-        }
-      )
+      await cambiarEstadoEmprendedora(emprendedora.id, nuevoEstado === 'Activa')
 
       setEmprendedoras((anteriores) =>
         anteriores.map((item) =>
@@ -159,41 +154,7 @@ function EmprendedorasAdmin({
 
       const uid = credencial.user.uid
 
-      // Los tres documentos utilizan el mismo UID.
-      const lote = writeBatch(db)
-
-      lote.set(doc(db, 'usuarios', uid), {
-        ID: uid,
-        nombre,
-        email,
-        rol: 'emprendedor',
-        activo: true,
-      })
-
-      lote.set(doc(db, 'emprendedores', uid), {
-        ID_Tienda: uid,
-        activo: true,
-        nombre,
-        telefono,
-        descripcion: '',
-        direccion: '',
-      })
-
-      lote.set(doc(db, 'tiendas', uid), {
-        ID_Dueno: uid,
-        activo: true,
-        nombre: nombreTienda,
-        categoria,
-        descripcion,
-        sector: '',
-        telefono,
-        whatsapp: '',
-        emailContacto: email,
-        imagen: '',
-      })
-
-      // Escritura atomica protegida por las reglas Firestore.
-      await lote.commit()
+      await crearDocumentosEmprendedora(uid, { nombre, email, telefono, nombreTienda, categoria, descripcion })
       documentosGuardados = true
 
       try {
@@ -293,13 +254,7 @@ function EmprendedorasAdmin({
     setMensajeValidacion('')
 
     try {
-      await updateDoc(
-        doc(db, 'emprendedores', emprendedoraEditando.id),
-        {
-          nombre,
-          telefono,
-        }
-      )
+      await editarPerfilEmprendedora(emprendedoraEditando.id, { nombre, telefono })
 
       setEmprendedoras((anteriores) =>
         anteriores.map((emprendedora) =>

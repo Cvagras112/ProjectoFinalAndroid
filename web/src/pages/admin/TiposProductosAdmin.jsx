@@ -1,5 +1,8 @@
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import {
+  crearTipoProducto,
+  editarNombreTipoProducto,
+  cambiarEstadoTipoProducto,
+} from '../../repositories/admin/catalogosRepository'
 
 import { useState } from 'react'
 
@@ -71,11 +74,7 @@ export default function TiposProductosAdmin({
 
     try {
       if (categoriaEditando) {
-        const referencia = doc(db, 'tipos_productos', categoriaEditando.id)
-
-        await updateDoc(referencia, {
-          nombre: nombreLimpio
-        })
+        await editarNombreTipoProducto(categoriaEditando.id, nombreLimpio)
 
         setCategorias((anteriores) =>
           anteriores.map((categoria) =>
@@ -85,19 +84,11 @@ export default function TiposProductosAdmin({
           )
         )
       } else {
-        const nueva = {
-          nombre: nombreLimpio,
-          estado: 'Activa'
-        }
-
-        const referencia = await addDoc(
-          collection(db, 'tipos_productos'),
-          nueva
-        )
+        const nueva = await crearTipoProducto(nombreLimpio)
 
         setCategorias((anteriores) => [
           ...anteriores,
-          { id: referencia.id, ...nueva }
+          nueva
         ])
       }
 
@@ -124,9 +115,7 @@ export default function TiposProductosAdmin({
     setGuardando(true)
 
     try {
-      await updateDoc(doc(db, 'tipos_productos', categoria.id), {
-        estado: nuevoEstado
-      })
+      await cambiarEstadoTipoProducto(categoria.id, nuevoEstado)
 
       setCategorias((anteriores) =>
         anteriores.map((item) =>

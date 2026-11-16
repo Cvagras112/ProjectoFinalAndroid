@@ -1,5 +1,8 @@
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import {
+  crearCategoria,
+  editarNombreCategoria,
+  cambiarEstadoCategoria,
+} from '../../repositories/admin/catalogosRepository'
 
 import { useState } from 'react'
 
@@ -71,11 +74,7 @@ export default function CategoriasAdmin({
 
     try {
       if (categoriaEditando) {
-        const referencia = doc(db, 'categorias', categoriaEditando.id)
-
-        await updateDoc(referencia, {
-          nombre: nombreLimpio
-        })
+        await editarNombreCategoria(categoriaEditando.id, nombreLimpio)
 
         setCategorias((anteriores) =>
           anteriores.map((categoria) =>
@@ -85,19 +84,11 @@ export default function CategoriasAdmin({
           )
         )
       } else {
-        const nueva = {
-          nombre: nombreLimpio,
-          estado: 'Activa'
-        }
-
-        const referencia = await addDoc(
-          collection(db, 'categorias'),
-          nueva
-        )
+        const nueva = await crearCategoria(nombreLimpio)
 
         setCategorias((anteriores) => [
           ...anteriores,
-          { id: referencia.id, ...nueva }
+          nueva
         ])
       }
 
@@ -124,9 +115,7 @@ export default function CategoriasAdmin({
     setGuardando(true)
 
     try {
-      await updateDoc(doc(db, 'categorias', categoria.id), {
-        estado: nuevoEstado
-      })
+      await cambiarEstadoCategoria(categoria.id, nuevoEstado)
 
       setCategorias((anteriores) =>
         anteriores.map((item) =>

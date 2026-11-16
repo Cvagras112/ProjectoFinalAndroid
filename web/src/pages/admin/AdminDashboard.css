@@ -526,3 +526,152 @@
   outline: 3px solid #FFAD39;
   outline-offset: 3px;
 }
+
+
+/* =====================================
+   BOTONES - GESTIÓN DE ADMINISTRADORES
+   ===================================== */
+
+.bora-admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bora-admin-btn--primary {
+  background: #236B4B;
+  color: #FFFFFF;
+}
+
+.bora-admin-btn--primary:hover {
+  background: #194C36;
+  transform: translateY(-2px);
+}
+
+.bora-admin-btn--danger {
+  background: #C8734E;
+  color: #FFFFFF;
+}
+
+.bora-admin-btn--danger:hover {
+  background: #A95435;
+  transform: translateY(-2px);
+}
+
+.bora-admin-btn--secondary {
+  background: #FFF6E5;
+  color: #194C36;
+}
+
+.bora-admin-btn--secondary:hover {
+  background: #FFE5B5;
+}
+
+.bora-admin-btn:disabled {
+  background: #DDE5DF;
+  color: #89938D;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bora-admin-btn:focus-visible {
+  outline: 3px solid #C8734E;
+  outline-offset: 3px;
+}
+
+/* Acciones de la tabla */
+
+.bora-admin-acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 230px;
+}
+
+/* BORA - Botones de administracion */
+.bora-admin .bora-card button.bora-admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bora-admin .bora-card button.bora-admin-btn--primary {
+  background: #236B4B;
+  color: #FFFFFF;
+}
+
+.bora-admin .bora-card button.bora-admin-btn--primary:hover {
+  background: #194C36;
+  transform: translateY(-2px);
+}
+
+.bora-admin .bora-card button.bora-admin-btn--danger {
+  background: #C8734E;
+  color: #FFFFFF;
+}
+
+.bora-admin .bora-card button.bora-admin-btn--danger:hover {
+  background: #A95435;
+}
+
+.bora-admin .bora-card button.bora-admin-btn--secondary {
+  background: #FFF6E5;
+  color: #194C36;
+}
+
+.bora-admin .bora-card button.bora-admin-btn--secondary:hover {
+  background: #FFE5B5;
+}
+
+.bora-admin .bora-card button.bora-admin-btn:disabled {
+  background: #DDE5DF;
+  color: #89938D;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bora-admin .bora-card button.bora-admin-btn:focus-visible {
+  outline: 3px solid #C8734E;
+  outline-offset: 3px;
+}
+
+/* BORA - Unificar botones restantes de administradores */
+.bora-admin .bora-card button:not(.bora-admin-btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #236B4B;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bora-admin .bora-card button:not(.bora-admin-btn):hover {
+  background: #194C36;
+  transform: translateY(-2px);
+}

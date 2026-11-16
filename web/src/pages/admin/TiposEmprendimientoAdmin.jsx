@@ -1,5 +1,8 @@
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import {
+  crearTipoEmprendimiento,
+  editarNombreTipoEmprendimiento,
+  cambiarEstadoTipoEmprendimiento,
+} from '../../repositories/admin/catalogosRepository'
 
 import { useState } from 'react'
 
@@ -71,11 +74,7 @@ export default function TiposEmprendimientoAdmin({
 
     try {
       if (categoriaEditando) {
-        const referencia = doc(db, 'tipos_emprendimiento', categoriaEditando.id)
-
-        await updateDoc(referencia, {
-          nombre: nombreLimpio
-        })
+        await editarNombreTipoEmprendimiento(categoriaEditando.id, nombreLimpio)
 
         setCategorias((anteriores) =>
           anteriores.map((categoria) =>
@@ -85,19 +84,11 @@ export default function TiposEmprendimientoAdmin({
           )
         )
       } else {
-        const nueva = {
-          nombre: nombreLimpio,
-          estado: 'Activa'
-        }
-
-        const referencia = await addDoc(
-          collection(db, 'tipos_emprendimiento'),
-          nueva
-        )
+        const nueva = await crearTipoEmprendimiento(nombreLimpio)
 
         setCategorias((anteriores) => [
           ...anteriores,
-          { id: referencia.id, ...nueva }
+          nueva
         ])
       }
 
@@ -124,9 +115,7 @@ export default function TiposEmprendimientoAdmin({
     setGuardando(true)
 
     try {
-      await updateDoc(doc(db, 'tipos_emprendimiento', categoria.id), {
-        estado: nuevoEstado
-      })
+      await cambiarEstadoTipoEmprendimiento(categoria.id, nuevoEstado)
 
       setCategorias((anteriores) =>
         anteriores.map((item) =>

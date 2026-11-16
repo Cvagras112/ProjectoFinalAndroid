@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { collection, doc, setDoc, updateDoc } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import {
+  crearAsociacion,
+  editarAsociacion,
+  cambiarEstadoAsociacion,
+} from '../../repositories/admin/asociacionesRepository'
 
 const inicial = {
   nombre: '',
@@ -82,24 +85,18 @@ export default function AsociacionesAdmin({ asociaciones, setAsociaciones }) {
 
     try {
       if (editando) {
-        await updateDoc(doc(db, 'asociaciones', editando), datos)
+        await editarAsociacion(editando, datos)
         setAsociaciones(anteriores =>
           anteriores.map(item =>
             item.id === editando ? { ...item, ...datos } : item
           )
         )
       } else {
-        const referencia = doc(collection(db, 'asociaciones'))
-        const nueva = {
-          ...datos,
-          estado: 'Activa'
-        }
-
-        await setDoc(referencia, nueva)
+        const nueva = await crearAsociacion(datos)
 
         setAsociaciones(anteriores => [
           ...anteriores,
-          { id: referencia.id, ...nueva }
+          nueva
         ])
       }
 
@@ -120,7 +117,7 @@ export default function AsociacionesAdmin({ asociaciones, setAsociaciones }) {
     )) return
 
     try {
-      await updateDoc(doc(db, 'asociaciones', item.id), { estado })
+      await cambiarEstadoAsociacion(item.id, estado)
       setAsociaciones(anteriores =>
         anteriores.map(actual =>
           actual.id === item.id ? { ...actual, estado } : actual

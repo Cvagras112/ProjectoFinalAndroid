@@ -1,8 +1,10 @@
 
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { collection, getDocs } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import { listarCategorias, listarTiposEmprendimiento, listarTiposProductos } from '../../repositories/admin/catalogosRepository'
+import { listarAsociaciones } from '../../repositories/admin/asociacionesRepository'
+import { listarAsignaciones } from '../../repositories/admin/asignacionesRepository'
+import { listarEmprendedoras } from '../../repositories/admin/emprendedorasRepository'
 
 import './AdminDashboard.css'
 
@@ -14,6 +16,7 @@ import CategoriasAdmin from './CategoriasAdmin'
 import TiposProductosAdmin from './TiposProductosAdmin'
 import TiposEmprendimientoAdmin from './TiposEmprendimientoAdmin'
 import AdministradoresAdmin from './AdministradoresAdmin'
+import BitacoraAdmin from './BitacoraAdmin'
 
 function AdminDashboard() {
   const [seccion, setSeccion] = useState('dashboard')
@@ -29,15 +32,10 @@ function AdminDashboard() {
 
     async function cargarCategorias() {
       try {
-        const resultado = await getDocs(collection(db, 'categorias'))
+        const datos = await listarCategorias()
 
         if (activo) {
-          setCategorias(
-            resultado.docs.map((documento) => ({
-              id: documento.id,
-              ...documento.data()
-            }))
-          )
+          setCategorias(datos)
         }
       } catch (error) {
         console.error('Error cargando categorías:', error)
@@ -58,17 +56,10 @@ function AdminDashboard() {
 
     async function cargarTiposEmprendimiento() {
       try {
-        const resultado = await getDocs(
-          collection(db, 'tipos_emprendimiento')
-        )
+        const datos = await listarTiposEmprendimiento()
 
         if (activo) {
-          setTiposEmprendimiento(
-            resultado.docs.map((documento) => ({
-              id: documento.id,
-              ...documento.data()
-            }))
-          )
+          setTiposEmprendimiento(datos)
         }
       } catch (error) {
         console.error('Error cargando tipos de emprendimiento:', error)
@@ -88,17 +79,10 @@ function AdminDashboard() {
 
     async function cargarTiposProductos() {
       try {
-        const resultado = await getDocs(
-          collection(db, 'tipos_productos')
-        )
+        const datos = await listarTiposProductos()
 
         if (activo) {
-          setTiposProductos(
-            resultado.docs.map((documento) => ({
-              id: documento.id,
-              ...documento.data()
-            }))
-          )
+          setTiposProductos(datos)
         }
       } catch (error) {
         console.error('Error cargando tipos de productos:', error)
@@ -119,21 +103,14 @@ function AdminDashboard() {
       try {
         const [resultadoAsociaciones, resultadoAsignaciones] =
           await Promise.all([
-            getDocs(collection(db, 'asociaciones')),
-            getDocs(collection(db, 'asignaciones'))
+            listarAsociaciones(),
+            listarAsignaciones()
           ])
 
         if (!activo) return
 
-        setAsociaciones(resultadoAsociaciones.docs.map(item => ({
-          id: item.id,
-          ...item.data()
-        })))
-
-        setAsignaciones(resultadoAsignaciones.docs.map(item => ({
-          id: item.id,
-          ...item.data()
-        })))
+        setAsociaciones(resultadoAsociaciones)
+        setAsignaciones(resultadoAsignaciones)
       } catch (error) {
         console.error('Error cargando asociaciones y asignaciones:', error)
       }
@@ -144,7 +121,7 @@ function AdminDashboard() {
     return () => {
       activo = false
     }
-  }, [])
+  }, [seccion])
 
   const [cargandoEmprendedoras, setCargandoEmprendedoras] =
     useState(true)
@@ -158,61 +135,7 @@ function AdminDashboard() {
         setCargandoEmprendedoras(true)
         setErrorEmprendedoras('')
 
-        const [
-          resultadoEmprendedores,
-          resultadoTiendas,
-          resultadoUsuarios,
-        ] = await Promise.all([
-          getDocs(collection(db, 'emprendedores')),
-          getDocs(collection(db, 'tiendas')),
-          getDocs(collection(db, 'usuarios')),
-        ])
-
-        const tiendas = {}
-
-        resultadoTiendas.docs.forEach((documento) => {
-          tiendas[documento.id] = documento.data()
-        })
-
-        const usuarios = {}
-
-        resultadoUsuarios.docs.forEach((documento) => {
-          usuarios[documento.id] = documento.data()
-        })
-
-        const datos = resultadoEmprendedores.docs.map((documento) => {
-          const emprendedora = documento.data()
-          const usuario = usuarios[documento.id]
-
-          const tiendaId =
-            emprendedora.ID_Tienda ||
-            emprendedora.idTienda ||
-            ''
-
-          const tienda = tiendas[tiendaId]
-
-          return {
-            id: documento.id,
-            nombre: emprendedora.nombre || 'Sin nombre',
-
-            correo:
-              usuario?.email ||
-              emprendedora.email ||
-              '',
-
-            telefono: emprendedora.telefono || '',
-
-            emprendimiento:
-              tienda?.nombre || 'Sin tienda asociada',
-
-            tiendaId,
-
-            estado:
-              emprendedora.activo === false
-                ? 'Inactiva'
-                : 'Activa',
-          }
-        })
+        const datos = await listarEmprendedoras()
 
         if (activo) {
           setEmprendedoras(datos)
@@ -237,7 +160,7 @@ function AdminDashboard() {
     return () => {
       activo = false
     }
-  }, [])
+  }, [seccion])
 
   const opciones = [
     {
@@ -279,7 +202,13 @@ function AdminDashboard() {
       id: 'administradores',
       nombre: 'Administradores',
       icono: '🛡️',
-    },    {
+    },
+    {
+      id: 'bitacora',
+      nombre: 'Bitácora',
+      icono: '▤',
+    },
+    {
       id: 'tipos',
       nombre: 'Tipos de productos',
       icono: '📦',
@@ -553,6 +482,8 @@ function AdminDashboard() {
             categorias={tiposProductos}
             setCategorias={setTiposProductos}
           />
+        ) : seccion === 'bitacora' ? (
+          <BitacoraAdmin />
         ) : seccion === 'administradores' ? (
           <AdministradoresAdmin />
         ) : (

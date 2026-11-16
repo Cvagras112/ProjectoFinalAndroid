@@ -1,0 +1,415 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "operacionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "operacionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "operacionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "operacionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "actorUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "actorUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "actorUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "actorUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "elementoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "elementoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "elementoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "elementoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "destinatarioUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "destinatarioUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "destinatarioUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditoria_administrativa",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "accion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "resultado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "destinatarioUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,35 @@
+"use strict";
+
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const admin = require("firebase-admin");
+const {FieldValue} = require("firebase-admin/firestore");
+const {crearOperacionesCatalogos} = require("./catalogosAdministrativos");
+const {ErrorAdministrativo} = require("./administracion");
+
+// Lista cerrada de endpoints: ningún cliente elige una colección o ruta.
+for (const nombre of [
+  "crearCategoria", "editarCategoria", "cambiarEstadoCategoria",
+  "crearTipoProducto", "editarTipoProducto", "cambiarEstadoTipoProducto",
+  "crearTipoEmprendimiento", "editarTipoEmprendimiento",
+  "cambiarEstadoTipoEmprendimiento", "crearAsociacion", "editarAsociacion",
+  "cambiarEstadoAsociacion"]) {
+  exports[nombre] = onCall({region: "us-central1"}, async (request) => {
+    if (!admin.apps.length) admin.initializeApp();
+    const operaciones = crearOperacionesCatalogos({auth: admin.auth(),
+      db: admin.firestore(),
+      fechaServidor: () => FieldValue.serverTimestamp()});
+    const cabecera = request.rawRequest.headers.authorization || "";
+    try {
+      return await operaciones[nombre]({
+        token: cabecera.startsWith("Bearer ") ? cabecera.slice(7) : "",
+        datos: request.data,
+      });
+    } catch (error) {
+      if (error instanceof ErrorAdministrativo) {
+        throw new HttpsError(error.codigo, error.message,
+            {operacionId: error.operacionId});
+      }
+      throw new HttpsError("unavailable", "No se pudo confirmar la operación.");
+    }
+  });
+}

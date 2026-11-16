@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react'
-import { collection, getDocs } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import { listarSolicitudes } from '../../repositories/admin/solicitudesRepository'
 import { aprobarSolicitudEmprendedor } from '../../services/solicitudes/aprobacionService'
 import './SolicitudesAdmin.css'
 
@@ -40,14 +39,7 @@ function SolicitudesAdmin() {
   async function cargarSolicitudes() {
 
     try {
-      const resultado = await getDocs(
-        collection(db, 'solicitudes_emprendedores')
-      )
-
-      const datos = resultado.docs.map((documento) => ({
-        ...documento.data(),
-        id: documento.id,
-      }))
+      const datos = await listarSolicitudes()
 
       datos.sort((a, b) => {
         const fechaA = a.fechaSolicitud?.toMillis?.() || 0
