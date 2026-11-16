@@ -1,16 +1,5 @@
-
-import {
-  doc,
-  getDoc,
-  setDoc,
-} from 'firebase/firestore'
-
-import {
-  reload,
-  getIdTokenResult,
-} from 'firebase/auth'
-
-import { db } from '../../firebase/config'
+import { reload, getIdTokenResult } from 'firebase/auth'
+import { obtenerUsuario, crearCompradorSiNoExiste, obtenerEmprendedor } from '../../repositories/auth/usuarioRepository'
 
 /**
  * Consulta el perfil de un usuario en Firestore.
@@ -20,17 +9,7 @@ export async function obtenerPerfilUsuario(uid) {
     throw new Error('No se recibió el identificador del usuario.')
   }
 
-  const referencia = doc(db, 'usuarios', uid)
-  const resultado = await getDoc(referencia)
-
-  if (!resultado.exists()) {
-    return null
-  }
-
-  return {
-    ...resultado.data(),
-    id: resultado.id,
-  }
+  return obtenerUsuario(uid)
 }
 
 /**
@@ -58,10 +37,9 @@ export async function completarPerfilComprador(usuario) {
 
   const token = await getIdTokenResult(usuario)
 
-  if (!token.signInProvider ||
-      token.signInProvider !== 'password') {
+  if (!['password', 'google.com'].includes(token.signInProvider)) {
     throw new Error(
-      'Este proceso está disponible únicamente para cuentas registradas con correo y contraseña.'
+      'Este método de acceso no permite completar tu perfil.'
     )
   }
 
@@ -75,7 +53,7 @@ export async function completarPerfilComprador(usuario) {
   const nombre = String(usuario.displayName || '').trim()
   const email = String(usuario.email || '').trim()
 
-  if (!nombre || !email) {
+  if (!nombre || nombre.length > 150 || !email) {
     throw new Error(
       'Tu cuenta no tiene los datos necesarios para completar el perfil.'
     )
@@ -89,12 +67,10 @@ export async function completarPerfilComprador(usuario) {
     activo: true,
   }
 
-  const referencia = doc(db, 'usuarios', usuario.uid)
+  return crearCompradorSiNoExiste(usuario.uid, nuevoPerfil)
+}
 
-  await setDoc(referencia, nuevoPerfil)
-
-  return {
-    ...nuevoPerfil,
-    id: usuario.uid,
-  }
+export async function emprendedorActivo(uid) {
+  const perfil = await obtenerEmprendedor(uid)
+  return perfil?.activo === true
 }

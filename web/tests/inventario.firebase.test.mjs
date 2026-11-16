@@ -16,7 +16,7 @@ const vender = (extra = {}, uid = 'duena') => registrarVentaTransaccion(cliente(
 const leer = async path => { let dato; await env.withSecurityRulesDisabled(async ctx => { dato = (await getDoc(doc(ctx.firestore(),path))).data() }); return dato }
 const listar = async path => { let datos; await env.withSecurityRulesDisabled(async ctx => { datos = (await getDocs(collection(ctx.firestore(),path))).docs.map(d=>d.data()) }); return datos }
 
-before(async () => { env = await initializeTestEnvironment({projectId:'demo-bora-inventario',firestore:{rules:readFileSync(new URL('../../firestore.rules',import.meta.url),'utf8')}}) })
+before(async () => { env = await initializeTestEnvironment({projectId:'demo-bora-inventario',firestore:{rules:readFileSync(process.env.BORA_RULES_FILE || new URL('../../firestore.rules',import.meta.url),'utf8')}}) })
 after(async () => {
   if (process.env.BORA_RULE_COVERAGE) {
     const respuesta = await fetch('http://' + process.env.FIRESTORE_EMULATOR_HOST + '/emulator/v1/projects/demo-bora-inventario:ruleCoverage')
@@ -147,10 +147,10 @@ test('reglas impiden stock negativo y reutilizar o borrar identidades de variant
   await assertFails(updateDoc(doc(db,'productos/p'),{Stock:-1,Revision:2,ActualizadoEn:serverTimestamp()}))
   await assertFails(updateDoc(doc(db,'productos/p'),{Variantes:[p.Variantes[1]],Stock:1,Revision:2,ActualizadoEn:serverTimestamp()}))
 })
-test('diez variantes cumplen límites de reglas y se vende la última correctamente', async () => {
-  const diez=Array.from({length:10},(_,i)=>({id:'v'+i,name:'Variante '+i,price:1000+i,stock:2}))
-  await crear({...base,Variantes:diez}); await vender({varianteId:'v9'})
-  assert.equal((await leer('productos/p')).Stock,19)
+test('cinco variantes cumplen límites de reglas y se vende la última correctamente', async () => {
+  const cinco=Array.from({length:5},(_,i)=>({id:'v'+i,name:'Variante '+i,price:1000+i,stock:2}))
+  await crear({...base,Variantes:cinco}); await vender({varianteId:'v4'})
+  assert.equal((await leer('productos/p')).Stock,9)
 })
 test('pieza única vendida no vuelve a publicarse por edición', async () => {
   await crear({...base,PiezaUnica:true}); await vender()
@@ -159,12 +159,24 @@ test('pieza única vendida no vuelve a publicarse por edición', async () => {
   await assertFails(updateDoc(doc(cliente(),'productos/p'),{Vendido:false,Disponible:true,Revision:4,ActualizadoEn:serverTimestamp()}))
 })
 
-test('diez variantes por escritura directa también deben validar el esquema completo', async () => {
-  const diez=Array.from({length:10},(_,i)=>({id:'v'+i,name:'Variante '+i,price:1000+i,stock:2}))
-  const p=prepararProducto({...base,Variantes:diez})
+test('cinco variantes por escritura directa también deben validar el esquema completo', async () => {
+  const cinco=Array.from({length:5},(_,i)=>({id:'v'+i,name:'Variante '+i,price:1000+i,stock:2}))
+  const p=prepararProducto({...base,Variantes:cinco})
   await assertSucceeds(setDoc(doc(cliente(),'productos/p'),{...p,ID_Producto:'p',ID_Tienda:'t',ActualizadoEn:serverTimestamp()}))
-  await vender({varianteId:'v9'})
-  assert.equal((await leer('productos/p')).Stock,19)
+  await vender({varianteId:'v4'})
+  assert.equal((await leer('productos/p')).Stock,9)
+})
+
+test('cinco variantes: rechaza índice de venta seis y precio manipulado antes de vender la última', async () => {
+  const cinco=Array.from({length:5},(_,i)=>({id:'v'+i,name:'Variante '+i,price:1000+i,stock:2}))
+  await crear({...base,Variantes:cinco})
+  await assertFails(manipulada({varianteId:'v4',venta:{indiceVariante:5}}))
+  await assertFails(manipulada({varianteId:'v4',venta:{precioUnitario:1,total:1}}))
+  assert.equal((await leer('productos/p')).Stock,10)
+  await vender({varianteId:'v4'})
+  const producto=await leer('productos/p')
+  assert.deepEqual(producto.Variantes.map(v=>v.stock),[2,2,2,2,1])
+  assert.equal((await leer('ventas/duena_op1')).precioUnitario,1004)
 })
 
 // Intentos que no utilizan las validaciones del formulario ni del modelo JS.
@@ -230,11 +242,11 @@ test('variantes válidas admiten los límites exactos de texto y valores numéri
   p.Variantes[0].imageUrl='http://'+'a'.repeat(1993)
   await assertSucceeds(escribirCrudo(p))
 })
-test('el total de stock, IDs únicos y límite de diez variantes se verifican en reglas', async () => {
+test('el total de stock, IDs únicos y límite de cinco variantes se verifican en reglas', async () => {
   let p=documentoCrudo();p.Stock=99;await assertFails(escribirCrudo(p))
   p=documentoCrudo();p.Variantes.push({...p.Variantes[0],name:'Duplicada'});p.Stock=6;await assertFails(escribirCrudo(p))
   p=documentoCrudo();p.ManejaStock=false;await assertFails(escribirCrudo(p))
-  p=documentoCrudo();p.Variantes=Array.from({length:11},(_,i)=>({...p.Variantes[0],id:'v'+i}));p.Stock=33;await assertFails(escribirCrudo(p))
+  p=documentoCrudo();p.Variantes=Array.from({length:6},(_,i)=>({...p.Variantes[0],id:'v'+i}));p.Stock=18;await assertFails(escribirCrudo(p))
 })
 
 test('el SDK rechaza arrays anidados antes de enviar datos a Firestore', async () => {

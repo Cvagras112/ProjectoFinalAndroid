@@ -12,6 +12,7 @@ import { auth } from '../../firebase/config'
 import {
   obtenerPerfilUsuario,
   completarPerfilComprador,
+  emprendedorActivo,
 } from '../../services/auth/authService'
 
 import './Login.css'
@@ -32,15 +33,8 @@ function Login() {
     try {
       let datos = await obtenerPerfilUsuario(usuario.uid)
 
-      // Si no tiene perfil, solo el registro por correo
-      // puede completar un perfil de comprador.
+      // El registro público por correo o Google solo crea compradores.
       if (!datos) {
-        if (ingresoGoogle) {
-          throw new Error(
-            'Tu cuenta de Google no tiene un perfil autorizado en BORA. Contacta al administrador.'
-          )
-        }
-
         if (!usuario.emailVerified) {
           throw new Error(
             'Debes verificar tu correo electrónico antes de iniciar sesión.'
@@ -104,17 +98,15 @@ function Login() {
           )
         }
 
+        if (!await emprendedorActivo(usuario.uid)) {
+          throw new Error('Tu perfil de emprendimiento no permite el acceso. Contacta al administrador.')
+        }
+
         navigate('/panel-emprendedora', { replace: true })
         return
       }
-      // Compradores: acceso mediante correo y contraseña.
+      // Compradores: acceso mediante correo y contraseña o Google.
       if (rol === 'comprador') {
-        if (ingresoGoogle) {
-          throw new Error(
-            'Los compradores deben iniciar sesión con correo y contraseña.'
-          )
-        }
-
         if (!usuario.emailVerified) {
           throw new Error(
             'Debes verificar tu correo electrónico antes de continuar.'
@@ -161,6 +153,10 @@ function Login() {
       err.code === 'auth/user-not-found'
     ) {
       setError('Correo o contraseña incorrectos.')
+    } else if (err.code === 'auth/user-disabled') {
+      setError('No fue posible acceder a tu cuenta. Contacta al administrador.')
+    } else if (err.code === 'auth/network-request-failed') {
+      setError('No pudimos conectarnos. Revisa tu conexión a Internet.')
     } else if (err.code === 'auth/invalid-email') {
       setError('Ingresa un correo electrónico válido.')
     } else if (err.code === 'auth/too-many-requests') {
@@ -175,7 +171,8 @@ function Login() {
       setError('No tienes permisos para consultar tu perfil.')
     } else {
       setError(
-        err.message || 'No fue posible iniciar sesión.'
+        err.code ? 'No fue posible iniciar sesión. Inténtalo nuevamente.' :
+          err.message || 'No fue posible iniciar sesión.'
       )
     }
   }

@@ -65,20 +65,16 @@ const formularioInicial = {
 }
 
 function VistaPreviaImagen({ url, alt, tipo }) {
-  const [fallo, setFallo] = useState(false)
+  const [urlFallida, setUrlFallida] = useState(null)
 
-  useEffect(() => {
-    setFallo(false)
-  }, [url])
-
-  if (!url || fallo) return null
+  if (!url || url === urlFallida) return null
 
   return (
     <div style={{ marginTop: 12 }}>
       <img
         src={url}
         alt={alt}
-        onError={() => setFallo(true)}
+        onError={() => setUrlFallida(url)}
         style={{
           display: 'block',
           width: tipo === 'portada' ? '100%' : 140,

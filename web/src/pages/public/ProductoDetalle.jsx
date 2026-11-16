@@ -9,6 +9,7 @@ import {
   IMAGEN_PRODUCTO_PREDETERMINADA,
 } from '../../services/productos/productoService'
 
+import ContactosPublicos from '../../components/ContactosPublicos'
 import BotonFavorito from '../../components/BotonFavorito'
 import './ProductoDetalle.css'
 
@@ -18,20 +19,6 @@ function formatoPrecio(precio) {
     currency: 'CLP',
     maximumFractionDigits: 0,
   }).format(precio)
-}
-
-function normalizarWhatsApp(numero) {
-  const digitos = String(numero || '').replace(/\D/g, '')
-
-  if (/^9\d{8}$/.test(digitos)) {
-    return `56${digitos}`
-  }
-
-  if (/^569\d{8}$/.test(digitos)) {
-    return digitos
-  }
-
-  return ''
 }
 
 export default function ProductoDetalle() {
@@ -134,27 +121,22 @@ export default function ProductoDetalle() {
     )
   }
 
-  const variante = producto.variantes.find(v => v.id === varianteId && v.active) || producto.variantes.find(v => v.active)
+  const variante = producto.variantes.find(v => v.id === varianteId && v.active)
+  const nombreOpcion = variante?.name || 'Original'
   const precioSeleccionado = variante?.price ?? producto.precio
   const imagenSeleccionada = variante?.imageUrl || producto.imagen
-  const numeroWhatsApp = normalizarWhatsApp(producto.whatsapp)
-  const correo = String(producto.emailContacto || '').trim()
-
+  const opciones = [
+    { id: '', name: 'Original', price: producto.precio, imageUrl: producto.imagen, stock: producto.stockOriginal },
+    ...producto.variantes.filter(v => v.active),
+  ]
+  const opcionSeleccionada = variante || opciones[0]
   const mensaje =
     `¡Hola! Vi el producto "${producto.nombre}" ` +
     `en BORA, publicado por "${producto.tienda}", ` +
-    `con un precio de ${formatoPrecio(precioSeleccionado)}. ` +
+    `opción "${nombreOpcion}", con un precio de ${formatoPrecio(precioSeleccionado)}. ` +
     'Me gustaría obtener más información.'
 
   const asunto = `Consulta por ${producto.nombre} - BORA`
-
-  const enlaceWhatsApp = numeroWhatsApp
-    ? `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`
-    : ''
-
-  const enlaceCorreo = correo
-    ? `mailto:${correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`
-    : ''
 
   return (
     <main className="bora-producto-pagina">
@@ -181,7 +163,7 @@ export default function ProductoDetalle() {
           <div className="bora-producto-foto">
             <img
               src={imagenSeleccionada}
-              alt={producto.nombre}
+              alt={`${producto.nombre} · ${nombreOpcion}`}
               onError={(evento) => {
                 evento.currentTarget.onerror = null
                 evento.currentTarget.src =
@@ -193,6 +175,31 @@ export default function ProductoDetalle() {
           <p className="bora-producto-foto-nota">
             Fotografía referencial del producto.
           </p>
+
+          <div className="bora-producto-opciones" role="group" aria-label="Elige el original o una variante">
+            {opciones.map(opcion => (
+              <button
+                key={opcion.id ? 'variante:' + opcion.id : 'original'}
+                type="button"
+                className="bora-producto-opcion"
+                aria-pressed={(variante?.id || '') === opcion.id}
+                onClick={() => setVarianteId(opcion.id)}
+              >
+                <img
+                  src={opcion.imageUrl || producto.imagen}
+                  alt=""
+                  loading="lazy"
+                  onError={evento => {
+                    evento.currentTarget.onerror = null
+                    evento.currentTarget.src = IMAGEN_PRODUCTO_PREDETERMINADA
+                  }}
+                />
+                <strong>{opcion.name}</strong>
+                <span>{formatoPrecio(opcion.price)}</span>
+                <small>{disponibilidadProducto(producto, opcion)}</small>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* INFORMACIÓN */}
@@ -215,15 +222,37 @@ export default function ProductoDetalle() {
             {formatoPrecio(precioSeleccionado)}
           </strong>
 
-          {producto.variantes.length > 0 && (
-            <label className="bora-producto-variantes">Elige una variante
-              <select value={variante?.id || ''} onChange={e => setVarianteId(e.target.value)}>
-                {producto.variantes.filter(v => v.active).map(v => (
-                  <option key={v.id} value={v.id}>{v.name} · {formatoPrecio(v.price)} · {disponibilidadProducto(producto, v)}</option>
-                ))}
-              </select>
-            </label>
-          )}
+          <p aria-live="polite">Opción seleccionada: {nombreOpcion} · {formatoPrecio(precioSeleccionado)} · {disponibilidadProducto(producto, opcionSeleccionada)}</p>
+          {/* DESCRIPCIÓN */}
+          <div className="bora-producto-descripcion">
+            <h2>📝 Descripción del producto</h2>
+            <p>
+              {producto.descripcion ||
+                'Este producto todavía no tiene una descripción.'}
+            </p>
+          </div>
+
+          {/* DISPONIBILIDAD */}
+          <div className="bora-producto-descripcion">
+            <h2>📦 Disponibilidad</h2>
+
+            <p>
+              {disponibilidadProducto(producto, opcionSeleccionada)}
+            </p>
+          </div>
+
+          {/* CONTACTO */}
+          <div className="bora-producto-acciones">
+
+            <ContactosPublicos
+              whatsapp={producto.whatsapp}
+              correo={producto.emailContacto}
+              asunto={asunto}
+              mensajeWhatsApp={mensaje}
+            />
+
+          </div>
+
           {/* TIENDA */}
           <div className="bora-producto-vendedor">
             <span className="bora-producto-vendedor-icono">
@@ -250,67 +279,6 @@ export default function ProductoDetalle() {
                 <p>Emprendimiento de nuestra comunidad</p>
               )}
             </div>
-          </div>
-
-          {/* DESCRIPCIÓN */}
-          <div className="bora-producto-descripcion">
-            <h2>📝 Descripción del producto</h2>
-            <p>
-              {producto.descripcion ||
-                'Este producto todavía no tiene una descripción.'}
-            </p>
-          </div>
-
-          {/* DISPONIBILIDAD */}
-          <div className="bora-producto-descripcion">
-            <h2>📦 Disponibilidad</h2>
-
-            <p>
-              {disponibilidadProducto(producto, variante)}
-            </p>
-          </div>
-
-          {/* CONTACTO */}
-          <div className="bora-producto-acciones">
-
-            {enlaceWhatsApp && (
-              <a
-                href={enlaceWhatsApp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bora-producto-contactar"
-              >
-                💬 Consultar por WhatsApp
-              </a>
-            )}
-
-            {enlaceCorreo && (
-              <a
-                href={enlaceCorreo}
-                className="bora-producto-contactar bora-producto-contactar-correo"
-              >
-                ✉️ Consultar por correo
-              </a>
-            )}
-
-            {!enlaceWhatsApp && !enlaceCorreo && (
-              <>
-                <button
-                  type="button"
-                  className="bora-producto-contactar"
-                  disabled
-                  title="La tienda no tiene datos de contacto"
-                >
-                  💬 Contactar emprendimiento
-                </button>
-
-                <p>
-                  Este emprendimiento todavía no tiene
-                  información de contacto disponible.
-                </p>
-              </>
-            )}
-
           </div>
 
         </div>

@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Navbar from './components/Navbar'
+import RutaCuentaActiva from './components/auth/RutaCuentaActiva'
 import RutaAdmin from './components/auth/RutaAdmin'
 import RutaEmprendedor from './components/auth/RutaEmprendedor'
 
@@ -22,6 +23,7 @@ import MiPerfil from './pages/perfil/MiPerfil'
 import PanelEmprendedor from './pages/emprendedor/PanelEmprendedor'
 import EditarTienda from './pages/emprendedor/EditarTienda'
 import MisFavoritos from './pages/perfil/MisFavoritos'
+import TiendasSeguidas from './pages/perfil/TiendasSeguidas'
 
 // Panel administrativo desarrollado por David
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -72,8 +74,10 @@ function App() {
         />
 
         {/* PERFIL */}
-        <Route path="/perfil" element={<MiPerfil />} />
+        <Route path="/perfil" element={<RutaCuentaActiva><MiPerfil /></RutaCuentaActiva>} />
         <Route path="/mis-favoritos" element={<MisFavoritos />} />
+
+        <Route path="/tiendas-seguidas" element={<TiendasSeguidas />} />
 
         {/* PANEL ADMINISTRATIVO PROTEGIDO */}
         <Route

@@ -1,113 +1,28 @@
-
-import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { onAuthStateChanged } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from '../../firebase/config'
-import { obtenerProductos } from '../../services/productos/productoService'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { listaFavoritos, obtenerDetallesFavoritos } from '../../services/productos/favoritosService'
+import { useDetallesLista } from '../../hooks/useListaPersonal'
+import AccesoListaPersonal from '../../components/perfil/AccesoListaPersonal'
+import ImagenPublica from '../../components/ImagenPublica'
+import '../../components/perfil/ListasPersonales.css'
 import './MisFavoritos.css'
 
-const CLAVE_FAVORITOS = 'bora-favoritos'
-
-function leerFavoritos() {
-  try {
-    const datos = JSON.parse(
-      localStorage.getItem(CLAVE_FAVORITOS) || '[]'
-    )
-    return Array.isArray(datos) ? datos.map(String) : []
-  } catch {
-    return []
-  }
-}
-
 export default function MisFavoritos() {
-  const navigate = useNavigate()
-  const [productos, setProductos] = useState([])
-  const [favoritos, setFavoritos] = useState(leerFavoritos)
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
+  const lista = useDetallesLista(listaFavoritos, obtenerDetallesFavoritos)
+  const [fallo, setFallo] = useState(null)
+  const { detalles: productosFavoritos, cargando } = lista
+  const error = lista.error || (fallo?.sesion === lista.sesion ? fallo.mensaje : '')
 
-  const sincronizar = useCallback(() => {
-    setFavoritos(leerFavoritos())
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('storage', sincronizar)
-    window.addEventListener('bora:favoritos', sincronizar)
-
-    return () => {
-      window.removeEventListener('storage', sincronizar)
-      window.removeEventListener('bora:favoritos', sincronizar)
+  async function quitarFavorito(id) {
+    setFallo(null)
+    try {
+      await listaFavoritos.quitar(id)
+    } catch {
+      if (listaFavoritos.leerEstado().sesion === lista.sesion) setFallo({ sesion: lista.sesion, mensaje: 'No pudimos quitar el favorito. Inténtalo nuevamente.' })
     }
-  }, [sincronizar])
-
-  useEffect(() => {
-    let cancelar = false
-
-    const desuscribir = onAuthStateChanged(auth, async (usuario) => {
-      if (!usuario) {
-        navigate('/login', { replace: true })
-        return
-      }
-
-      setCargando(true)
-      setError('')
-
-      try {
-        const perfilRef = doc(db, 'usuarios', usuario.uid)
-        const perfilDoc = await getDoc(perfilRef)
-
-        if (!perfilDoc.exists()) {
-          throw new Error('No encontramos tu perfil.')
-        }
-
-        const rol = String(
-          perfilDoc.data().rol || perfilDoc.data().Rol || ''
-        ).trim().toLowerCase()
-
-        if (rol !== 'comprador') {
-          navigate('/', { replace: true })
-          return
-        }
-
-        const resultado = await obtenerProductos()
-
-        if (!cancelar) {
-          setProductos(resultado)
-          setFavoritos(leerFavoritos())
-        }
-      } catch (err) {
-        if (!cancelar) {
-          setError(err.message || 'No pudimos cargar tus favoritos.')
-        }
-      } finally {
-        if (!cancelar) setCargando(false)
-      }
-    })
-
-    return () => {
-      cancelar = true
-      desuscribir()
-    }
-  }, [navigate])
-
-  function quitarFavorito(id) {
-    const actualizados = leerFavoritos().filter(
-      (favorito) => favorito !== String(id)
-    )
-
-    localStorage.setItem(
-      CLAVE_FAVORITOS,
-      JSON.stringify(actualizados)
-    )
-
-    setFavoritos(actualizados)
-    window.dispatchEvent(new Event('bora:favoritos'))
   }
 
-  const productosFavoritos = productos.filter((producto) =>
-    favoritos.includes(String(producto.id))
-  )
+  if (['sin-sesion', 'sin-permiso'].includes(lista.estado)) return <AccesoListaPersonal estado={lista.estado} />
 
   if (cargando) {
     return (
@@ -146,7 +61,7 @@ export default function MisFavoritos() {
 
         {error && (
           <div className="bora-favoritos-error" role="alert">
-            {error}
+            {error}{' '}<button type="button" onClick={() => { setFallo(null); lista.reintentar() }}>Reintentar</button>
           </div>
         )}
 
@@ -168,56 +83,54 @@ export default function MisFavoritos() {
           <section className="bora-favoritos-grid">
             {productosFavoritos.map((producto) => (
               <article
-                className="bora-favorito-card"
+                className={`bora-favorito-card ${producto.estado !== 'publicado' ? 'bora-favorito-card--no-disponible' : ''}`}
                 key={producto.id}
               >
-                <Link
-                  to={`/productos/${producto.id}`}
-                  className="bora-favorito-imagen"
-                >
-                  <img
+                <div className="bora-favorito-imagen">
+                  {producto.estado === 'publicado' ? <Link to={`/productos/${encodeURIComponent(producto.id)}`}><ImagenPublica src={producto.imagen} alt={producto.nombre} loading="lazy" /></Link> : producto.estado === 'eliminado' ? <span className="bora-lista-sin-imagen" aria-hidden="true">♡</span> : <ImagenPublica
                     src={producto.imagen}
                     alt={producto.nombre}
                     loading="lazy"
-                  />
-                </Link>
+                  />}
+                </div>
 
                 <button
                   type="button"
                   className="bora-favorito-quitar"
                   onClick={() => quitarFavorito(producto.id)}
+                  disabled={lista.pendientes.includes(producto.id)}
                   aria-label={`Quitar ${producto.nombre} de favoritos`}
                   title="Quitar de favoritos"
                 >
-                  ♥
+                  {lista.pendientes.includes(producto.id) ? '…' : '♥'}
                 </button>
 
                 <div className="bora-favorito-info">
                   <span>{producto.categoria}</span>
 
-                  <Link
-                    to={`/productos/${producto.id}`}
+                  {producto.estado === 'publicado' ? <Link
+                    to={`/productos/${encodeURIComponent(producto.id)}`}
                     className="bora-favorito-nombre"
                   >
                     {producto.nombre}
-                  </Link>
+                  </Link> : <h2 className="bora-favorito-nombre">{producto.nombre}</h2>}
 
                   <small>{producto.tienda}</small>
 
-                  <strong>
+                  {producto.estado !== 'eliminado' && <strong>
                     {Number(producto.precio).toLocaleString('es-CL', {
                       style: 'currency',
                       currency: 'CLP',
                       maximumFractionDigits: 0,
                     })}
-                  </strong>
+                  </strong>}
 
-                  <Link
-                    to={`/productos/${producto.id}`}
+                  {producto.estado === 'publicado' ? <Link
+                    to={`/productos/${encodeURIComponent(producto.id)}`}
                     className="bora-favorito-ver"
                   >
                     Ver producto →
-                  </Link>
+                  </Link> : <p className="bora-lista-no-disponible">{producto.estado === 'eliminado' ? 'Este producto fue eliminado. Puedes quitarlo de tu lista.' : 'Producto no disponible. Puedes conservarlo o quitarlo de tu lista.'}</p>}
                 </div>
               </article>
             ))}

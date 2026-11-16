@@ -20,6 +20,10 @@ const texto = (value, max, obligatorio = false) => {
   }
   return value.trim();
 };
+// El total antiguo con variantes nunca representa unidades del original.
+export const stockOriginalProducto = (p) => p.StockOriginal ??
+  ((p.Variantes || []).length ? 0 : p.Stock ?? p.stock ?? 0);
+
 const prepararProducto = (datos, anterior = {}) => {
   const p = {...anterior};
   for (const [campo, max, obligatorio] of [
@@ -38,7 +42,9 @@ const prepararProducto = (datos, anterior = {}) => {
     fail("Imagen inválida.");
   }
   p.Precio = entero(datos.Precio ?? anterior.Precio, 1, 999999999);
-  p.Stock = entero(datos.Stock ?? anterior.Stock ?? 0, 0, 1000000);
+  p.StockOriginal = entero(datos.StockOriginal ?? stockOriginalProducto(
+      Object.keys(anterior).length ? anterior : datos,
+  ), 0, 1000000);
   for (const campo of [
     "Disponible",
     "OfrecerPedido",
@@ -58,8 +64,8 @@ const prepararProducto = (datos, anterior = {}) => {
     fail("Modalidad inválida.");
   }
   const variantes = datos.Variantes ?? anterior.Variantes ?? [];
-  if (!Array.isArray(variantes) || variantes.length > 10) {
-    fail("Máximo diez variantes.");
+  if (!Array.isArray(variantes) || variantes.length > 5) {
+    fail("Máximo cinco variantes en total, incluidas las desactivadas.");
   }
   const ids = new Set();
   p.Variantes = variantes.map((v) => {
@@ -91,12 +97,12 @@ const prepararProducto = (datos, anterior = {}) => {
   }
   if (p.Variantes.length) {
     p.ManejaStock = true;
-    p.Stock = p.Variantes.filter((v) => v.active)
-        .reduce((total, v) => total + v.stock, 0);
   }
-  if (p.Variantes.length > 10) {
+  p.Stock = entero(p.StockOriginal + p.Variantes.filter((v) => v.active)
+      .reduce((total, v) => total + v.stock, 0), 0, 1000000);
+  if (p.Variantes.length > 5) {
     fail(
-        "Máximo diez variantes; edita o desactiva las existentes.",
+        "Máximo cinco variantes, incluidas las desactivadas. No se pueden agregar más variantes.",
     );
   }
   p.Vendido = anterior.Vendido === true;
@@ -111,12 +117,15 @@ const prepararVenta = (producto, solicitud) => {
     fail("El producto no está disponible.");
   }
   const variantes = producto.Variantes || [];
+  if (variantes.length > 5) {
+    fail("El producto supera el máximo de cinco variantes. Revisa su configuración antes de registrar una venta.");
+  }
   const variante = variantes.length ?
     variantes.find(
         (v) => v.id === solicitud.varianteId && v.active !== false,
     ) :
     null;
-  if (variantes.length && !variante) {
+  if (solicitud.varianteId && !variante) {
     fail("Selecciona una variante disponible.");
   }
   if (!variantes.length && solicitud.varianteId) {
@@ -125,7 +134,8 @@ const prepararVenta = (producto, solicitud) => {
   if (producto.PiezaUnica && cantidad !== 1) {
     fail("Una pieza única se vende de a una.");
   }
-  const stock = entero(variante ? variante.stock : producto.Stock, 0, 1000000);
+  const original = entero(stockOriginalProducto(producto), 0, 1000000);
+  const stock = entero(variante ? variante.stock : original, 0, 1000000);
   // La modalidad a pedido no autoriza sobregiros de inventario.
   const manejaStock = variantes.length > 0 || producto.ManejaStock !== false;
   if (manejaStock && stock < cantidad) {
@@ -136,18 +146,17 @@ const prepararVenta = (producto, solicitud) => {
     1,
     999999999,
   );
-  const cambios = {Revision: (producto.Revision || 0) + 1};
+  const cambios = {Revision: (producto.Revision || 0) + 1, StockOriginal: original};
   if (variantes.length || producto.ManejaStock !== false) {
     if (variante) {
       cambios.Variantes = variantes.map((v) =>
         v.id === variante.id ? {...v, stock: v.stock - cantidad} : v,
       );
-    } else cambios.Stock = stock - cantidad;
+    } else cambios.StockOriginal = stock - cantidad;
   }
-  if (cambios.Variantes) {
-    cambios.Stock = cambios.Variantes.filter((v) => v.active !== false)
-        .reduce((total, v) => total + v.stock, 0);
-  }
+  cambios.Stock = entero(cambios.StockOriginal + (cambios.Variantes || variantes)
+      .filter((v) => v.active !== false)
+      .reduce((total, v) => total + v.stock, 0), 0, 1000000);
   if (producto.PiezaUnica) {
     Object.assign(cambios, {Vendido: true, Disponible: false});
   }

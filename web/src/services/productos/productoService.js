@@ -24,7 +24,7 @@ function adaptarProducto(documento, tiendas = {}) {
     ...normalizarProducto(datos, documento.id),
     imagen: datos.imagen?.trim() || datos.Imagen?.trim() || IMAGEN_PRODUCTO_PREDETERMINADA,
     tienda: tienda?.nombre || 'Emprendimiento BORA',
-    whatsapp: tienda?.whatsapp || tienda?.telefono || '',
+    whatsapp: tienda?.whatsapp || '',
     emailContacto: tienda?.emailContacto || tienda?.correo || tienda?.email || '',
     etiqueta: tienda?.nombre || 'Emprendimiento BORA',
   }
@@ -76,7 +76,10 @@ export async function obtenerProductosPorTienda(tiendaId) {
     throw new Error('No se recibió el identificador de la tienda.')
   }
 
-  const resultado = await getDocs(collection(db, 'productos'))
+  const [resultado, tiendas] = await Promise.all([
+    getDocs(collection(db, 'productos')),
+    obtenerTiendas(),
+  ])
 
   return resultado.docs
     .filter((documento) => {
@@ -87,7 +90,7 @@ export async function obtenerProductosPorTienda(tiendaId) {
         datos.idTienda === tiendaId
       )
     })
-    .map((documento) => adaptarProducto(documento))
+    .map((documento) => adaptarProducto(documento, tiendas))
 }
 
 
@@ -98,7 +101,7 @@ function validarProducto(datos) {
   const descripcion = String(datos.descripcion ?? '').trim()
   const imagen = String(datos.imagen ?? '').trim()
   const precio = Number(datos.precio)
-  const stock = Number(datos.stock)
+  const stock = Number(datos.stockOriginal ?? datos.stock)
 
   const ofrecerPedido = datos.ofrecerPedido === true
   const piezaUnica = datos.piezaUnica === true
@@ -138,7 +141,7 @@ function validarProducto(datos) {
     Categoria: categoria,
     Descripcion: descripcion,
     Precio: precio,
-    Stock: stock,
+    StockOriginal: stock,
     imagen,
     Disponible: datos.disponible !== false,
 

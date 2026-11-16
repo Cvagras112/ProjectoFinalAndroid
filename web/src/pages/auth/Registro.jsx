@@ -60,6 +60,11 @@ function Registro() {
       return
     }
 
+    if (nombre.length + apellido.length + 1 > 150) {
+      setError('Tu nombre completo debe tener como máximo 150 caracteres.')
+      return
+    }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
       setError('Ingresa un correo electrónico válido.')
       return
@@ -99,17 +104,18 @@ function Registro() {
 
       await sendEmailVerification(credencial.user)
 
+      await signOut(auth)
+
       setRegistroExitoso(true)
       setMensaje(
         '¡Cuenta creada! Revisa tu correo electrónico y verifica tu cuenta antes de iniciar sesión.'
       )
 
-      await signOut(auth)
     } catch (err) {
       console.error('Error al registrar usuario:', err.code || err.message)
 
       if (err.code === 'auth/email-already-in-use') {
-        setError('Este correo electrónico ya está registrado.')
+        setError('No pudimos registrar este correo. Intenta iniciar sesión o recuperar tu contraseña.')
       } else if (err.code === 'auth/invalid-email') {
         setError('El correo electrónico no es válido.')
       } else if (err.code === 'auth/weak-password') {
@@ -126,6 +132,13 @@ function Registro() {
         setError('No fue posible crear la cuenta. Inténtalo nuevamente.')
       }
     } finally {
+      if (cuentaCreada && auth.currentUser) {
+        try {
+          await signOut(auth)
+        } catch {
+          setError('No pudimos cerrar la sesión. Intenta cerrar sesión desde el menú de tu cuenta.')
+        }
+      }
       setCargando(false)
     }
   }

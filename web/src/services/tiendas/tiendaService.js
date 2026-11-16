@@ -1,6 +1,8 @@
 
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../../firebase/config'
+import { consultarTiendaPublica, listarTiendasPublicas } from '../../repositories/tiendas/tiendaPublicaRepository'
+import { normalizarTiendaPublica } from './tiendaPublicaModelo'
 
 export async function obtenerTiendaEmprendedor(uid) {
   if (!uid) {
@@ -152,6 +154,10 @@ export async function actualizarTiendaEmprendedor(uid, datos) {
 }
 
 export async function obtenerTiendaPublica(id) {
-  const resultado = await getDoc(doc(db, 'tiendas', id))
-  return resultado.exists() && resultado.data().activo === true ? { ...resultado.data(), id: resultado.id } : null
+  if (typeof id !== 'string' || !id.trim() || id.includes('/')) return null
+  return normalizarTiendaPublica(await consultarTiendaPublica(id))
+}
+
+export async function obtenerTiendasPublicas() {
+  return (await listarTiendasPublicas()).map(normalizarTiendaPublica).filter(Boolean)
 }

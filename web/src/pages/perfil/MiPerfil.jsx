@@ -1,18 +1,30 @@
 
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   onAuthStateChanged,
   EmailAuthProvider,
   reauthenticateWithCredential,
   updatePassword
 } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from '../../firebase/config'
+import { obtenerPerfilUsuario } from '../../services/auth/authService'
+import { auth } from '../../firebase/config'
 
 import './MiPerfil.css'
 
 const opciones = [
+  {
+    id: 'favoritos',
+    icono: '❤️',
+    titulo: 'Mis favoritos',
+    descripcion: 'Consulta tus productos favoritos.'
+  },
+  {
+    id: 'tiendas-seguidas',
+    icono: '🏪',
+    titulo: 'Tiendas seguidas',
+    descripcion: 'Encuentra los emprendimientos que sigues.'
+  },
   {
     id: 'informacion',
     icono: '👤',
@@ -94,6 +106,7 @@ function IconoOjo({ visible }) {
 }
 
 function MiPerfil() {
+  const navigate = useNavigate()
   const [usuario, setUsuario] = useState(null)
   const [datos, setDatos] = useState(null)
   const [cargando, setCargando] = useState(true)
@@ -126,13 +139,12 @@ function MiPerfil() {
       setCargando(true)
 
       try {
-        const referencia = doc(db, 'usuarios', usuarioFirebase.uid)
-        const resultado = await getDoc(referencia)
+        const perfil = await obtenerPerfilUsuario(usuarioFirebase.uid)
 
         if (actual !== solicitud) return
 
-        if (resultado.exists()) {
-          setDatos(resultado.data())
+        if (perfil) {
+          setDatos(perfil)
         } else {
           setError('No encontramos tu perfil registrado en BORA.')
         }
@@ -164,7 +176,7 @@ function MiPerfil() {
     ['administrador', 'emprendedora', 'emprendedor'].includes(rolNormalizado)
 
   const opcionesVisibles = [
-    ...opciones.slice(0, 2),
+    ...(datos?.activo === true && ['comprador', 'emprendedor', 'emprendedora'].includes(rolNormalizado) ? opciones.slice(0, 2) : []),
     ...(puedeVerColaboradores
       ? [{
           id: 'colaboradores',
@@ -209,6 +221,15 @@ function MiPerfil() {
   }
 
   const abrirSeccion = (id) => {
+    if (id === 'favoritos') {
+      navigate('/mis-favoritos')
+      return
+    }
+
+    if (id === 'tiendas-seguidas') {
+      navigate('/tiendas-seguidas')
+      return
+    }
     limpiarFormulario()
     setSeccion(id)
   }

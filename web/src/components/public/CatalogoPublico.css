@@ -1,0 +1,107 @@
+.bora-publico-catalogo {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+  color: #333936;
+}
+.bora-publico-catalogo :is(button, input, select, a):focus-visible {
+  outline: 3px solid #c8734e;
+  outline-offset: 3px;
+}
+.bora-publico-catalogo :is(button, input, select) { font: inherit; }
+.bora-publico-filtros {
+  min-width: 0;
+  border: 1px solid #e4e9df;
+  border-radius: 18px;
+  background: #fff;
+}
+.bora-publico-filtros-contenido { padding: 22px 18px; }
+.bora-publico-plegar { display: none; }
+.bora-publico-filtros-titulo { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.bora-publico-filtros-titulo h3 { margin: 0; font-size: 14px; color: #194c36; }
+.bora-publico-filtros-titulo button, .bora-publico-filtros-activos button {
+  min-height: 44px; border: 0; padding: 4px; background: transparent; color: #236b4b; font-size: 12px; font-weight: 600;
+}
+.bora-publico-filtro-grupo { min-width: 0; margin: 20px 0 0; padding: 20px 0 0; border: 0; border-top: 1px solid #edf0e9; }
+.bora-publico-filtro-grupo :is(h4, legend) { margin: 0 0 12px; padding: 0; color: #194c36; font-size: 13px; font-weight: 600; }
+fieldset.bora-publico-filtro-grupo { padding-top: 10px; }
+fieldset.bora-publico-filtro-grupo legend { padding-top: 20px; }
+.bora-publico-filtro-opcion {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 44px;
+  border: 0; border-radius: 8px; padding: 9px; background: transparent; color: #59695f; text-align: left;
+  font-size: 12px !important; overflow-wrap: anywhere;
+}
+.bora-publico-filtro-opcion small { flex-shrink: 0; color: #69736d; }
+.bora-publico-filtro-opcion:hover { background: #f5f7f2; }
+.bora-publico-filtro-opcion[aria-pressed="true"] { background: #eaf2e9; color: #194c36; font-weight: 600; box-shadow: inset 3px 0 #e99b38; }
+.bora-publico-radio { display: flex; align-items: center; gap: 10px; min-height: 44px; color: #59695f; font-size: 12px; cursor: pointer; }
+.bora-publico-radio input { width: 17px; height: 17px; margin: 0; accent-color: #236b4b; }
+.bora-publico-rango { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.bora-publico-rango label { min-width: 0; color: #59695f; font-size: 11px; }
+.bora-publico-rango input { width: 100%; min-width: 0; margin-top: 6px; min-height: 42px; border: 1px solid #dce5dc; border-radius: 8px; padding: 7px; font-size: 12px; }
+.bora-publico-error { margin: 10px 0 0; color: #9a4029; font-size: 12px; line-height: 1.6; }
+.bora-publico-apoyo { margin: 24px 0 0; padding-top: 18px; border-top: 1px solid #edf0e9; color: #69736d; font-size: 12px; line-height: 1.8; }
+.bora-publico-resultados { min-width: 0; }
+.bora-publico-buscador { display: block; color: #194c36; font-size: 12px; font-weight: 600; }
+.bora-publico-buscador input { display: block; width: 100%; height: 52px; margin-top: 7px; padding: 0 18px; border: 1px solid #dce5dc; border-radius: 12px; background: #fff; color: #333936; box-shadow: 0 3px 12px #194c3605; }
+.bora-publico-herramientas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 0; color: #69736d; font-size: 12px; }
+.bora-publico-herramientas p { margin: 0; }
+.bora-publico-herramientas strong { color: #194c36; }
+.bora-publico-herramientas label { display: flex; align-items: center; gap: 10px; }
+.bora-publico-herramientas select { min-height: 44px; min-width: 0; max-width: 100%; border: 1px solid #dce5dc; border-radius: 9px; padding: 0 10px; color: #194c36; background: #fff; font-size: 12px; }
+.bora-publico-filtros-activos { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding: 0 12px; border-radius: 8px; background: #eaf2e9; color: #194c36; font-size: 12px; }
+.bora-publico-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.bora-publico-tarjeta { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid #e4e9df; border-radius: 16px; background: #fff; box-shadow: 0 3px 12px #194c3605; transition: transform .2s, box-shadow .2s; }
+.bora-publico-tarjeta:hover { transform: translateY(-3px); box-shadow: 0 10px 24px #194c3612; }
+.bora-publico-foto { position: relative; aspect-ratio: 1.15; background: #f0f2eb; }
+.bora-publico-foto > a { display: block; width: 100%; height: 100%; overflow: hidden; }
+.bora-publico-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
+.bora-publico-tarjeta:hover .bora-publico-foto img { transform: scale(1.025); }
+.bora-publico-tipo { position: absolute; bottom: 12px; left: 12px; max-width: calc(100% - 24px); padding: 6px 10px; border-radius: 7px; background: #ffa323; color: #3c2b0a; font-size: 10px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; pointer-events: none; }
+.bora-publico-foto .bora-boton-favorito { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #ffffff99; border-radius: 50%; background: #fffffff0; color: #236b4b; font-size: 24px; box-shadow: 0 2px 8px #194c3610; }
+.bora-publico-foto .bora-boton-favorito.activo { color: #ba4e37; }
+.bora-publico-info { display: flex; flex-direction: column; align-items: start; flex: 1; min-width: 0; padding: 18px; overflow-wrap: anywhere; }
+.bora-publico-categoria { color: #68756b; font-size: 11px; }
+.bora-publico-info h3 { margin: 7px 0 5px; color: #194c36; font-size: 17px; line-height: 1.45; }
+.bora-publico-info h3 a:hover { text-decoration: underline; }
+.bora-publico-tienda { display: block; color: #236b4b; font-size: 11px; }
+a.bora-publico-tienda:hover { text-decoration: underline; }
+.bora-publico-descripcion { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; margin: 10px 0 0; color: #69736d; font-size: 12px; line-height: 1.65; }
+.bora-publico-opciones { display: block; margin-top: 10px; color: #236b4b; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+.bora-publico-pie { width: 100%; margin-top: auto; padding-top: 17px; }
+.bora-publico-precio { color: #194c36; font-size: 23px; font-weight: 600; }
+.bora-publico-estados { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 15px; }
+.bora-publico-estado { border-radius: 6px; padding: 5px 8px; background: #fff0df; color: #8c4b14; font-size: 10px; }
+.bora-publico-estado--disponible { background: #e9f3e9; color: #236b4b; }
+.bora-publico-estado--unica { background: #f1edf6; color: #6a4a8d; }
+.bora-publico-acciones { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 9px; padding-top: 13px; border-top: 1px solid #edf0e9; }
+.bora-publico-detalle { display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 12px; border: 1px solid #d4e2d7; border-radius: 9px; color: #236b4b; font-size: 11px; font-weight: 600; }
+.bora-publico-detalle:hover { background: #eaf2e9; }
+.bora-publico-acciones .bora-contactos-publicos { gap: 5px; }
+.bora-publico-vacio { padding: 60px 24px; border: 1px dashed #cdd9ca; border-radius: 16px; background: #ffffffb0; text-align: center; }
+.bora-publico-vacio > span { color: #c8734e; font-size: 35px; }
+.bora-publico-vacio h3 { margin: 12px 0; color: #194c36; font-size: 20px; }
+.bora-publico-vacio p { color: #69736d; font-size: 13px; line-height: 1.8; }
+.bora-publico-vacio button { min-height: 44px; border: 0; border-radius: 9px; padding: 10px 18px; background: #236b4b; color: #fff; font-size: 13px; }
+@media (max-width: 1150px) {
+  .bora-publico-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .bora-publico-catalogo { grid-template-columns: 1fr; gap: 20px; }
+  .bora-publico-plegar { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 50px; padding: 12px 18px; border: 0; border-radius: 18px; background: #fff; color: #194c36; font-size: 13px; font-weight: 600; }
+  .bora-publico-filtros-contenido { display: none; }
+  .bora-publico-filtros-contenido.abierto { display: block; }
+  .bora-publico-grid { gap: 16px; }
+}
+@media (max-width: 540px) {
+  .bora-publico-grid { grid-template-columns: 1fr; gap: 22px; }
+  .bora-publico-foto { aspect-ratio: 1.3; }
+  .bora-publico-herramientas { align-items: start; flex-direction: column; }
+  .bora-publico-herramientas label { justify-content: space-between; width: 100%; }
+  .bora-publico-info { padding: 19px; }
+  .bora-publico-tipo { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bora-publico-tarjeta, .bora-publico-foto img { transition: none; }
+}

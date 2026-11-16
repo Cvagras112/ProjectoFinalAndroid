@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react'
+import BotonFavorito from './BotonFavorito'
 import './ProductosDestacados.css'
 
 const productosDemo = [
@@ -58,17 +59,6 @@ export default function ProductosDestacados({
     const [categoriaActiva, setCategoriaActiva] = useState('Todos')
     const [productoSeleccionado, setProductoSeleccionado] = useState(null)
 
-    const [favoritos, setFavoritos] = useState(() => {
-        try {
-            const guardados = JSON.parse(
-                localStorage.getItem('bora-favoritos') || '[]'
-            )
-            return Array.isArray(guardados) ? guardados : []
-        } catch {
-            return []
-        }
-    })
-
     const carruselRef = useRef(null)
 
     const categorias = [
@@ -84,10 +74,6 @@ export default function ProductosDestacados({
             )
 
     useEffect(() => {
-        localStorage.setItem('bora-favoritos', JSON.stringify(favoritos))
-    }, [favoritos])
-
-    useEffect(() => {
         if (!productoSeleccionado) return
 
         const cerrarConEscape = (evento) => {
@@ -97,14 +83,6 @@ export default function ProductosDestacados({
         window.addEventListener('keydown', cerrarConEscape)
         return () => window.removeEventListener('keydown', cerrarConEscape)
     }, [productoSeleccionado])
-
-    function cambiarFavorito(id) {
-        setFavoritos((actuales) =>
-            actuales.includes(id)
-                ? actuales.filter((favorito) => favorito !== id)
-                : [...actuales, id]
-        )
-    }
 
     function cambiarCategoria(categoria) {
         setCategoriaActiva(categoria)
@@ -172,8 +150,6 @@ export default function ProductosDestacados({
 
             <div className="bora-productos-carrusel" ref={carruselRef}>
                 {productosFiltrados.map((producto) => {
-                    const favorito = favoritos.includes(producto.id)
-
                     return (
                         <article className="bora-producto" key={producto.id}>
                             <div className="bora-producto-foto">
@@ -187,20 +163,7 @@ export default function ProductosDestacados({
                                     ✦ Destacado
                                 </span>
 
-                                <button
-                                    type="button"
-                                    className={`bora-producto-favorito ${favorito ? 'activo' : ''
-                                        }`}
-                                    aria-label={
-                                        favorito
-                                            ? `Quitar ${producto.nombre} de favoritos`
-                                            : `Guardar ${producto.nombre} en favoritos`
-                                    }
-                                    aria-pressed={favorito}
-                                    onClick={() => cambiarFavorito(producto.id)}
-                                >
-                                    {favorito ? '♥' : '♡'}
-                                </button>
+                                <BotonFavorito productoId={producto.id} className="bora-producto-favorito" />
                             </div>
 
                             <div className="bora-producto-detalles">

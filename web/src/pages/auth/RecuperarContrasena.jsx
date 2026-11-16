@@ -51,7 +51,10 @@ function RecuperarContrasena() {
 
       setTipoMensaje('error')
 
-      if (error.code === 'auth/too-many-requests') {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/user-disabled') {
+        setTipoMensaje('informacion')
+        setMensaje('Si existe una cuenta asociada a este correo, recibirás un enlace para restablecer tu contraseña. Revisa también la carpeta de spam.')
+      } else if (error.code === 'auth/too-many-requests') {
         setMensaje(
           'Se realizaron demasiados intentos. Espera unos minutos antes de intentarlo nuevamente.'
         )

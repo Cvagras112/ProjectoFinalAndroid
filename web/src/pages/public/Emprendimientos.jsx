@@ -1,13 +1,12 @@
 
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { collection, getDocs } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+import { obtenerTiendasPublicas } from '../../services/tiendas/tiendaService'
+import ImagenPublica from '../../components/ImagenPublica'
 import './Emprendimientos.css'
 
 // Imagen predeterminada para tiendas sin fotografía
-const IMAGEN_PREDETERMINADA =
-  'https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=900&auto=format&fit=crop&q=85'
+const IMAGEN_PREDETERMINADA = '/imagenes/Icono_BORA.png'
 
 function normalizarTexto(texto) {
   return String(texto ?? '')
@@ -31,14 +30,7 @@ export default function Emprendimientos() {
         setCargando(true)
         setError('')
 
-        const resultado = await getDocs(collection(db, 'tiendas'))
-
-        const tiendas = resultado.docs
-          .map((documento) => ({
-            id: documento.id,
-            ...documento.data(),
-          }))
-          .filter((tienda) => tienda.activo === true)
+        const tiendas = await obtenerTiendasPublicas()
 
         if (activo) {
           setEmprendimientos(tiendas)
@@ -166,7 +158,7 @@ export default function Emprendimientos() {
                 >
                   {/* IMAGEN */}
                   <div className="bora-emprendimiento-imagen">
-                    <img
+                    <ImagenPublica
                       src={
                         emprendimiento.imagen?.trim()
                           ? emprendimiento.imagen
@@ -174,24 +166,19 @@ export default function Emprendimientos() {
                       }
                       alt={emprendimiento.nombre}
                       loading="lazy"
-                      onError={(evento) => {
-                        evento.currentTarget.onerror = null
-                        evento.currentTarget.src =
-                          IMAGEN_PREDETERMINADA
-                      }}
                     />
 
                     <span className="bora-emprendimiento-etiqueta">
-                      ✨ Emprendimiento BORA
+                      ✨{' '}
+                      {emprendimiento.categoria &&
+                      emprendimiento.categoria !== 'Tipo de emprendimiento no informado'
+                        ? emprendimiento.categoria.toLocaleUpperCase('es-CL')
+                        : 'TIPO NO INFORMADO'}
                     </span>
                   </div>
 
                   {/* INFORMACIÓN */}
                   <div className="bora-emprendimiento-info">
-
-                    <span className="bora-emprendimiento-categoria">
-                      {emprendimiento.categoria || 'Artesanía'}
-                    </span>
 
                     <h3>{emprendimiento.nombre}</h3>
 

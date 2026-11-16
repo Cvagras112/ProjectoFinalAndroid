@@ -33,9 +33,9 @@ export default function VentasPanel({ tiendaId, productos, actualizarProductos }
   const variante = variantes.find(v => v.id === formulario.varianteId)
   const cantidad = Number(formulario.cantidad)
   const unitario = variante?.price ?? producto?.precioBase ?? producto?.precio ?? 0
-  const stock = variante?.stock ?? producto?.stock ?? 0
+  const stock = variante?.stock ?? producto?.stockOriginal ?? 0
   const requiereVariante = (producto?.variantes.length || 0) > 0
-  const valida = producto?.disponible && (!requiereVariante || variante) && Number.isSafeInteger(cantidad) && cantidad > 0 &&
+  const valida = producto?.disponible && (!formulario.varianteId || variante) && Number.isSafeInteger(cantidad) && cantidad > 0 &&
     (producto.manejaStock === false || cantidad <= stock) && (!producto.piezaUnica || cantidad === 1)
 
   async function confirmar(evento) {
@@ -82,9 +82,9 @@ export default function VentasPanel({ tiendaId, productos, actualizarProductos }
               {productos.filter(p => p.disponible).map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
             </select>
           </label>
-          {requiereVariante && <label>Variante
-            <select value={formulario.varianteId} required onChange={e => setFormulario({...formulario, varianteId:e.target.value})}>
-              <option value="">Selecciona una variante</option>
+          {requiereVariante && <label>Opción de venta
+            <select value={formulario.varianteId} onChange={e => setFormulario({...formulario, varianteId:e.target.value})}>
+              <option value="">Original · {producto.stockOriginal} unidades</option>
               {variantes.map(v => <option key={v.id} value={v.id}>{v.name} · {v.stock} unidades</option>)}
             </select>
           </label>}
@@ -95,7 +95,7 @@ export default function VentasPanel({ tiendaId, productos, actualizarProductos }
           <label>Total<input readOnly value={precio(Number.isSafeInteger(cantidad) && cantidad > 0 ? unitario * cantidad : 0)} /></label>
         </fieldset>
         {producto && <p>{producto.manejaStock === false ? 'Producto sin control de stock.' : 'Existencias disponibles: ' + stock}</p>}
-        {producto && !valida && !pendiente && !confirmada && <p role="status">Selecciona una variante y una cantidad con stock suficiente. Las piezas únicas se venden de a una.</p>}
+        {producto && !valida && !pendiente && !confirmada && <p role="status">Selecciona el original o una variante y una cantidad con stock suficiente. Las piezas únicas se venden de a una.</p>}
         {pendiente && !guardando && <p role="status">Hay una operación pendiente de confirmación. Reinténtala para comprobar su resultado sin descontar dos veces.</p>}
         {error && <p className="panel-emprendedor__alerta-error" role="alert">{error}</p>}
         {mensaje && <p className="panel-emprendedor__alerta-exito" role="status">{mensaje}</p>}

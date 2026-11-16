@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from '../firebase/config'
+import { obtenerPerfilUsuario } from '../services/auth/authService'
+import { auth } from '../firebase/config'
 import './Navbar.css'
 
 const enlaces = [
@@ -55,13 +55,12 @@ export default function Navbar() {
       }
 
       try {
-        const referencia = doc(db, 'usuarios', usuarioFirebase.uid)
-        const resultado = await getDoc(referencia)
+        const perfil = await obtenerPerfilUsuario(usuarioFirebase.uid)
 
         if (actual !== solicitud) return
 
-        if (resultado.exists()) {
-          setPerfil(resultado.data())
+        if (perfil) {
+          setPerfil(perfil)
         }
       } catch (error) {
         console.error('Error al consultar perfil:', error)
@@ -220,7 +219,7 @@ export default function Navbar() {
                     Mi perfil
                   </Link>
 
-                  {rol === 'comprador' && (
+                  {perfil?.activo === true && ['comprador', 'emprendedor', 'emprendedora'].includes(rol) && (
                   <Link
                     to="/mis-favoritos"
                     className="navbar-user-option"

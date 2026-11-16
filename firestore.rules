@@ -25,6 +25,15 @@ service cloud.firestore {
       return request.auth != null
         && tiendaId is string
         && exists(
+          /databases/$(database)/documents/usuarios/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/usuarios/$(request.auth.uid)
+        ).data.activo == true
+        && get(
+          /databases/$(database)/documents/usuarios/$(request.auth.uid)
+        ).data.rol == 'emprendedor'
+        && exists(
           /databases/$(database)/documents/emprendedores/$(request.auth.uid)
         )
         && exists(
@@ -151,6 +160,64 @@ service cloud.firestore {
     // EMPRENDEDORES
     // ========================================
 
+    // ========================================
+    // TIENDAS SEGUIDAS POR USUARIO
+    // ========================================
+
+    // Solo las listas personales usan este permiso; no concede acceso a otros módulos.
+    function titularListaActivo(usuarioId) {
+        return request.auth != null
+          && request.auth.uid == usuarioId
+          && exists(
+            /databases/$(database)/documents/usuarios/$(usuarioId)
+          )
+          && get(
+            /databases/$(database)/documents/usuarios/$(usuarioId)
+          ).data.activo == true
+          && get(
+            /databases/$(database)/documents/usuarios/$(usuarioId)
+          ).data.rol in ['comprador', 'emprendedor', 'emprendedora'];
+    }
+
+    match /usuarios/{usuarioId}/favoritos/{productoId} {
+      allow get, list, delete: if titularListaActivo(usuarioId);
+      allow create: if titularListaActivo(usuarioId)
+        && request.resource.data.keys().hasAll(['productoId', 'usuarioId', 'fecha'])
+        && request.resource.data.keys().hasOnly(['productoId', 'usuarioId', 'fecha'])
+        && request.resource.data.productoId == productoId
+        && request.resource.data.usuarioId == usuarioId
+        && request.resource.data.fecha == request.time
+        && exists(/databases/$(database)/documents/productos/$(productoId))
+        // Tampoco puede eliminar el destino dentro del mismo lote que crea el favorito.
+        && getAfter(/databases/$(database)/documents/productos/$(productoId)).data is map;
+      allow update: if false;
+    }
+
+    match /usuarios/{usuarioId}/tiendasSeguidas/{tiendaId} {
+
+      allow get, list: if titularListaActivo(usuarioId);
+
+      allow create: if titularListaActivo(usuarioId)
+        && exists(
+          /databases/$(database)/documents/tiendas/$(tiendaId)
+        )
+        && get(
+          /databases/$(database)/documents/tiendas/$(tiendaId)
+        ).data.activo == true
+        && request.resource.data.keys().hasAll([
+          'tiendaId', 'usuarioId', 'fecha'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'tiendaId', 'usuarioId', 'fecha'
+        ])
+        && request.resource.data.tiendaId == tiendaId
+        && request.resource.data.usuarioId == usuarioId
+        && request.resource.data.fecha == request.time;
+
+      allow delete: if titularListaActivo(usuarioId);
+
+      allow update: if false;
+    }
     match /emprendedores/{emprendedorId} {
 
       allow read: if request.auth != null
@@ -229,7 +296,8 @@ match /tiendas/{tiendaId} {
         'telefono',
         'whatsapp',
         'emailContacto',
-        'imagen'
+        'imagen',
+        'portada'
       ])
 
     // Nombre de la tienda.
@@ -264,7 +332,15 @@ match /tiendas/{tiendaId} {
 
     // Imagen de la tienda.
     && request.resource.data.imagen is string
-    && request.resource.data.imagen.size() <= 2000;
+    && request.resource.data.imagen.size() <= 2000
+
+    // Portada opcional: las tiendas anteriores pueden no tener este campo.
+    && request.resource.data.get('portada', '') is string
+    && request.resource.data.get('portada', '').size() <= 2000
+    && (
+      request.resource.data.get('portada', '') == ''
+      || request.resource.data.portada.matches('(?i)^https?://[^/[:space:]]+[^[:space:]]*$')
+    );
 
   // Crear tienda mediante alta administrativa atomica.
   allow create: if esAdministrador()
@@ -322,192 +398,50 @@ match /tiendas/{tiendaId} {
         && tienda.activo == true && tienda.ID_Dueno == request.auth.uid
         && usuario.rol == 'emprendedor' && usuario.activo == true;
     }
-    function varianteNuevaValida0() {
-      let v = request.resource.data.Variantes[0];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
+    // Una variante inválida hace negativo el subtotal de las cinco variantes.
+    // Ese subtotal debe validarse antes de agregar el stock original.
+    function stockVarianteValidada(v) {
+      return (v.size() == 7 && [
+        v.id.matches('^[^/]{1,64}$'),
+        v.name.matches('(?s)^.{1,150}$'),
+        v.price is int, v.stock is int,
+        // La expresión conjunta conserva ambos rangos; los tipos se exigen arriba.
+        [v.price, v.stock].join(',').matches('^[1-9][0-9]{0,8},([0-9]{1,5}|100000)$'),
+        v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$'),
+        v.imagePath.matches('(?s)^.{0,512}$'),
+        v.active is bool].hasOnly([true]))
+        ? (v.active ? v.stock : 0) : -500001;
     }
-    function varianteNuevaValida1() {
-      let v = request.resource.data.Variantes[1];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
+    function stockNuevasVariantes(v) {
+      let n = v.size();
+      return (n > 0 ? stockVarianteValidada(v[0]) : 0)
+          + (n > 1 ? stockVarianteValidada(v[1]) : 0)
+          + (n > 2 ? stockVarianteValidada(v[2]) : 0)
+          + (n > 3 ? stockVarianteValidada(v[3]) : 0)
+          + (n > 4 ? stockVarianteValidada(v[4]) : 0);
     }
-    function varianteNuevaValida2() {
-      let v = request.resource.data.Variantes[2];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
+    function variantesNuevasValidas(v) {
+      let n = v.size();
+      return v is list && n <= 5
+        && (n == 0 || [(n > 0 ? v[0].id : 0), (n > 1 ? v[1].id : 1), (n > 2 ? v[2].id : 2), (n > 3 ? v[3].id : 3), (n > 4 ? v[4].id : 4)].toSet().size() == 5);
     }
-    function varianteNuevaValida3() {
-      let v = request.resource.data.Variantes[3];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
+    function stockOriginalInventario(p) {
+      return p.get('StockOriginal', p.get('Variantes', []).size() == 0 ? p.Stock : 0);
     }
-    function varianteNuevaValida4() {
-      let v = request.resource.data.Variantes[4];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
-    }
-    function varianteNuevaValida5() {
-      let v = request.resource.data.Variantes[5];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
-    }
-    function varianteNuevaValida6() {
-      let v = request.resource.data.Variantes[6];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
-    }
-    function varianteNuevaValida7() {
-      let v = request.resource.data.Variantes[7];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
-    }
-    function varianteNuevaValida8() {
-      let v = request.resource.data.Variantes[8];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
-    }
-    function varianteNuevaValida9() {
-      let v = request.resource.data.Variantes[9];
-      // matches solo existe para string: otro tipo se rechaza. (?s) incluye saltos de línea.
-      // keys solo existe en mapas. Las siete propiedades se validan abajo.
-      return v.keys().size() == 7
-        && v.id.matches('^[^/]{1,64}$')
-        && v.name.matches('(?s)^.{1,150}$')
-        && v.price is int && string(v.price).matches('^[1-9][0-9]{0,8}$')
-        && v.stock is int && string(v.stock).matches('^([0-9]{1,5}|100000)$')
-        && v.imageUrl.matches('^$|^http://[^ ].{0,1000}.{0,992}$|^https://[^ ].{0,1000}.{0,991}$')
-        && v.imagePath.matches('(?s)^.{0,512}$')
-        && v.active is bool;
-    }
-    function stockNuevasVariantes() {
-      let v = request.resource.data.Variantes;
-      // Con tamaño diez, todos los índices existen: no se repite esa comprobación.
-      return v.size() == 10
-        ? (v[0].active ? v[0].stock : 0)
-          + (v[1].active ? v[1].stock : 0)
-          + (v[2].active ? v[2].stock : 0)
-          + (v[3].active ? v[3].stock : 0)
-          + (v[4].active ? v[4].stock : 0)
-          + (v[5].active ? v[5].stock : 0)
-          + (v[6].active ? v[6].stock : 0)
-          + (v[7].active ? v[7].stock : 0)
-          + (v[8].active ? v[8].stock : 0)
-          + (v[9].active ? v[9].stock : 0)
-        : (v.size() > 0 && v[0].active ? v[0].stock : 0)
-          + (v.size() > 1 && v[1].active ? v[1].stock : 0)
-          + (v.size() > 2 && v[2].active ? v[2].stock : 0)
-          + (v.size() > 3 && v[3].active ? v[3].stock : 0)
-          + (v.size() > 4 && v[4].active ? v[4].stock : 0)
-          + (v.size() > 5 && v[5].active ? v[5].stock : 0)
-          + (v.size() > 6 && v[6].active ? v[6].stock : 0)
-          + (v.size() > 7 && v[7].active ? v[7].stock : 0)
-          + (v.size() > 8 && v[8].active ? v[8].stock : 0)
-          + (v.size() > 9 && v[9].active ? v[9].stock : 0);
-    }
-    function variantesNuevasValidas() {
-      let v = request.resource.data.get('Variantes', []);
-      return v is list && v.size() <= 10
-        && (v.size() == 0 ? true : v.size() == 10
-          ? (varianteNuevaValida0()
-            && varianteNuevaValida1()
-            && varianteNuevaValida2()
-            && varianteNuevaValida3()
-            && varianteNuevaValida4()
-            && varianteNuevaValida5()
-            && varianteNuevaValida6()
-            && varianteNuevaValida7()
-            && varianteNuevaValida8()
-            && varianteNuevaValida9()
-            && [v[0].id, v[1].id, v[2].id, v[3].id, v[4].id, v[5].id, v[6].id, v[7].id, v[8].id, v[9].id].toSet().size() == 10)
-          : ((v.size() > 0 ? varianteNuevaValida0() : true)
-            && (v.size() > 1 ? varianteNuevaValida1() : true)
-            && (v.size() > 2 ? varianteNuevaValida2() : true)
-            && (v.size() > 3 ? varianteNuevaValida3() : true)
-            && (v.size() > 4 ? varianteNuevaValida4() : true)
-            && (v.size() > 5 ? varianteNuevaValida5() : true)
-            && (v.size() > 6 ? varianteNuevaValida6() : true)
-            && (v.size() > 7 ? varianteNuevaValida7() : true)
-            && (v.size() > 8 ? varianteNuevaValida8() : true)
-            && (v.size() > 9 ? varianteNuevaValida9() : true)
-            && [(v.size() > 0 ? v[0].id : 0), (v.size() > 1 ? v[1].id : 1), (v.size() > 2 ? v[2].id : 2), (v.size() > 3 ? v[3].id : 3), (v.size() > 4 ? v[4].id : 4), (v.size() > 5 ? v[5].id : 5), (v.size() > 6 ? v[6].id : 6), (v.size() > 7 ? v[7].id : 7), (v.size() > 8 ? v[8].id : 8), (v.size() > 9 ? v[9].id : 9)].toSet().size() == 10));
+    function stockInventarioValido(p, v) {
+      let subtotal = stockNuevasVariantes(v);
+      let original = p.get('StockOriginal', 0);
+      // Validar el subtotal antes de sumar: el original no compensa un centinela de error.
+      return subtotal >= 0
+        && original is int && original >= 0 && original <= 1000000
+        && (v.size() == 0 || p.ManejaStock == true)
+        && ('StockOriginal' in p ? p.Stock == original + subtotal
+          : v.size() == 0 || p.Stock == subtotal);
     }
     function productoInventarioValido(p, productoId) {
       let v = p.get('Variantes', []);
       // Cada campo obligatorio se accede y se valida abajo; ausencias se deniegan.
-      return p.keys().hasOnly(['ID_Producto','ID_Tienda','Nombre','Categoria','Precio','Stock','Disponible','imagen',
+      return p.keys().hasOnly(['ID_Producto','ID_Tienda','Nombre','Categoria','Precio','Stock','StockOriginal','Disponible','imagen',
           'Descripcion','OfrecerPedido','PiezaUnica','AccionAgotado','ManejaStock','Variantes','Vendido','Revision','UltimaVenta','ActualizadoEn'])
         && p.ID_Producto == productoId
         && p.ID_Tienda is string && p.ID_Tienda.size() > 0
@@ -524,8 +458,8 @@ match /tiendas/{tiendaId} {
         && p.Revision is int && p.Revision > 0
         && p.UltimaVenta.matches('(?s)^.{0,260}$')
         && p.ActualizadoEn == request.time
-        && variantesNuevasValidas()
-        && (v.size() == 0 || (p.ManejaStock == true && p.Stock == stockNuevasVariantes()));
+        && variantesNuevasValidas(v)
+        && stockInventarioValido(p, v);
     }
 
     function conservaIdentidades(a, b) {
@@ -541,7 +475,7 @@ match /tiendas/{tiendaId} {
         && v.tiendaId is string && v.tiendaId.size() > 0
         && v.operacionId is string && v.operacionId.matches('^[a-zA-Z0-9_-]{1,128}$')
         && ventaId == request.auth.uid + '_' + v.operacionId
-        && v.indiceVariante is int && v.indiceVariante >= -1 && v.indiceVariante < 10
+        && v.indiceVariante is int && v.indiceVariante >= -1 && v.indiceVariante < 5
         && v.productoNombre is string && v.productoNombre.size() <= 150
         && v.varianteId is string && v.varianteId.size() <= 64
         && v.varianteNombre is string && v.varianteNombre.size() <= 150
@@ -551,10 +485,22 @@ match /tiendas/{tiendaId} {
         && v.fecha == request.time;
     }
 
+    function stocksVariantesVentaValidos(v) {
+      let n = v.size();
+      // La resta compara valores numéricos, pero no exige un resultado de tipo int.
+      // Validar todos los stocks persistidos, incluidos los heredados e inactivos.
+      return v is list && n <= 5
+        && (n < 1 || (v[0].stock is int && v[0].stock >= 0 && v[0].stock <= 100000))
+        && (n < 2 || (v[1].stock is int && v[1].stock >= 0 && v[1].stock <= 100000))
+        && (n < 3 || (v[2].stock is int && v[2].stock >= 0 && v[2].stock <= 100000))
+        && (n < 4 || (v[3].stock is int && v[3].stock >= 0 && v[3].stock <= 100000))
+        && (n < 5 || (v[4].stock is int && v[4].stock >= 0 && v[4].stock <= 100000));
+    }
     function cambiosVariantesValidos(a, b, v) {
       let i = v.indiceVariante;
       // IDs únicos: al retirar el elemento vendido, el resto debe ser idéntico.
-      return a.size() == b.size() && (a.size() == 0 ? true
+      return a.size() <= 5 && a.size() == b.size()
+        && stocksVariantesVentaValidos(b) && (i == -1 ? a == b
         : i >= 0 && i < a.size() && a[i].active == true
           && a[i].stock >= v.cantidad && b[i].stock == a[i].stock - v.cantidad
           && b[i].diff(a[i]).affectedKeys().hasOnly(['stock'])
@@ -562,13 +508,25 @@ match /tiendas/{tiendaId} {
     }
     function lineaVentaValida(v, p) {
       let variantes = p.get('Variantes', []);
-      return variantes.size() == 0
+      return v.indiceVariante == -1
         ? v.indiceVariante == -1 && v.varianteId == '' && v.varianteNombre == ''
           && v.precioUnitario == p.Precio
         : v.indiceVariante >= 0 && v.indiceVariante < variantes.size()
           && v.varianteId == variantes[v.indiceVariante].id
           && v.varianteNombre == variantes[v.indiceVariante].name
           && v.precioUnitario == variantes[v.indiceVariante].price;
+    }
+    function stockVentaValido(p, despues, v) {
+      let original = stockOriginalInventario(p);
+      let controla = p.get('Variantes', []).size() > 0 || p.get('ManejaStock', true);
+      let descuentoOriginal = v.indiceVariante == -1 && controla ? v.cantidad : 0;
+      return (!('StockOriginal' in p) || 'StockOriginal' in despues)
+        && original is int && original >= descuentoOriginal
+        && stockOriginalInventario(despues) is int
+        && despues.Stock is int && despues.Stock >= 0 && despues.Stock <= 1000000
+        && stockOriginalInventario(despues) == original - descuentoOriginal
+        && (controla ? p.Stock >= v.cantidad && despues.Stock == p.Stock - v.cantidad
+          : despues.Stock == p.Stock);
     }
     function movimientoValido(v, p, despues, productoId, ventaId) {
       let a = p.get('Variantes', []);
@@ -579,11 +537,9 @@ match /tiendas/{tiendaId} {
         && despues.Revision == p.get('Revision',0) + 1
         && despues.UltimaVenta == ventaId && despues.UltimaVenta != p.get('UltimaVenta','')
         && despues.ActualizadoEn == request.time
-        && despues.diff(p).affectedKeys().hasOnly(['Stock','Variantes','Revision','UltimaVenta','ActualizadoEn','Vendido','Disponible'])
+        && despues.diff(p).affectedKeys().hasOnly(['Stock','StockOriginal','Variantes','Revision','UltimaVenta','ActualizadoEn','Vendido','Disponible'])
         && cambiosVariantesValidos(a, b, v)
-        && (a.size() > 0 ? p.Stock >= v.cantidad && despues.Stock == p.Stock - v.cantidad
-          : p.get('ManejaStock',true) ? p.Stock >= v.cantidad && despues.Stock == p.Stock - v.cantidad
-          : despues.Stock == p.Stock)
+        && stockVentaValido(p, despues, v)
         && (p.get('PiezaUnica',false)
           ? v.cantidad == 1 && despues.Vendido == true && despues.Disponible == false
           : despues.get('Vendido',false) == false && despues.Disponible == p.Disponible);
@@ -615,6 +571,7 @@ match /tiendas/{tiendaId} {
         && request.resource.data.Vendido == false;
 
       allow update: if propietariaInventario(resource.data.ID_Tienda)
+        && (!('StockOriginal' in resource.data) || 'StockOriginal' in request.resource.data)
         && (request.resource.data.get('UltimaVenta','') != resource.data.get('UltimaVenta','')
           ? productoConVentaValido(productoId)
           : productoInventarioValido(request.resource.data, productoId)
@@ -640,98 +597,6 @@ match /tiendas/{tiendaId} {
     match /ferias/{feriaId} {
       allow read: if true;
       allow write: if false;
-    }
-
-    // ========================================
-    // SOLICITUDES PARA SER EMPRENDEDOR/A
-    // ========================================
-
-    match /solicitudes_emprendedores/{usuarioId} {
-
-      // Consultar solicitud propia o administrar.
-      allow read: if request.auth != null
-        && (
-          request.auth.uid == usuarioId
-          || esAdministrador()
-        );
-
-      // Crear solicitud pendiente.
-      allow create: if request.auth != null
-        && request.auth.uid == usuarioId
-        && request.auth.token.email_verified == true
-
-        && request.resource.data.keys().hasAll([
-          'usuarioId',
-          'email',
-          'nombre',
-          'telefono',
-          'emprendimiento',
-          'categoria',
-          'descripcion',
-          'estado',
-          'fechaSolicitud'
-        ])
-
-        && request.resource.data.keys().hasOnly([
-          'usuarioId',
-          'email',
-          'nombre',
-          'telefono',
-          'emprendimiento',
-          'categoria',
-          'descripcion',
-          'estado',
-          'fechaSolicitud'
-        ])
-
-        && request.resource.data.usuarioId == usuarioId
-        && request.resource.data.email ==
-          request.auth.token.email
-
-        && request.resource.data.estado == 'pendiente'
-
-        && request.resource.data.nombre is string
-        && request.resource.data.nombre.size() > 0
-        && request.resource.data.nombre.size() <= 150
-
-        && request.resource.data.telefono is string
-        && request.resource.data.telefono.size() > 0
-        && request.resource.data.telefono.size() <= 30
-
-        && request.resource.data.emprendimiento is string
-        && request.resource.data.emprendimiento.size() > 0
-        && request.resource.data.emprendimiento.size() <= 150
-
-        && request.resource.data.categoria in [
-          'Artesanía',
-          'Textiles y tejidos',
-          'Gastronomía',
-          'Belleza y bienestar',
-          'Decoración',
-          'Otros'
-        ]
-
-        && request.resource.data.descripcion is string
-        && request.resource.data.descripcion.size() > 0
-        && request.resource.data.descripcion.size() <= 1000
-
-        && request.resource.data.fechaSolicitud == request.time;
-
-      // Aprobar o rechazar solicitudes pendientes.
-      allow update: if esAdministrador()
-
-        && resource.data.estado == 'pendiente'
-
-        && request.resource.data.diff(resource.data)
-          .affectedKeys()
-          .hasOnly(['estado'])
-
-        && request.resource.data.estado in [
-          'aprobada',
-          'rechazada'
-        ];
-
-      allow delete: if false;
     }
 
     // ========================================
